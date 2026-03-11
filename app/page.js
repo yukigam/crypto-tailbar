@@ -214,21 +214,62 @@ function diffColor(d){ return d==="Амархан"?C.accent:d==="Дунд"?C.gol
 
 // ── MAIN ─────────────────────────────────────────────
 export default function CryptoTailbar() {
-  const [screen, setScreen] = useState("home"); // home|post|category|glossary|about
+  const [screen, setScreen] = useState("home");
   const [activePost, setActivePost] = useState(null);
   const [activeCat, setActiveCat] = useState(null);
   const [searchQ, setSearchQ] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
   const [glossaryQ, setGlossaryQ] = useState("");
-  const [mobileMenu, setMobileMenu] = useState(false);
   const [newsletterEmail, setNewsletterEmail] = useState("");
   const [newsletterDone, setNewsletterDone] = useState(false);
+  const [allPosts, setAllPosts] = useState(POSTS);
 
-  function openPost(p){ setActivePost(p); setScreen("post"); }
-  function openCat(id){ setActiveCat(id); setScreen("category"); }
+  // Admin form state
+  const [adminPass, setAdminPass] = useState("");
+  const [adminAuth, setAdminAuth] = useState(false);
+  const [newPost, setNewPost] = useState({
+    title:"", subtitle:"", intro:"", body:"", author:"Б.Мөнхбаяр",
+    cat:"beginner", readTime:"5", difficulty:"Амархан", tags:""
+  });
+  const [adminSaved, setAdminSaved] = useState(false);
 
-  const catPosts = activeCat ? POSTS.filter(p=>p.cat===activeCat) : [];
-  const searchResults = searchQ.length>1 ? POSTS.filter(p=>p.title.toLowerCase().includes(searchQ.toLowerCase())||p.tags.some(t=>t.toLowerCase().includes(searchQ.toLowerCase()))) : [];
+  const [logoClicks, setLogoClicks] = useState(0);
+  function handleLogoClick(){
+    const next = logoClicks+1;
+    setLogoClicks(next);
+    if(next>=5){ setScreen("admin"); setLogoClicks(0); }
+    else setScreen("home");
+  }
+
+  function handleAddPost(){
+    if(!newPost.title||!newPost.intro||!newPost.body) return;
+    const p = {
+      id: allPosts.length+1,
+      slug: newPost.title.toLowerCase().replace(/\s+/g,"-").slice(0,40),
+      cat: newPost.cat,
+      catLabel: CATEGORIES.find(c=>c.id===newPost.cat)?.label||"",
+      title: newPost.title,
+      subtitle: newPost.subtitle,
+      author: newPost.author,
+      authorTitle: "Редактор",
+      date: new Date().toISOString().slice(0,10),
+      readTime: newPost.readTime,
+      views: "0",
+      difficulty: newPost.difficulty,
+      featured: false,
+      cover: "btc",
+      tags: newPost.tags.split(",").map(t=>t.trim()).filter(Boolean),
+      intro: newPost.intro,
+      sections:[{ title:"Дэлгэрэнгүй", body: newPost.body }]
+    };
+    setAllPosts(prev=>[p,...prev]);
+    setAdminSaved(true);
+    setNewPost({title:"",subtitle:"",intro:"",body:"",author:"Б.Мөнхбаяр",cat:"beginner",readTime:"5",difficulty:"Амархан",tags:""});
+    setTimeout(()=>setAdminSaved(false),3000);
+  }
+
+  const catPosts = activeCat ? allPosts.filter(p=>p.cat===activeCat) : [];
+  const searchResults = searchQ.length>1 ? allPosts.filter(p=>p.title.toLowerCase().includes(searchQ.toLowerCase())||p.tags.some(t=>t.toLowerCase().includes(searchQ.toLowerCase()))) : [];
   const filtered_glossary = glossaryQ ? GLOSSARY.filter(g=>g.term.toLowerCase().includes(glossaryQ.toLowerCase())||g.mn.includes(glossaryQ)) : GLOSSARY;
 
   return(
@@ -252,7 +293,7 @@ export default function CryptoTailbar() {
 
         {/* Logo row */}
         <div style={{maxWidth:1200,margin:"0 auto",padding:"18px 24px",display:"flex",alignItems:"center",gap:20}}>
-          <div onClick={()=>setScreen("home")} style={{cursor:"pointer",flex:1}}>
+          <div onClick={handleLogoClick} style={{cursor:"pointer",flex:1}}>
             <div style={{display:"flex",alignItems:"baseline",gap:3}}>
               <span style={{fontSize:"clamp(26px,3.5vw,42px)",fontWeight:900,letterSpacing:"-2px",color:C.ink,lineHeight:1,fontFamily:"Georgia,serif"}}>Крипто</span>
               <span style={{fontSize:"clamp(26px,3.5vw,42px)",fontWeight:900,letterSpacing:"-2px",color:C.accent,lineHeight:1,fontFamily:"Georgia,serif"}}>Тайлбарлагч</span>
@@ -268,8 +309,8 @@ export default function CryptoTailbar() {
         {/* Nav */}
         <nav style={{borderTop:`1px solid ${C.border}`,background:C.white}}>
           <div style={{maxWidth:1200,margin:"0 auto",padding:"0 24px",display:"flex",overflowX:"auto"}}>
-            {[["home","Нүүр"],["glossary","Толь бичиг"],["about","Бидний тухай"]].concat(CATEGORIES.slice(0,5).map(c=>[c.id,c.label])).map(([id,label])=>(
-              <button key={id} onClick={()=>id==="home"?setScreen("home"):id==="glossary"||id==="about"?setScreen(id):openCat(id)}
+            {[["home","Нүүр"],["news","Сүүлийн мэдээ"],["glossary","Толь бичиг"],["about","Бидний тухай"]].concat(CATEGORIES.slice(0,5).map(c=>[c.id,c.label])).map(([id,label])=>(
+              <button key={id} onClick={()=>id==="home"?setScreen("home"):id==="glossary"||id==="about"||id==="news"?setScreen(id):openCat(id)}
                 style={{background:"none",border:"none",borderBottom:`2.5px solid ${(screen===id||(screen==="category"&&activeCat===id))?"#1a1a14":"transparent"}`,color:(screen===id||(screen==="category"&&activeCat===id))?C.ink:C.inkLight,padding:"11px 16px",cursor:"pointer",fontFamily:"sans-serif",fontSize:13,fontWeight:(screen===id||(screen==="category"&&activeCat===id))?700:400,whiteSpace:"nowrap",transition:"color 0.15s"}}>
                 {label}
               </button>
@@ -309,7 +350,7 @@ export default function CryptoTailbar() {
             {/* Hero featured */}
             <div style={{display:"grid",gridTemplateColumns:"5fr 3fr",gap:1,marginBottom:36,border:`1.5px solid ${C.ink}`,borderRadius:4,overflow:"hidden"}}>
               {/* Main hero */}
-              {POSTS.slice(0,1).map(p=>(
+              {allPosts.slice(0,1).map(p=>(
                 <div key={p.id} onClick={()=>openPost(p)} style={{cursor:"pointer",padding:"32px 36px",background:COVER_GRADIENTS[p.cover],position:"relative",borderRight:`1px solid ${C.ink}`}}>
                   <div style={{fontSize:60,marginBottom:16,opacity:0.5}}>{COVER_ICON[p.cover]}</div>
                   <div style={{display:"flex",gap:8,marginBottom:12,alignItems:"center"}}>
@@ -329,7 +370,7 @@ export default function CryptoTailbar() {
               ))}
               {/* Side stack */}
               <div style={{display:"flex",flexDirection:"column"}}>
-                {POSTS.slice(1,4).map((p,i)=>(
+                {allPosts.slice(1,4).map((p,i)=>(
                   <div key={p.id} onClick={()=>openPost(p)} style={{padding:"18px 22px",background:COVER_GRADIENTS[p.cover],cursor:"pointer",flex:1,borderBottom:i<2?`1px solid ${C.ink}`:"none",transition:"opacity 0.15s"}}
                     onMouseEnter={e=>e.currentTarget.style.opacity="0.85"}
                     onMouseLeave={e=>e.currentTarget.style.opacity="1"}>
@@ -373,7 +414,7 @@ export default function CryptoTailbar() {
                   <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:18,paddingBottom:10,borderBottom:`2px solid ${C.ink}`}}>
                     <h2 style={{margin:0,fontSize:22,fontWeight:900,fontFamily:"Georgia,serif"}}>Сүүлийн нийтлэлүүд</h2>
                   </div>
-                  {POSTS.map((p,i)=>(
+                  {allPosts.map((p,i)=>(
                     <div key={p.id}>
                       <div onClick={()=>openPost(p)} style={{display:"flex",gap:18,padding:"20px 0",cursor:"pointer"}}
                         onMouseEnter={e=>e.currentTarget.querySelector(".ptitle").style.color=C.accent}
@@ -393,7 +434,7 @@ export default function CryptoTailbar() {
                           </div>
                         </div>
                       </div>
-                      {i<POSTS.length-1&&<div style={{height:1,background:C.border}}/>}
+                      {i<allPosts.length-1&&<div style={{height:1,background:C.border}}/>}
                       
                     </div>
                   ))}
@@ -407,7 +448,7 @@ export default function CryptoTailbar() {
                 {/* Popular */}
                 <div style={{border:`1.5px solid ${C.border}`,borderRadius:8,overflow:"hidden"}}>
                   <div style={{padding:"12px 16px",background:C.ink,color:"#fff",fontSize:13,fontWeight:800,fontFamily:"sans-serif",letterSpacing:"0.05em"}}>🔥 ХАМГИЙН ИХ УНШИХ</div>
-                  {POSTS.sort((a,b)=>parseFloat(b.views)-parseFloat(a.views)).slice(0,5).map((p,i)=>(
+                  {allPosts.sort((a,b)=>parseFloat(b.views)-parseFloat(a.views)).slice(0,5).map((p,i)=>(
                     <div key={p.id} onClick={()=>openPost(p)} style={{display:"flex",gap:10,padding:"12px 14px",borderBottom:`1px solid ${C.border}`,cursor:"pointer",background:C.white}}
                       onMouseEnter={e=>e.currentTarget.style.background=C.accentLight}
                       onMouseLeave={e=>e.currentTarget.style.background=C.white}>
@@ -572,7 +613,7 @@ export default function CryptoTailbar() {
                 <div style={{paddingTop:20,borderTop:`2px solid ${C.ink}`}}>
                   <h3 style={{margin:"0 0 18px",fontSize:18,fontWeight:800,fontFamily:"Georgia,serif"}}>Холбогдох нийтлэлүүд</h3>
                   <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16}}>
-                    {POSTS.filter(p=>p.id!==activePost.id&&(p.cat===activePost.cat||p.difficulty===activePost.difficulty)).slice(0,4).map(p=>(
+                    {allPosts.filter(p=>p.id!==activePost.id&&(p.cat===activePost.cat||p.difficulty===activePost.difficulty)).slice(0,4).map(p=>(
                       <div key={p.id} onClick={()=>openPost(p)} style={{border:`1px solid ${C.border}`,borderRadius:8,overflow:"hidden",cursor:"pointer",background:C.white}}
                         onMouseEnter={e=>e.currentTarget.style.borderColor=C.accent}
                         onMouseLeave={e=>e.currentTarget.style.borderColor=C.border}>
@@ -593,7 +634,7 @@ export default function CryptoTailbar() {
                 
                 <div style={{border:`1.5px solid ${C.border}`,borderRadius:8,overflow:"hidden"}}>
                   <div style={{padding:"12px 16px",background:C.ink,color:"#fff",fontSize:12,fontWeight:800,fontFamily:"sans-serif"}}>🔥 ХАМГИЙН ИХ УНШИХ</div>
-                  {POSTS.sort((a,b)=>parseFloat(b.views)-parseFloat(a.views)).slice(0,5).map((p,i)=>(
+                  {allPosts.sort((a,b)=>parseFloat(b.views)-parseFloat(a.views)).slice(0,5).map((p,i)=>(
                     <div key={p.id} onClick={()=>openPost(p)} style={{display:"flex",gap:10,padding:"11px 14px",borderBottom:`1px solid ${C.border}`,cursor:"pointer",background:C.white}}
                       onMouseEnter={e=>e.currentTarget.style.background=C.accentLight}
                       onMouseLeave={e=>e.currentTarget.style.background=C.white}>
@@ -691,6 +732,149 @@ export default function CryptoTailbar() {
               </div>
               
             </div>
+          </div>
+        )}
+
+        {/* ══ NEWS PAGE ══════════════════════════════════ */}
+        {screen==="news"&&(
+          <div style={{paddingTop:32,paddingBottom:48}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:24,paddingBottom:14,borderBottom:`2px solid ${C.ink}`}}>
+              <div>
+                <h1 style={{margin:"0 0 4px",fontSize:32,fontWeight:900,fontFamily:"Georgia,serif"}}>📰 Сүүлийн мэдээ</h1>
+                <div style={{fontSize:13,color:C.inkFaint,fontFamily:"sans-serif"}}>{allPosts.length} нийтлэл · Өнөөдөр {new Date().toLocaleDateString("mn-MN")}</div>
+              </div>
+            </div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 300px",gap:36}}>
+              <div>
+                {[...allPosts].sort((a,b)=>b.date.localeCompare(a.date)).map((p,i)=>(
+                  <div key={p.id}>
+                    <div onClick={()=>openPost(p)} style={{display:"flex",gap:18,padding:"20px 0",cursor:"pointer"}}
+                      onMouseEnter={e=>e.currentTarget.querySelector(".nt").style.color=C.accent}
+                      onMouseLeave={e=>e.currentTarget.querySelector(".nt").style.color=C.ink}>
+                      <div style={{width:110,height:82,borderRadius:8,background:COVER_GRADIENTS[p.cover]||COVER_GRADIENTS.btc,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:32}}>{COVER_ICON[p.cover]||"📰"}</div>
+                      <div style={{flex:1}}>
+                        <div style={{display:"flex",gap:8,marginBottom:7,alignItems:"center",flexWrap:"wrap"}}>
+                          <span style={{fontSize:10,color:C.white,background:C.accent,padding:"2px 8px",fontWeight:700,fontFamily:"sans-serif"}}>{p.catLabel?.toUpperCase()}</span>
+                          <span style={{fontSize:10,color:C.inkFaint,fontFamily:"sans-serif"}}>⏱ {p.readTime} мин</span>
+                          <span style={{fontSize:10,color:C.inkFaint,fontFamily:"sans-serif"}}>📅 {p.date}</span>
+                          {p.views==="0"&&<span style={{fontSize:10,background:"#fef9c3",color:"#854d0e",padding:"2px 7px",fontWeight:700,fontFamily:"sans-serif",borderRadius:3}}>ШИНЭ</span>}
+                        </div>
+                        <h3 className="nt" style={{margin:"0 0 6px",fontSize:"clamp(14px,1.8vw,17px)",fontWeight:800,lineHeight:1.3,color:C.ink,fontFamily:"Georgia,serif",transition:"color 0.15s"}}>{p.title}</h3>
+                        <p style={{margin:"0 0 8px",fontSize:13,color:C.inkLight,lineHeight:1.5,fontFamily:"sans-serif"}}>{p.intro?.slice(0,120)}...</p>
+                        <div style={{fontSize:12,color:C.inkFaint,fontFamily:"sans-serif"}}>{p.author} · {p.date}</div>
+                      </div>
+                    </div>
+                    {i<allPosts.length-1&&<div style={{height:1,background:C.border}}/>}
+                  </div>
+                ))}
+              </div>
+              <aside style={{display:"flex",flexDirection:"column",gap:20}}>
+                <div style={{border:`1.5px solid ${C.border}`,borderRadius:8,overflow:"hidden"}}>
+                  <div style={{padding:"12px 16px",background:C.ink,color:"#fff",fontSize:12,fontWeight:800,fontFamily:"sans-serif"}}>🔥 ХАМГИЙН ИХ УНШИХ</div>
+                  {[...allPosts].sort((a,b)=>parseFloat(b.views)-parseFloat(a.views)).slice(0,5).map((p,i)=>(
+                    <div key={p.id} onClick={()=>openPost(p)} style={{display:"flex",gap:10,padding:"11px 14px",borderBottom:`1px solid ${C.border}`,cursor:"pointer",background:C.white}}
+                      onMouseEnter={e=>e.currentTarget.style.background=C.accentLight}
+                      onMouseLeave={e=>e.currentTarget.style.background=C.white}>
+                      <div style={{fontSize:20,fontWeight:900,color:C.border,width:24,flexShrink:0,fontFamily:"Georgia,serif"}}>{i+1}</div>
+                      <div style={{fontSize:12,fontWeight:700,color:C.ink,lineHeight:1.3,fontFamily:"Georgia,serif"}}>{p.title}</div>
+                    </div>
+                  ))}
+                </div>
+                <div style={{border:`1.5px solid ${C.accent}`,borderRadius:8,padding:"18px",background:C.accentLight}}>
+                  <div style={{fontSize:14,fontWeight:800,fontFamily:"Georgia,serif",marginBottom:8}}>📖 Крипто сурах</div>
+                  <p style={{fontSize:12,color:C.inkLight,margin:"0 0 12px",fontFamily:"sans-serif"}}>Эхлэгчдэд зориулсан бүрэн гарын авлага</p>
+                  <button onClick={()=>openCat("beginner")} style={{width:"100%",padding:"9px",background:C.accent,border:"none",color:"#fff",borderRadius:6,fontWeight:700,cursor:"pointer",fontSize:13,fontFamily:"sans-serif"}}>Үзэх →</button>
+                </div>
+              </aside>
+            </div>
+          </div>
+        )}
+
+        {/* ══ ADMIN PANEL ════════════════════════════════ */}
+        {screen==="admin"&&(
+          <div style={{paddingTop:32,paddingBottom:48,maxWidth:800,margin:"0 auto"}}>
+            <button onClick={()=>setScreen("home")} style={{background:"none",border:`1px solid ${C.borderDark}`,color:C.inkLight,cursor:"pointer",padding:"6px 14px",borderRadius:4,fontSize:13,fontFamily:"sans-serif",marginBottom:24}}>← Буцах</button>
+            <h1 style={{margin:"0 0 6px",fontSize:32,fontWeight:900,fontFamily:"Georgia,serif"}}>✍️ Мэдээ нэмэх</h1>
+            <p style={{fontSize:13,color:C.inkFaint,fontFamily:"sans-serif",marginBottom:24}}>CoinDesk эсвэл бусад эх сурвалжаас мэдээ уншаад монголоор бичнэ үү</p>
+
+            {!adminAuth?(
+              <div style={{background:C.white,border:`1.5px solid ${C.border}`,borderRadius:10,padding:"32px",maxWidth:400,margin:"0 auto",textAlign:"center"}}>
+                <div style={{fontSize:40,marginBottom:16}}>🔐</div>
+                <div style={{fontSize:16,fontWeight:700,fontFamily:"Georgia,serif",marginBottom:16}}>Нэвтрэх</div>
+                <input type="password" value={adminPass} onChange={e=>setAdminPass(e.target.value)}
+                  placeholder="Нууц үг..." onKeyDown={e=>e.key==="Enter"&&setAdminAuth(adminPass==="crypto2026")}
+                  style={{width:"100%",padding:"10px 14px",background:C.bg,border:`1.5px solid ${C.borderDark}`,borderRadius:6,color:C.ink,fontSize:14,outline:"none",fontFamily:"sans-serif",boxSizing:"border-box",marginBottom:12}}/>
+                <button onClick={()=>setAdminAuth(adminPass==="crypto2026")}
+                  style={{width:"100%",padding:"11px",background:C.accent,border:"none",color:"#fff",borderRadius:6,fontWeight:700,cursor:"pointer",fontSize:14,fontFamily:"sans-serif"}}>Нэвтрэх</button>
+                {adminPass&&!adminAuth&&<div style={{color:C.red,fontSize:12,fontFamily:"sans-serif",marginTop:8}}>Нууц үг буруу байна</div>}
+              </div>
+            ):(
+              <div style={{background:C.white,border:`1.5px solid ${C.border}`,borderRadius:10,padding:"28px"}}>
+                {adminSaved&&(
+                  <div style={{background:"#f0fdf4",border:`1px solid ${C.accent}`,borderRadius:8,padding:"12px 16px",marginBottom:20,fontSize:14,color:C.accent,fontWeight:600,fontFamily:"sans-serif"}}>
+                    ✅ Мэдээ амжилттай нэмэгдлээ! "Сүүлийн мэдээ" хэсэгт харагдана.
+                  </div>
+                )}
+                <div style={{display:"grid",gap:16}}>
+                  <div>
+                    <div style={{fontSize:13,fontWeight:700,color:C.ink,marginBottom:6,fontFamily:"sans-serif"}}>Гарчиг *</div>
+                    <input value={newPost.title} onChange={e=>setNewPost(p=>({...p,title:e.target.value}))}
+                      placeholder="Жишээ: Bitcoin $100,000 давлаа — юу болох вэ?"
+                      style={{width:"100%",padding:"10px 14px",background:C.bg,border:`1.5px solid ${C.borderDark}`,borderRadius:6,color:C.ink,fontSize:14,outline:"none",fontFamily:"sans-serif",boxSizing:"border-box"}}/>
+                  </div>
+                  <div>
+                    <div style={{fontSize:13,fontWeight:700,color:C.ink,marginBottom:6,fontFamily:"sans-serif"}}>Дэд гарчиг</div>
+                    <input value={newPost.subtitle} onChange={e=>setNewPost(p=>({...p,subtitle:e.target.value}))}
+                      placeholder="Товч тайлбар..."
+                      style={{width:"100%",padding:"10px 14px",background:C.bg,border:`1.5px solid ${C.borderDark}`,borderRadius:6,color:C.ink,fontSize:14,outline:"none",fontFamily:"sans-serif",boxSizing:"border-box"}}/>
+                  </div>
+                  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:12}}>
+                    <div>
+                      <div style={{fontSize:13,fontWeight:700,color:C.ink,marginBottom:6,fontFamily:"sans-serif"}}>Ангилал</div>
+                      <select value={newPost.cat} onChange={e=>setNewPost(p=>({...p,cat:e.target.value}))}
+                        style={{width:"100%",padding:"10px",background:C.bg,border:`1.5px solid ${C.borderDark}`,borderRadius:6,color:C.ink,fontSize:13,outline:"none",fontFamily:"sans-serif"}}>
+                        {CATEGORIES.map(c=><option key={c.id} value={c.id}>{c.label}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <div style={{fontSize:13,fontWeight:700,color:C.ink,marginBottom:6,fontFamily:"sans-serif"}}>Хүндрэл</div>
+                      <select value={newPost.difficulty} onChange={e=>setNewPost(p=>({...p,difficulty:e.target.value}))}
+                        style={{width:"100%",padding:"10px",background:C.bg,border:`1.5px solid ${C.borderDark}`,borderRadius:6,color:C.ink,fontSize:13,outline:"none",fontFamily:"sans-serif"}}>
+                        <option>Амархан</option><option>Дунд</option><option>Хэцүү</option>
+                      </select>
+                    </div>
+                    <div>
+                      <div style={{fontSize:13,fontWeight:700,color:C.ink,marginBottom:6,fontFamily:"sans-serif"}}>Унших хугацаа (мин)</div>
+                      <input type="number" value={newPost.readTime} onChange={e=>setNewPost(p=>({...p,readTime:e.target.value}))}
+                        style={{width:"100%",padding:"10px",background:C.bg,border:`1.5px solid ${C.borderDark}`,borderRadius:6,color:C.ink,fontSize:13,outline:"none",fontFamily:"sans-serif",boxSizing:"border-box"}}/>
+                    </div>
+                  </div>
+                  <div>
+                    <div style={{fontSize:13,fontWeight:700,color:C.ink,marginBottom:6,fontFamily:"sans-serif"}}>Товч агуулга * (нүүр хуудсанд харагдана)</div>
+                    <textarea value={newPost.intro} onChange={e=>setNewPost(p=>({...p,intro:e.target.value}))}
+                      placeholder="2-3 өгүүлбэрт мэдээний гол санааг бич..."
+                      rows={3} style={{width:"100%",padding:"10px 14px",background:C.bg,border:`1.5px solid ${C.borderDark}`,borderRadius:6,color:C.ink,fontSize:14,outline:"none",fontFamily:"sans-serif",boxSizing:"border-box",resize:"vertical"}}/>
+                  </div>
+                  <div>
+                    <div style={{fontSize:13,fontWeight:700,color:C.ink,marginBottom:6,fontFamily:"sans-serif"}}>Дэлгэрэнгүй агуулга * (нийтлэлийн бие)</div>
+                    <div style={{fontSize:11,color:C.inkFaint,fontFamily:"sans-serif",marginBottom:6}}>CoinDesk-ийн мэдээг өөрийн үгээр монголоор бичнэ үү</div>
+                    <textarea value={newPost.body} onChange={e=>setNewPost(p=>({...p,body:e.target.value}))}
+                      placeholder="Мэдээний дэлгэрэнгүй агуулга энд бичнэ..."
+                      rows={10} style={{width:"100%",padding:"10px 14px",background:C.bg,border:`1.5px solid ${C.borderDark}`,borderRadius:6,color:C.ink,fontSize:14,outline:"none",fontFamily:"sans-serif",boxSizing:"border-box",resize:"vertical"}}/>
+                  </div>
+                  <div>
+                    <div style={{fontSize:13,fontWeight:700,color:C.ink,marginBottom:6,fontFamily:"sans-serif"}}>Таг (таслалаар тусгаарлана)</div>
+                    <input value={newPost.tags} onChange={e=>setNewPost(p=>({...p,tags:e.target.value}))}
+                      placeholder="Bitcoin, Үнэ, 2026"
+                      style={{width:"100%",padding:"10px 14px",background:C.bg,border:`1.5px solid ${C.borderDark}`,borderRadius:6,color:C.ink,fontSize:14,outline:"none",fontFamily:"sans-serif",boxSizing:"border-box"}}/>
+                  </div>
+                  <button onClick={handleAddPost}
+                    style={{padding:"14px",background:(!newPost.title||!newPost.intro||!newPost.body)?C.borderDark:C.accent,border:"none",color:"#fff",borderRadius:8,fontWeight:700,cursor:"pointer",fontSize:16,fontFamily:"sans-serif",transition:"background 0.2s"}}>
+                    ✅ Нийтлэх
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
 

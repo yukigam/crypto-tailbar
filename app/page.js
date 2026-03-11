@@ -699,6 +699,149 @@ export default function CryptoTailbar() {
 
       </div>
 
+      {/* ══ CONTACT ══════════════════════════════════════ */}
+      {screen==="contact"&&(
+        <div style={{paddingTop:32,paddingBottom:48,maxWidth:700,margin:"0 auto"}}>
+          <button onClick={()=>setScreen("home")} style={{background:"none",border:`1px solid ${C.borderDark}`,color:C.inkLight,cursor:"pointer",padding:"6px 14px",borderRadius:4,fontSize:13,fontFamily:"sans-serif",marginBottom:24}}>← Буцах</button>
+          <h1 style={{margin:"0 0 8px",fontSize:36,fontWeight:900,fontFamily:"Georgia,serif"}}>Холбоо барих</h1>
+          <div style={{height:3,width:60,background:C.accent,marginBottom:28}}/>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,marginBottom:32}}>
+            {[{icon:"📧",title:"И-мэйл",val:"info@cryptotailbar.mn",sub:"24 цагийн дотор хариулна"},
+              {icon:"📱",title:"Telegram",val:"@cryptotailbar",sub:"Хурдан холбоо барих"},
+              {icon:"📍",title:"Хаяг",val:"Улаанбаатар, Монгол",sub:"Сүхбаатар дүүрэг"},
+              {icon:"🕐",title:"Ажлын цаг",val:"Да-Ба: 09:00-18:00",sub:"Монгол цагаар"},
+            ].map(i=>(
+              <div key={i.title} style={{padding:"20px",background:C.white,border:`1.5px solid ${C.border}`,borderRadius:10}}>
+                <div style={{fontSize:28,marginBottom:10}}>{i.icon}</div>
+                <div style={{fontWeight:700,color:C.ink,fontFamily:"sans-serif",marginBottom:4}}>{i.title}</div>
+                <div style={{fontSize:14,color:C.accent,fontFamily:"sans-serif",fontWeight:600,marginBottom:3}}>{i.val}</div>
+                <div style={{fontSize:12,color:C.inkFaint,fontFamily:"sans-serif"}}>{i.sub}</div>
+              </div>
+            ))}
+          </div>
+          <div style={{background:C.white,border:`1.5px solid ${C.border}`,borderRadius:10,padding:"28px"}}>
+            <h2 style={{margin:"0 0 20px",fontSize:20,fontWeight:800,fontFamily:"Georgia,serif"}}>Мессеж илгээх</h2>
+            {[["Таны нэр","Нэрээ оруулна уу..."],["И-мэйл хаяг","email@example.com"],["Сэдэв","Ямар асуудлаар холбогдож байна вэ?"]].map(([l,p])=>(
+              <div key={l} style={{marginBottom:14}}>
+                <div style={{fontSize:13,fontWeight:600,color:C.ink,marginBottom:6,fontFamily:"sans-serif"}}>{l}</div>
+                <input placeholder={p} style={{width:"100%",padding:"10px 14px",background:C.bg,border:`1.5px solid ${C.borderDark}`,borderRadius:6,color:C.ink,fontSize:14,outline:"none",fontFamily:"sans-serif",boxSizing:"border-box"}}/>
+              </div>
+            ))}
+            <div style={{marginBottom:14}}>
+              <div style={{fontSize:13,fontWeight:600,color:C.ink,marginBottom:6,fontFamily:"sans-serif"}}>Мессеж</div>
+              <textarea placeholder="Дэлгэрэнгүй бичнэ үү..." rows={5} style={{width:"100%",padding:"10px 14px",background:C.bg,border:`1.5px solid ${C.borderDark}`,borderRadius:6,color:C.ink,fontSize:14,outline:"none",fontFamily:"sans-serif",boxSizing:"border-box",resize:"vertical"}}/>
+            </div>
+            <button style={{width:"100%",padding:"12px",background:C.accent,border:"none",color:"#fff",borderRadius:6,fontWeight:700,cursor:"pointer",fontSize:15,fontFamily:"sans-serif"}}>Илгээх →</button>
+          </div>
+        </div>
+      )}
+
+      {/* ══ WRITER ════════════════════════════════════════ */}
+      {screen==="writer"&&(
+        <div style={{paddingTop:32,paddingBottom:48,maxWidth:780,margin:"0 auto"}}>
+          <button onClick={()=>setScreen("home")} style={{background:"none",border:`1px solid ${C.borderDark}`,color:C.inkLight,cursor:"pointer",padding:"6px 14px",borderRadius:4,fontSize:13,fontFamily:"sans-serif",marginBottom:24}}>← Буцах</button>
+          <h1 style={{margin:"0 0 8px",fontSize:36,fontWeight:900,fontFamily:"Georgia,serif"}}>Нийтлэгч болох</h1>
+          <div style={{height:3,width:60,background:C.accent,marginBottom:20}}/>
+          <p style={{fontSize:16,color:C.inkLight,lineHeight:1.8,fontFamily:"sans-serif",marginBottom:28}}>
+            Крипто, блокчейн, Web3 чиглэлээр монгол хэлэнд мэдлэгтэй бол манай командтай нэгдэж нийтлэл бичих боломжтой.
+          </p>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:14,marginBottom:32}}>
+            {[{icon:"✍️",t:"Чөлөөт нийтлэгч",d:"Нийтлэл тутмаас орлого авна"},
+              {icon:"📅",t:"Байнгын нийтлэгч",d:"Сар бүр тогтмол орлого"},
+              {icon:"⭐",t:"Гол редактор",d:"Бүтэн цагийн ажлын байр"},
+            ].map(i=>(
+              <div key={i.t} style={{padding:"20px",background:C.accentLight,border:`1.5px solid ${C.accent}33`,borderRadius:10,textAlign:"center"}}>
+                <div style={{fontSize:32,marginBottom:10}}>{i.icon}</div>
+                <div style={{fontWeight:700,color:C.ink,fontSize:14,fontFamily:"sans-serif",marginBottom:6}}>{i.t}</div>
+                <div style={{fontSize:12,color:C.inkLight,fontFamily:"sans-serif"}}>{i.d}</div>
+              </div>
+            ))}
+          </div>
+          <div style={{background:C.white,border:`1.5px solid ${C.border}`,borderRadius:10,padding:"28px"}}>
+            <h2 style={{margin:"0 0 6px",fontSize:20,fontWeight:800,fontFamily:"Georgia,serif"}}>Өргөдөл гаргах</h2>
+            <p style={{margin:"0 0 20px",fontSize:13,color:C.inkFaint,fontFamily:"sans-serif"}}>Бидэнтэй холбогдоход 3-5 ажлын өдрийн дотор хариу өгнө.</p>
+            {[["Нэр","Таны бүтэн нэр"],["И-мэйл","email@example.com"],["Telegram","@username"]].map(([l,p])=>(
+              <div key={l} style={{marginBottom:14}}>
+                <div style={{fontSize:13,fontWeight:600,color:C.ink,marginBottom:6,fontFamily:"sans-serif"}}>{l}</div>
+                <input placeholder={p} style={{width:"100%",padding:"10px 14px",background:C.bg,border:`1.5px solid ${C.borderDark}`,borderRadius:6,color:C.ink,fontSize:14,outline:"none",fontFamily:"sans-serif",boxSizing:"border-box"}}/>
+              </div>
+            ))}
+            <div style={{marginBottom:14}}>
+              <div style={{fontSize:13,fontWeight:600,color:C.ink,marginBottom:6,fontFamily:"sans-serif"}}>Крипто чиглэлийн мэдлэгийн түвшин</div>
+              <select style={{width:"100%",padding:"10px 14px",background:C.bg,border:`1.5px solid ${C.borderDark}`,borderRadius:6,color:C.ink,fontSize:14,outline:"none",fontFamily:"sans-serif"}}>
+                <option>Эхлэгч (6 сар хүртэл)</option>
+                <option>Дунд (1-3 жил)</option>
+                <option>Мэргэжилтэн (3+ жил)</option>
+              </select>
+            </div>
+            <div style={{marginBottom:20}}>
+              <div style={{fontSize:13,fontWeight:600,color:C.ink,marginBottom:6,fontFamily:"sans-serif"}}>Бичсэн нийтлэлийн жишээ (холбоос)</div>
+              <input placeholder="https://..." style={{width:"100%",padding:"10px 14px",background:C.bg,border:`1.5px solid ${C.borderDark}`,borderRadius:6,color:C.ink,fontSize:14,outline:"none",fontFamily:"sans-serif",boxSizing:"border-box"}}/>
+            </div>
+            <button style={{width:"100%",padding:"12px",background:C.accent,border:"none",color:"#fff",borderRadius:6,fontWeight:700,cursor:"pointer",fontSize:15,fontFamily:"sans-serif"}}>Өргөдөл илгээх →</button>
+          </div>
+        </div>
+      )}
+
+      {/* ══ ADVERTISE ═════════════════════════════════════ */}
+      {screen==="advertise"&&(
+        <div style={{paddingTop:32,paddingBottom:48,maxWidth:860,margin:"0 auto"}}>
+          <button onClick={()=>setScreen("home")} style={{background:"none",border:`1px solid ${C.borderDark}`,color:C.inkLight,cursor:"pointer",padding:"6px 14px",borderRadius:4,fontSize:13,fontFamily:"sans-serif",marginBottom:24}}>← Буцах</button>
+          <h1 style={{margin:"0 0 8px",fontSize:36,fontWeight:900,fontFamily:"Georgia,serif"}}>Advertise — Зар сурталчилгаа</h1>
+          <div style={{height:3,width:60,background:C.accent,marginBottom:20}}/>
+          <p style={{fontSize:16,color:C.inkLight,lineHeight:1.8,fontFamily:"sans-serif",marginBottom:32}}>
+            Монголын крипто болон санхүүгийн сонирхолтой залуучуудад хүрэх хамгийн шууд арга. Сар бүр <strong style={{color:C.ink}}>50,000+</strong> зочинтой.
+          </p>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,marginBottom:32}}>
+            {[
+              {name:"Banner зар",size:"728×90 px",place:"Header доор",price:"$50/сар",hot:false},
+              {name:"Sidebar зар",size:"300×250 px",place:"Нийтлэлийн хажуу",price:"$80/сар",hot:true},
+              {name:"Sponsored нийтлэл",size:"Бүтэн хуудас",place:"Нүүр хуудсанд",price:"$150/нийтлэл",hot:true},
+              {name:"Newsletter зар",size:"600×200 px",place:"7 хоног бүрийн имэйл",price:"$40/удаа",hot:false},
+            ].map(p=>(
+              <div key={p.name} style={{padding:"22px",background:C.white,border:`1.5px solid ${p.hot?C.accent:C.border}`,borderRadius:10,position:"relative"}}>
+                {p.hot&&<div style={{position:"absolute",top:12,right:12,background:C.accent,color:"#fff",fontSize:10,fontWeight:700,padding:"2px 8px",borderRadius:3,fontFamily:"sans-serif"}}>ЭРЭЛТТЭЙ</div>}
+                <div style={{fontWeight:800,fontSize:17,color:C.ink,fontFamily:"Georgia,serif",marginBottom:8}}>{p.name}</div>
+                <div style={{fontSize:13,color:C.inkFaint,fontFamily:"sans-serif",marginBottom:4}}>Хэмжээ: {p.size}</div>
+                <div style={{fontSize:13,color:C.inkFaint,fontFamily:"sans-serif",marginBottom:12}}>Байрлал: {p.place}</div>
+                <div style={{fontSize:22,fontWeight:900,color:C.accent,fontFamily:"Georgia,serif"}}>{p.price}</div>
+              </div>
+            ))}
+          </div>
+          <div style={{background:C.ink,color:"#fff",borderRadius:10,padding:"28px",textAlign:"center",marginBottom:24}}>
+            <div style={{fontSize:20,fontWeight:800,fontFamily:"Georgia,serif",marginBottom:8}}>Захиалга өгөх</div>
+            <p style={{fontSize:14,color:"#888",margin:"0 0 16px",fontFamily:"sans-serif"}}>Telegram эсвэл и-мэйлээр холбогдоорой</p>
+            <div style={{display:"flex",gap:12,justifyContent:"center",flexWrap:"wrap"}}>
+              <a href="https://t.me/" target="_blank" rel="noopener noreferrer" style={{padding:"11px 24px",background:C.accent,border:"none",color:"#fff",borderRadius:6,fontWeight:700,cursor:"pointer",fontSize:14,fontFamily:"sans-serif",textDecoration:"none"}}>📱 Telegram-аар</a>
+              <a href="mailto:ads@cryptotailbar.mn" style={{padding:"11px 24px",background:"#2a2a2a",border:"none",color:"#fff",borderRadius:6,fontWeight:700,cursor:"pointer",fontSize:14,fontFamily:"sans-serif",textDecoration:"none"}}>📧 И-мэйлээр</a>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ══ PRIVACY ═══════════════════════════════════════ */}
+      {screen==="privacy"&&(
+        <div style={{paddingTop:32,paddingBottom:48,maxWidth:780,margin:"0 auto"}}>
+          <button onClick={()=>setScreen("home")} style={{background:"none",border:`1px solid ${C.borderDark}`,color:C.inkLight,cursor:"pointer",padding:"6px 14px",borderRadius:4,fontSize:13,fontFamily:"sans-serif",marginBottom:24}}>← Буцах</button>
+          <h1 style={{margin:"0 0 8px",fontSize:36,fontWeight:900,fontFamily:"Georgia,serif"}}>Нууцлалын бодлого</h1>
+          <div style={{height:3,width:60,background:C.accent,marginBottom:8}}/>
+          <div style={{fontSize:12,color:C.inkFaint,fontFamily:"sans-serif",marginBottom:28}}>Сүүлд шинэчилсэн: 2026 оны 3 дугаар сар</div>
+          {[
+            {t:"1. Цуглуулдаг мэдээлэл",b:"Бид newsletter-т бүртгүүлэх үед и-мэйл хаягийг цуглуулна. Вебсайт ашиглалтын статистик мэдээллийг (зочны тоо, хуудасны үзэлт) нэрийгүй хэлбэрээр Google Analytics-аар цуглуулна."},
+            {t:"2. Мэдээллийг хэрхэн ашигладаг вэ",b:"Цуглуулсан мэдээллийг зөвхөн newsletter илгээх болон сайтын агуулгыг сайжруулах зорилгоор ашиглана. Таны мэдээллийг гуравдагч этгээдэд зардаггүй."},
+            {t:"3. Cookie (Күүки)",b:"Бид Google Analytics болон зарын системийн зорилгоор күүки ашигладаг. Та хөтчийнхөө тохиргооноос күүкийг идэвхгүй болгох боломжтой."},
+            {t:"4. Гуравдагч этгээдийн холбоосууд",b:"Бидний сайт дахь affiliate болон sponsor холбоосууд гуравдагч сайт руу орох боломж олгодог. Тэдгээр сайтын нууцлалын бодлогод бид хариуцлага хүлээхгүй."},
+            {t:"5. Хүүхдийн нууцлал",b:"Бидний сайт 18 нас хүрсэн хүмүүст зориулагдсан. Бид 18-аас доош насны хүмүүсийн мэдээллийг санаатайгаар цуглуулдаггүй."},
+            {t:"6. Холбоо барих",b:"Нууцлалтай холбоотой асуулт байвал info@cryptotailbar.mn хаягаар бидэнтэй холбогдоно уу."},
+          ].map((s,i)=>(
+            <div key={i} style={{marginBottom:24,padding:"20px",background:C.white,border:`1px solid ${C.border}`,borderRadius:8}}>
+              <h2 style={{margin:"0 0 10px",fontSize:17,fontWeight:800,color:C.ink,fontFamily:"Georgia,serif"}}>{s.t}</h2>
+              <p style={{margin:0,fontSize:14,color:C.inkLight,lineHeight:1.75,fontFamily:"sans-serif"}}>{s.b}</p>
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* ── FOOTER ── */}
       <footer style={{background:C.ink,color:"#aaa",marginTop:48,padding:"40px 24px 20px"}}>
         <div style={{maxWidth:1200,margin:"0 auto"}}>
@@ -708,14 +851,46 @@ export default function CryptoTailbar() {
                 <span style={{color:"#fff"}}>Крипто</span><span style={{color:C.accentBright}}>Тайлбарлагч</span>
               </div>
               <p style={{fontSize:13,lineHeight:1.7,color:"#666",margin:"0 0 16px"}}>Монголын хамгийн найдвартай крипто мэдлэгийн эх сурвалж. Энгийн хэлэнд ойлгомжтой тайлбар.</p>
+              <div style={{display:"flex",gap:10,marginBottom:14}}>
+                {[["Telegram","https://t.me/"],["Twitter","https://twitter.com/"],["Facebook","https://facebook.com/"],["YouTube","https://youtube.com/"]].map(([s,url])=>(
+                  <a key={s} href={url} target="_blank" rel="noopener noreferrer"
+                    style={{width:32,height:32,borderRadius:"50%",background:"#2a2a2a",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,textDecoration:"none",color:"#888",transition:"all 0.15s"}}
+                    onMouseEnter={e=>{e.currentTarget.style.background=C.accent;e.currentTarget.style.color="#fff";}}
+                    onMouseLeave={e=>{e.currentTarget.style.background="#2a2a2a";e.currentTarget.style.color="#888";}}>
+                    {s[0]}
+                  </a>
+                ))}
+              </div>
               <div style={{fontSize:11,color:"#444"}}>© 2026 КрыптоТайлбарлагч. Бүх эрх хамгаалагдсан.</div>
             </div>
-            {[["Агуулга",["Эхлэгчдэд","Bitcoin","Ethereum","DeFi","NFT & Web3"]],["Платформ",["Бидний тухай","Нийтлэгч болох","Advertise","Нууцлал","Холбоо барих"]],["Нийгэмлэг",["Telegram","Twitter/X","Facebook","YouTube","Discord"]]].map(([t,ls])=>(
-              <div key={t}>
-                <div style={{fontSize:11,fontWeight:700,letterSpacing:"0.1em",color:C.accentBright,marginBottom:14}}>{t.toUpperCase()}</div>
-                {ls.map(l=><div key={l} style={{fontSize:13,color:"#555",marginBottom:8,cursor:"pointer"}} onMouseEnter={e=>e.target.style.color="#fff"} onMouseLeave={e=>e.target.style.color="#555"}>{l}</div>)}
-              </div>
-            ))}
+
+            {/* Агуулга */}
+            <div>
+              <div style={{fontSize:11,fontWeight:700,letterSpacing:"0.1em",color:C.accentBright,marginBottom:14}}>АГУУЛГА</div>
+              {[["beginner","Эхлэгчдэд"],["bitcoin","Bitcoin"],["ethereum","Ethereum"],["defi","DeFi"],["nft","NFT & Web3"]].map(([id,label])=>(
+                <div key={id} onClick={()=>openCat(id)} style={{fontSize:13,color:"#555",marginBottom:8,cursor:"pointer",transition:"color 0.15s"}}
+                  onMouseEnter={e=>e.target.style.color="#fff"} onMouseLeave={e=>e.target.style.color="#555"}>{label}</div>
+              ))}
+            </div>
+
+            {/* Платформ */}
+            <div>
+              <div style={{fontSize:11,fontWeight:700,letterSpacing:"0.1em",color:C.accentBright,marginBottom:14}}>ПЛАТФОРМ</div>
+              {[["about","Бидний тухай"],["writer","Нийтлэгч болох"],["advertise","Advertise"],["privacy","Нууцлал"],["contact","Холбоо барих"]].map(([id,label])=>(
+                <div key={id} onClick={()=>setScreen(id)} style={{fontSize:13,color:"#555",marginBottom:8,cursor:"pointer",transition:"color 0.15s"}}
+                  onMouseEnter={e=>e.target.style.color="#fff"} onMouseLeave={e=>e.target.style.color="#555"}>{label}</div>
+              ))}
+            </div>
+
+            {/* Нийгэмлэг */}
+            <div>
+              <div style={{fontSize:11,fontWeight:700,letterSpacing:"0.1em",color:C.accentBright,marginBottom:14}}>НИЙГЭМЛЭГ</div>
+              {[["https://t.me/","Telegram 📱"],["https://twitter.com/","Twitter/X 🐦"],["https://facebook.com/","Facebook 👥"],["https://youtube.com/","YouTube ▶️"],["https://discord.com/","Discord 💬"]].map(([url,label])=>(
+                <a key={label} href={url} target="_blank" rel="noopener noreferrer"
+                  style={{display:"block",fontSize:13,color:"#555",marginBottom:8,cursor:"pointer",textDecoration:"none",transition:"color 0.15s"}}
+                  onMouseEnter={e=>e.target.style.color="#fff"} onMouseLeave={e=>e.target.style.color="#555"}>{label}</a>
+              ))}
+            </div>
           </div>
           <div style={{borderTop:"1px solid #1e1e1e",paddingTop:16,fontSize:11,color:"#333",textAlign:"center"}}>
             Энэхүү сайт дах агуулга нь санхүүгийн зөвлөгөө биш. Крипто хөрөнгө оруулалт нь эрсдэлтэй. Мэргэжилтэнтэй зөвлөлдөөрэй.

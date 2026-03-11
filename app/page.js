@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from "react";
-
+import { getPosts } from '../lib/sanity';
 // ── PALETTE ──────────────────────────────────────────
 const C = {
   bg: "#fafaf7",
@@ -223,6 +223,32 @@ export default function CryptoTailbar() {
   const [newsletterEmail, setNewsletterEmail] = useState("");
   const [newsletterDone, setNewsletterDone] = useState(false);
   const [allPosts, setAllPosts] = useState(POSTS);
+  useEffect(() => {
+    getPosts().then(data => {
+      if (data && data.length > 0) {
+        const mapped = data.map((p, i) => ({
+          id: POSTS.length + i + 1,
+          slug: p.slug?.current || p._id,
+          cat: p.categories?.[0]?.toLowerCase() || 'beginner',
+          catLabel: p.categories?.[0] || 'Medee',
+          title: p.title,
+          subtitle: p.excerpt || '',
+          author: p.author || 'Redaktor',
+          authorTitle: 'Redaktor',
+          date: p.publishedAt?.slice(0, 10) || new Date().toISOString().slice(0, 10),
+          readTime: '5',
+          views: '0',
+          difficulty: 'Amarhan',
+          featured: false,
+          cover: 'btc',
+          tags: [],
+          intro: p.excerpt || p.title,
+          sections: [{ title: 'Delgerengui', body: typeof p.body === 'string' ? p.body : JSON.stringify(p.body) }]
+        }));
+        setAllPosts([...mapped, ...POSTS]);
+      }
+    }).catch(e => console.log(e));
+  }, []);
 
   // Admin form state
   const [adminPass, setAdminPass] = useState("");

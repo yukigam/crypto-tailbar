@@ -136,6 +136,49 @@ const POSTS = [
     intro:"NFT буюу Non-Fungible Token — нэгдүгээрт \"unique\" буюу давтагдашгүй дижитал эд зүйл...",
     sections:[{ title:"NFT яаж ажилладаг вэ?", body:"NFT бол блокчейн дээр бүртгэгдсэн өмчлөлийн баримт бичиг юм. Зураг, дуу, тоглоомын зүйл, видео г.м. бүх дижитал агуулгыг NFT болгож болно. Хэн эзэмшиж байгааг блокчейн баталгаажуулна." }]
   },
+  {
+    id:9, slug:"bitcoin-price-history",
+    cat:"bitcoin", catLabel:"Bitcoin",
+    title:"Bitcoin-ийн үнийн түүх: $0-оос $100,000 хүртэлх аялал",
+    subtitle:"2009 оноос өнөөдрийг хүртэлх Bitcoin-ийн үнийн өөрчлөлт, чухал үйл явдлууд.",
+    author:"Б.Мөнхбаяр", authorTitle:"Крипто судлаач", date:"2026-02-05",
+    readTime:"9", views:"21.3K", difficulty:"Амархан",
+    featured:false, cover:"btc",
+    tags:["Bitcoin","Үнэ","Түүх"],
+    intro:"Bitcoin 2009 онд дөнгөж $0 үнэтэй байсан бол өнөөдөр нэг ширхэг нь $90,000 гаруй үнэтэй болжээ...",
+    sections:[
+      { title:"Bitcoin-ийн үнийн гол цэгүүд", body:"2009: $0 — Satoshi анхны блокийг олборлов\n2010: $0.01 — Анхны бодит арилжаа (10,000 BTC = 2 пицца)\n2013: $1,000 — Анхны мянган доллар давав\n2017: $20,000 — Түүхэн дээд цэг\n2021: $69,000 — Шинэ рекорд\n2024: $100,000 — Зуун мянгыг давав" },
+      { title:"Яагаад үнэ ингэж өснө вэ?", body:"Bitcoin-ийн үнэ нэмэгдэх гол шалтгаанууд:\n\n1. Halving — 4 жил тутам шагнал хагасдана, нийлүүлэлт буурна\n2. Institutional investment — BlackRock, Fidelity зэрэг томоохон компаниуд оруулалт хийж байна\n3. ETF батлагдсан — 2024 онд АНУ-д Bitcoin ETF зөвшөөрөгдсөн\n4. Хязгаарлагдмал тоо — Зөвхөн 21 сая BTC гарна" },
+    ]
+  },
+  {
+    id:10, slug:"bitcoin-halving",
+    cat:"bitcoin", catLabel:"Bitcoin",
+    title:"Bitcoin Halving гэж юу вэ? 2024 оны Halving яагаад чухал байсан вэ?",
+    subtitle:"4 жил тутам болдог энэ үйл явдал Bitcoin-ийн үнэд хэрхэн нөлөөлдөг вэ?",
+    author:"Б.Мөнхбаяр", authorTitle:"Крипто судлаач", date:"2026-01-28",
+    readTime:"7", views:"18.6K", difficulty:"Амархан",
+    featured:false, cover:"btc",
+    tags:["Bitcoin","Halving","Mining"],
+    intro:"Halving бол Bitcoin-ийн хамгийн чухал үйл явдлуудын нэг. 4 жил тутам олборлогчдын шагнал хагасдаж, Bitcoin-ийн нийлүүлэлт буурдаг...",
+    sections:[
+      { title:"Halving яаж ажилладаг вэ?", body:"Bitcoin-ийн код дотор 210,000 блок бүрт (≈4 жил) олборлогчдын шагнал автоматаар хагасдах заалт байдаг.\n\n2009: 50 BTC/блок\n2012: 25 BTC/блок\n2016: 12.5 BTC/блок\n2020: 6.25 BTC/блок\n2024: 3.125 BTC/блок" },
+    ]
+  },
+  {
+    id:11, slug:"bitcoin-wallet-beginner",
+    cat:"bitcoin", catLabel:"Bitcoin",
+    title:"Bitcoin анх удаа хэрхэн худалдаж авах вэ? Алхам алхмаар заавар",
+    subtitle:"Binance, OKX дээр Bitcoin авах бүрэн гарын авлага — эхлэгчдэд зориулав.",
+    author:"Д.Сарнай", authorTitle:"Блокчейн хөгжүүлэгч", date:"2026-01-20",
+    readTime:"10", views:"35.1K", difficulty:"Амархан",
+    featured:false, cover:"btc",
+    tags:["Bitcoin","Binance","Худалдаа"],
+    intro:"Bitcoin авахыг хүссэн ч хаанаас эхлэхээ мэдэхгүй байгаа бол энэ нийтлэл таны төлөө...",
+    sections:[
+      { title:"Алхам 1: Биржид бүртгүүлэх", body:"Хамгийн хялбар арга бол Binance эсвэл OKX бирж дээр бүртгүүлэх. Эдгээр бирж Монголд хамгийн түгээмэл ашиглагддаг.\n\n1. binance.com руу орно\n2. Email-ээрээ бүртгүүлнэ\n3. KYC баталгаажуулалт хийнэ (иргэний үнэмлэх)\n4. Төгрөгөөр орлого нэмнэ (P2P арилжааг ашиглан)\n5. Bitcoin худалдаж авна" },
+    ]
+  },
 ];
 
 const GLOSSARY = [
@@ -167,18 +210,7 @@ const COVER_ICON = { btc:"₿", wallet:"👛", defi:"🏦", eth:"Ξ", law:"⚖�
 
 function diffColor(d){ return d==="Амархан"?C.accent:d==="Дунд"?C.gold:C.red; }
 
-function AdBox({label="300×250 AdSense", h=250}){
-  return(
-    <div style={{width:"100%",height:h,border:`1.5px dashed ${C.borderDark}`,borderRadius:8,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:4,background:C.bgDark,position:"relative",overflow:"hidden"}}>
-      <div style={{position:"absolute",inset:0,backgroundImage:`repeating-linear-gradient(45deg,transparent,transparent 8px,${C.border} 8px,${C.border} 9px)`,opacity:0.4}}/>
-      <div style={{position:"relative",textAlign:"center"}}>
-        <div style={{fontSize:10,color:C.inkFaint,letterSpacing:"0.15em",marginBottom:4}}>ЗАРЫН ТАЛБАР</div>
-        <div style={{fontSize:12,color:C.inkLight,fontWeight:600}}>{label}</div>
-        <div style={{fontSize:10,color:C.inkFaint,marginTop:3}}>Google AdSense</div>
-      </div>
-    </div>
-  );
-}
+
 
 // ── MAIN ─────────────────────────────────────────────
 export default function CryptoTailbar() {
@@ -227,12 +259,9 @@ export default function CryptoTailbar() {
             </div>
             <div style={{fontSize:11,color:C.inkFaint,letterSpacing:"0.15em",marginTop:2,fontFamily:"sans-serif",fontWeight:400}}>МОНГОЛ ХЭЛЭН ДЭХ КРИПТО МЭДЛЭГ</div>
           </div>
-          <div style={{maxWidth:500,flex:2,display:"flex",justifyContent:"center"}}>
-            <AdBox label="728×90 Leaderboard Banner" h={80}/>
-          </div>
+          <div style={{flex:2}}/>
           <div style={{display:"flex",gap:8}}>
             <button onClick={()=>setSearchOpen(o=>!o)} style={{background:"none",border:`1.5px solid ${C.borderDark}`,color:C.inkLight,padding:"8px 13px",borderRadius:6,cursor:"pointer",fontSize:14,fontFamily:"sans-serif"}}>🔍</button>
-            <button onClick={()=>setScreen("newsletter")} style={{background:C.accent,border:"none",color:"#fff",padding:"9px 18px",borderRadius:6,fontWeight:700,cursor:"pointer",fontSize:13,fontFamily:"sans-serif"}}>Бүртгүүлэх</button>
           </div>
         </div>
 
@@ -337,7 +366,7 @@ export default function CryptoTailbar() {
                 </div>
 
                 {/* Inline ad */}
-                <div style={{marginBottom:32}}><AdBox label="728×90 Leaderboard" h={90}/></div>
+                
 
                 {/* Latest posts */}
                 <div>
@@ -365,7 +394,7 @@ export default function CryptoTailbar() {
                         </div>
                       </div>
                       {i<POSTS.length-1&&<div style={{height:1,background:C.border}}/>}
-                      {i===2&&<div style={{margin:"16px 0"}}><AdBox label="300×250 Mid-Content Ad" h={100}/></div>}
+                      
                     </div>
                   ))}
                 </div>
@@ -373,7 +402,7 @@ export default function CryptoTailbar() {
 
               {/* ── SIDEBAR ── */}
               <aside style={{display:"flex",flexDirection:"column",gap:24}}>
-                <AdBox label="300×250 Rectangle" h={250}/>
+                
 
                 {/* Popular */}
                 <div style={{border:`1.5px solid ${C.border}`,borderRadius:8,overflow:"hidden"}}>
@@ -429,7 +458,7 @@ export default function CryptoTailbar() {
                   <button style={{width:"100%",padding:"9px",background:"#f7931a",border:"none",color:"#000",borderRadius:6,fontWeight:700,cursor:"pointer",fontSize:13,fontFamily:"sans-serif"}}>Нэгдэх →</button>
                 </div>
 
-                <AdBox label="160×600 Skyscraper" h={400}/>
+                
               </aside>
             </div>
           </div>
@@ -508,7 +537,7 @@ export default function CryptoTailbar() {
                         }
                         return <p key={j} style={{margin:"0 0 16px",fontFamily:"sans-serif",fontSize:15,lineHeight:1.75,color:"#3a3a30"}}>{para}</p>;
                       })}
-                      {i===0&&<div style={{margin:"20px 0"}}><AdBox label="728×90 In-Article Ad" h={90}/></div>}
+                      
                     </div>
                   ))}
                 </div>
@@ -561,7 +590,7 @@ export default function CryptoTailbar() {
 
               {/* Sidebar */}
               <aside style={{display:"flex",flexDirection:"column",gap:20}}>
-                <AdBox label="300×250 Rectangle" h={250}/>
+                
                 <div style={{border:`1.5px solid ${C.border}`,borderRadius:8,overflow:"hidden"}}>
                   <div style={{padding:"12px 16px",background:C.ink,color:"#fff",fontSize:12,fontWeight:800,fontFamily:"sans-serif"}}>🔥 ХАМГИЙН ИХ УНШИХ</div>
                   {POSTS.sort((a,b)=>parseFloat(b.views)-parseFloat(a.views)).slice(0,5).map((p,i)=>(
@@ -579,7 +608,7 @@ export default function CryptoTailbar() {
                   <input placeholder="И-мэйл хаяг..." style={{width:"100%",padding:"9px 12px",background:"#fff",border:`1px solid ${C.borderDark}`,borderRadius:6,color:C.ink,fontSize:13,outline:"none",fontFamily:"sans-serif",boxSizing:"border-box",marginBottom:8}}/>
                   <button style={{width:"100%",padding:"9px",background:C.accent,border:"none",color:"#fff",borderRadius:6,fontWeight:700,cursor:"pointer",fontSize:13,fontFamily:"sans-serif"}}>Бүртгүүлэх</button>
                 </div>
-                <AdBox label="300×600 Half Page" h={350}/>
+                
               </aside>
             </div>
           </div>
@@ -622,7 +651,7 @@ export default function CryptoTailbar() {
                   ))}
                 </div>
                 <aside style={{display:"flex",flexDirection:"column",gap:20}}>
-                  <AdBox label="300×250 Rectangle" h={250}/>
+                  
                   <div style={{border:`1.5px solid ${C.border}`,borderRadius:8,padding:"18px"}}>
                     <h3 style={{margin:"0 0 14px",fontSize:15,fontWeight:800,fontFamily:"Georgia,serif"}}>Бусад ангиллууд</h3>
                     {CATEGORIES.filter(c=>c.id!==activeCat).map(c=>(
@@ -660,7 +689,7 @@ export default function CryptoTailbar() {
                   </div>
                 ))}
               </div>
-              <div style={{marginTop:32}}><AdBox label="728×90 Leaderboard" h={90}/></div>
+              
             </div>
           </div>
         )}

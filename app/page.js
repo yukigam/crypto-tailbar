@@ -242,8 +242,10 @@ export default function CryptoTailbar() {
           featured: false,
           cover: 'btc',
           tags: [],
-          intro: p.excerpt || p.title,
-          sections: [{ title: 'Delgerengui', body: typeof p.body === 'string' ? p.body : JSON.stringify(p.body) }]
+          intro: p.excerpt || (Array.isArray(p.body) ? p.body[0]?.children?.[0]?.text || p.title : p.title),
+          sections: [{ title: 'Delgerengui', body: Array.isArray(p.body) ? p.body.map(b => b.children ? b.children.map(c => c.text).join('') : '').join('
+
+') : (typeof p.body === 'string' ? p.body : '') }]
         }));
         setAllPosts([...mapped, ...POSTS]);
       }

@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from "react";
-
+import { getPosts } from '../lib/sanity';
+import { getPosts } from '../lib/sanity'; 
 // ── PALETTE ──────────────────────────────────────────
 const C = {
   bg: "#fafaf7",
@@ -223,12 +224,39 @@ export default function CryptoTailbar() {
   const [mobileMenu, setMobileMenu] = useState(false);
   const [newsletterEmail, setNewsletterEmail] = useState("");
   const [newsletterDone, setNewsletterDone] = useState(false);
+  const [allPosts, setAllPosts] = useState(POSTS);
+  useEffect(()=>{
+    getPosts().then(data=>{
+      if(data&&data.length>0){
+        const mapped=data.map((p,i)=>({
+          id:allPosts.length+i+1,
+          slug:p.slug?.current||p._id,
+          cat:"beginner",
+          catLabel:"Medee",
+          title:p.title,
+          subtitle:p.excerpt||"",
+          author:p.author||"Redaktor",
+          authorTitle:"Redaktor",
+          date:p.publishedAt?.slice(0,10)||new Date().toISOString().slice(0,10),
+          readTime:"5",
+          views:"0",
+          difficulty:"Amarhan",
+          featured:false,
+          cover:"btc",
+          tags:[],
+          intro:p.excerpt||p.title,
+          sections:[{title:"Info",body:p.excerpt||p.title}]
+        }));
+        setAllPosts([...mapped,...POSTS]);
+      }
+    }).catch(e=>console.log(e));
+  },[]);
 
   function openPost(p){ setActivePost(p); setScreen("post"); }
   function openCat(id){ setActiveCat(id); setScreen("category"); }
 
-  const catPosts = activeCat ? POSTS.filter(p=>p.cat===activeCat) : [];
-  const searchResults = searchQ.length>1 ? POSTS.filter(p=>p.title.toLowerCase().includes(searchQ.toLowerCase())||p.tags.some(t=>t.toLowerCase().includes(searchQ.toLowerCase()))) : [];
+  const catPosts = activeCat ? allPosts.filter(p=>p.cat===activeCat) : [];
+  const searchResults = searchQ.length>1 ? allPosts.filter(p=>p.title.toLowerCase().includes(searchQ.toLowerCase())||p.tags.some(t=>t.toLowerCase().includes(searchQ.toLowerCase()))) : [];
   const filtered_glossary = glossaryQ ? GLOSSARY.filter(g=>g.term.toLowerCase().includes(glossaryQ.toLowerCase())||g.mn.includes(glossaryQ)) : GLOSSARY;
 
   return(
@@ -309,7 +337,7 @@ export default function CryptoTailbar() {
             {/* Hero featured */}
             <div style={{display:"grid",gridTemplateColumns:"5fr 3fr",gap:1,marginBottom:36,border:`1.5px solid ${C.ink}`,borderRadius:4,overflow:"hidden"}}>
               {/* Main hero */}
-              {POSTS.slice(0,1).map(p=>(
+              {allPosts.slice(0,1).map(p=>(
                 <div key={p.id} onClick={()=>openPost(p)} style={{cursor:"pointer",padding:"32px 36px",background:COVER_GRADIENTS[p.cover],position:"relative",borderRight:`1px solid ${C.ink}`}}>
                   <div style={{fontSize:60,marginBottom:16,opacity:0.5}}>{COVER_ICON[p.cover]}</div>
                   <div style={{display:"flex",gap:8,marginBottom:12,alignItems:"center"}}>
@@ -329,7 +357,7 @@ export default function CryptoTailbar() {
               ))}
               {/* Side stack */}
               <div style={{display:"flex",flexDirection:"column"}}>
-                {POSTS.slice(1,4).map((p,i)=>(
+                {allPosts.slice(1,4).map((p,i)=>(
                   <div key={p.id} onClick={()=>openPost(p)} style={{padding:"18px 22px",background:COVER_GRADIENTS[p.cover],cursor:"pointer",flex:1,borderBottom:i<2?`1px solid ${C.ink}`:"none",transition:"opacity 0.15s"}}
                     onMouseEnter={e=>e.currentTarget.style.opacity="0.85"}
                     onMouseLeave={e=>e.currentTarget.style.opacity="1"}>
@@ -373,7 +401,7 @@ export default function CryptoTailbar() {
                   <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:18,paddingBottom:10,borderBottom:`2px solid ${C.ink}`}}>
                     <h2 style={{margin:0,fontSize:22,fontWeight:900,fontFamily:"Georgia,serif"}}>Сүүлийн нийтлэлүүд</h2>
                   </div>
-                  {POSTS.map((p,i)=>(
+                  {allPosts.map((p,i)=>(
                     <div key={p.id}>
                       <div onClick={()=>openPost(p)} style={{display:"flex",gap:18,padding:"20px 0",cursor:"pointer"}}
                         onMouseEnter={e=>e.currentTarget.querySelector(".ptitle").style.color=C.accent}
@@ -393,7 +421,7 @@ export default function CryptoTailbar() {
                           </div>
                         </div>
                       </div>
-                      {i<POSTS.length-1&&<div style={{height:1,background:C.border}}/>}
+                      {i<allPosts.length-1&&<div style={{height:1,background:C.border}}/>}
                       
                     </div>
                   ))}
@@ -407,7 +435,7 @@ export default function CryptoTailbar() {
                 {/* Popular */}
                 <div style={{border:`1.5px solid ${C.border}`,borderRadius:8,overflow:"hidden"}}>
                   <div style={{padding:"12px 16px",background:C.ink,color:"#fff",fontSize:13,fontWeight:800,fontFamily:"sans-serif",letterSpacing:"0.05em"}}>🔥 ХАМГИЙН ИХ УНШИХ</div>
-                  {POSTS.sort((a,b)=>parseFloat(b.views)-parseFloat(a.views)).slice(0,5).map((p,i)=>(
+                  {allPosts.sort((a,b)=>parseFloat(b.views)-parseFloat(a.views)).slice(0,5).map((p,i)=>(
                     <div key={p.id} onClick={()=>openPost(p)} style={{display:"flex",gap:10,padding:"12px 14px",borderBottom:`1px solid ${C.border}`,cursor:"pointer",background:C.white}}
                       onMouseEnter={e=>e.currentTarget.style.background=C.accentLight}
                       onMouseLeave={e=>e.currentTarget.style.background=C.white}>
@@ -572,7 +600,7 @@ export default function CryptoTailbar() {
                 <div style={{paddingTop:20,borderTop:`2px solid ${C.ink}`}}>
                   <h3 style={{margin:"0 0 18px",fontSize:18,fontWeight:800,fontFamily:"Georgia,serif"}}>Холбогдох нийтлэлүүд</h3>
                   <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16}}>
-                    {POSTS.filter(p=>p.id!==activePost.id&&(p.cat===activePost.cat||p.difficulty===activePost.difficulty)).slice(0,4).map(p=>(
+                    {allPosts.filter(p=>p.id!==activePost.id&&(p.cat===activePost.cat||p.difficulty===activePost.difficulty)).slice(0,4).map(p=>(
                       <div key={p.id} onClick={()=>openPost(p)} style={{border:`1px solid ${C.border}`,borderRadius:8,overflow:"hidden",cursor:"pointer",background:C.white}}
                         onMouseEnter={e=>e.currentTarget.style.borderColor=C.accent}
                         onMouseLeave={e=>e.currentTarget.style.borderColor=C.border}>
@@ -593,7 +621,7 @@ export default function CryptoTailbar() {
                 
                 <div style={{border:`1.5px solid ${C.border}`,borderRadius:8,overflow:"hidden"}}>
                   <div style={{padding:"12px 16px",background:C.ink,color:"#fff",fontSize:12,fontWeight:800,fontFamily:"sans-serif"}}>🔥 ХАМГИЙН ИХ УНШИХ</div>
-                  {POSTS.sort((a,b)=>parseFloat(b.views)-parseFloat(a.views)).slice(0,5).map((p,i)=>(
+                  {allPosts.sort((a,b)=>parseFloat(b.views)-parseFloat(a.views)).slice(0,5).map((p,i)=>(
                     <div key={p.id} onClick={()=>openPost(p)} style={{display:"flex",gap:10,padding:"11px 14px",borderBottom:`1px solid ${C.border}`,cursor:"pointer",background:C.white}}
                       onMouseEnter={e=>e.currentTarget.style.background=C.accentLight}
                       onMouseLeave={e=>e.currentTarget.style.background=C.white}>

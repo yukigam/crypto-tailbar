@@ -1,6 +1,5 @@
 'use client';
 import { useState, useEffect } from "react";
-import { getPosts } from '../lib/sanity';
 import { getPosts } from '../lib/sanity'; 
 // ── PALETTE ──────────────────────────────────────────
 const C = {

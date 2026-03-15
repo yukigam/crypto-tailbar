@@ -482,7 +482,7 @@ export default function CryptoTailbar() {
                   <div style={{fontSize:10,color:"#f7931a",letterSpacing:"0.15em",fontWeight:700,fontFamily:"sans-serif",marginBottom:10}}>SPONSORED</div>
                   <div style={{fontSize:15,fontWeight:800,color:C.ink,marginBottom:8,fontFamily:"Georgia,serif"}}>Binance Монгол — Крипто арилжааны #1 платформ</div>
                   <p style={{fontSize:12,color:C.inkLight,margin:"0 0 12px",lineHeight:1.5,fontFamily:"sans-serif"}}>Хамгийн бага шимтгэлтэй. Монгол хэлний дэмжлэгтэй.</p>
-                  <button style={{width:"100%",padding:"9px",background:"#f7931a",border:"none",color:"#000",borderRadius:6,fontWeight:700,cursor:"pointer",fontSize:13,fontFamily:"sans-serif"}}>Нэгдэх →</button>
+                  <button style={{width:"100%",padding:"9px",background:"#f7931a",border:"none",color:"#000",borderRadius:6,fontWeight:700,cursor:"pointer",fontSize:13,fontFamily:"sans-serif"}} onClick={()=>window.open('https://www.binance.com/referral/earn-together/refer2earn-usdc/claim?ref=GRO_28502_O2DNH','_blank')}>Нэгдэх →</button>
                 </div>
 
                 

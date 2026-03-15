@@ -242,10 +242,9 @@ export default function CryptoTailbar() {
           difficulty:"Amarhan",
           featured:false,
           cover:"btc",
-          sanityImg:p.mainImage?`https://cdn.sanity.io/images/88ym68hf/production/${p.mainImage.asset._ref.replace("image-","").replace(/-([a-z]+)$/,".$1").replace(/-/g,"/")}`:null,
           tags:[],
           intro:p.excerpt||p.title,
-          sections:[{title:"Дэлгэрэнгүй",body:Array.isArray(p.body)?p.body.map(b=>b.children?b.children.map(ch=>ch.text||"").join(""):"").filter(Boolean).join("\n\n"):p.excerpt||p.title}]
+          sections:[{title:"Info",body:p.excerpt||p.title}]
         }));
         setAllPosts([...mapped,...POSTS]);
       }

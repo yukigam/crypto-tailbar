@@ -300,7 +300,7 @@ export default function CryptoTailbar() {
               <IconButton key={id} onClick={()=>id==="home"?setScreen("home"):id==="glossary"||id==="about"?setScreen(id):openCat(id)}
                 style={{background:"none",border:"none",borderBottom:`2.5px solid ${(screen===id||(screen==="category"&&activeCat===id))?"#1a1a14":"transparent"}`,color:(screen===id||(screen==="category"&&activeCat===id))?C.ink:C.inkLight,padding:"11px 16px",cursor:"pointer",fontFamily:"sans-serif",fontSize:13,fontWeight:(screen===id||(screen==="category"&&activeCat===id))?700:400,whiteSpace:"nowrap",transition:"color 0.15s"}}>
                 {label}
-              </button>
+              </IconButton>
             ))}
           </div>
         </nav>
@@ -505,7 +505,7 @@ export default function CryptoTailbar() {
               <article>
                 <IconButton onClick={()=>setScreen("home")} style={{background:"none",border:`1px solid ${C.borderDark}`,color:C.inkLight,cursor:"pointer",padding:"6px 14px",borderRadius:4,fontSize:13,fontFamily:"sans-serif",marginBottom:24,display:"flex",alignItems:"center",gap:6}}>
                   ← Буцах
-                </button>
+                </IconButton>
                 {/* Breadcrumb */}
                 <div style={{fontSize:12,color:C.inkFaint,fontFamily:"sans-serif",marginBottom:16,display:"flex",gap:6,alignItems:"center"}}>
                   <span onClick={()=>setScreen("home")} style={{cursor:"pointer",color:C.accent}}>Нүүр</span>
@@ -658,7 +658,7 @@ export default function CryptoTailbar() {
           const cat = CATEGORIES.find(c=>c.id===activeCat);
           return(
             <div style={{paddingTop:32}}>
-              <button onClick={()=>setScreen("home")} style={{background:"none",border:`1px solid ${C.borderDark}`,color:C.inkLight,cursor:"pointer",padding:"6px 14px",borderRadius:4,fontSize:13,fontFamily:"sans-serif",marginBottom:24}}>← Буцах</button>
+              <IconButton onClick={()=>setScreen("home")} style={{background:"none",border:`1px solid ${C.borderDark}`,color:C.inkLight,cursor:"pointer",padding:"6px 14px",borderRadius:4,fontSize:13,fontFamily:"sans-serif",marginBottom:24}}>← Буцах</IconButton>
               <div style={{display:"flex",gap:16,alignItems:"center",marginBottom:28,paddingBottom:20,borderBottom:`2px solid ${C.ink}`}}>
                 <div style={{fontSize:48}}>{cat?.icon}</div>
                 <div>
@@ -773,7 +773,7 @@ export default function CryptoTailbar() {
       {/* ══ CONTACT ══════════════════════════════════════ */}
       {screen==="contact"&&(
         <div style={{paddingTop:32,paddingBottom:48,maxWidth:700,margin:"0 auto"}}>
-          <button onClick={()=>setScreen("home")} style={{background:"none",border:`1px solid ${C.borderDark}`,color:C.inkLight,cursor:"pointer",padding:"6px 14px",borderRadius:4,fontSize:13,fontFamily:"sans-serif",marginBottom:24}}>← Буцах</button>
+          <IconButton onClick={()=>setScreen("home")} style={{background:"none",border:`1px solid ${C.borderDark}`,color:C.inkLight,cursor:"pointer",padding:"6px 14px",borderRadius:4,fontSize:13,fontFamily:"sans-serif",marginBottom:24}}>← Буцах</IconButton>
           <h1 style={{margin:"0 0 8px",fontSize:36,fontWeight:900,fontFamily:"Georgia,serif"}}>Холбоо барих</h1>
           <div style={{height:3,width:60,background:C.accent,marginBottom:28}}/>
           <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,marginBottom:32}}>
@@ -810,7 +810,7 @@ export default function CryptoTailbar() {
       {/* ══ WRITER ════════════════════════════════════════ */}
       {screen==="writer"&&(
         <div style={{paddingTop:32,paddingBottom:48,maxWidth:780,margin:"0 auto"}}>
-          <button onClick={()=>setScreen("home")} style={{background:"none",border:`1px solid ${C.borderDark}`,color:C.inkLight,cursor:"pointer",padding:"6px 14px",borderRadius:4,fontSize:13,fontFamily:"sans-serif",marginBottom:24}}>← Буцах</button>
+          <IconButton onClick={()=>setScreen("home")} style={{background:"none",border:`1px solid ${C.borderDark}`,color:C.inkLight,cursor:"pointer",padding:"6px 14px",borderRadius:4,fontSize:13,fontFamily:"sans-serif",marginBottom:24}}>← Буцах</IconButton>
           <h1 style={{margin:"0 0 8px",fontSize:36,fontWeight:900,fontFamily:"Georgia,serif"}}>Нийтлэгч болох</h1>
           <div style={{height:3,width:60,background:C.accent,marginBottom:20}}/>
           <p style={{fontSize:16,color:C.inkLight,lineHeight:1.8,fontFamily:"sans-serif",marginBottom:28}}>
@@ -849,7 +849,7 @@ export default function CryptoTailbar() {
               <div style={{fontSize:13,fontWeight:600,color:C.ink,marginBottom:6,fontFamily:"sans-serif"}}>Бичсэн нийтлэлийн жишээ (холбоос)</div>
               <input placeholder="https://..." style={{width:"100%",padding:"10px 14px",background:C.bg,border:`1.5px solid ${C.borderDark}`,borderRadius:6,color:C.ink,fontSize:14,outline:"none",fontFamily:"sans-serif",boxSizing:"border-box"}}/>
             </div>
-            <button style={{width:"100%",padding:"12px",background:C.accent,border:"none",color:"#fff",borderRadius:6,fontWeight:700,cursor:"pointer",fontSize:15,fontFamily:"sans-serif"}}>Өргөдөл илгээх →</button>
+            <IconButton style={{width:"100%",padding:"12px",background:C.accent,border:"none",color:"#fff",borderRadius:6,fontWeight:700,cursor:"pointer",fontSize:15,fontFamily:"sans-serif"}}>Өргөдөл илгээх →</IconButton>
           </div>
         </div>
       )}
@@ -857,7 +857,7 @@ export default function CryptoTailbar() {
       {/* ══ ADVERTISE ═════════════════════════════════════ */}
       {screen==="advertise"&&(
         <div style={{paddingTop:32,paddingBottom:48,maxWidth:860,margin:"0 auto"}}>
-          <button onClick={()=>setScreen("home")} style={{background:"none",border:`1px solid ${C.borderDark}`,color:C.inkLight,cursor:"pointer",padding:"6px 14px",borderRadius:4,fontSize:13,fontFamily:"sans-serif",marginBottom:24}}>← Буцах</button>
+          <IconButton onClick={()=>setScreen("home")} style={{background:"none",border:`1px solid ${C.borderDark}`,color:C.inkLight,cursor:"pointer",padding:"6px 14px",borderRadius:4,fontSize:13,fontFamily:"sans-serif",marginBottom:24}}>← Буцах</IconButton>
           <h1 style={{margin:"0 0 8px",fontSize:36,fontWeight:900,fontFamily:"Georgia,serif"}}>Advertise — Зар сурталчилгаа</h1>
           <div style={{height:3,width:60,background:C.accent,marginBottom:20}}/>
           <p style={{fontSize:16,color:C.inkLight,lineHeight:1.8,fontFamily:"sans-serif",marginBottom:32}}>
@@ -893,7 +893,7 @@ export default function CryptoTailbar() {
       {/* ══ PRIVACY ═══════════════════════════════════════ */}
       {screen==="privacy"&&(
         <div style={{paddingTop:32,paddingBottom:48,maxWidth:780,margin:"0 auto"}}>
-          <button onClick={()=>setScreen("home")} style={{background:"none",border:`1px solid ${C.borderDark}`,color:C.inkLight,cursor:"pointer",padding:"6px 14px",borderRadius:4,fontSize:13,fontFamily:"sans-serif",marginBottom:24}}>← Буцах</button>
+          <IconButton onClick={()=>setScreen("home")} style={{background:"none",border:`1px solid ${C.borderDark}`,color:C.inkLight,cursor:"pointer",padding:"6px 14px",borderRadius:4,fontSize:13,fontFamily:"sans-serif",marginBottom:24}}>← Буцах</IconButton>
           <h1 style={{margin:"0 0 8px",fontSize:36,fontWeight:900,fontFamily:"Georgia,serif"}}>Нууцлалын бодлого</h1>
           <div style={{height:3,width:60,background:C.accent,marginBottom:8}}/>
           <div style={{fontSize:12,color:C.inkFaint,fontFamily:"sans-serif",marginBottom:28}}>Сүүлд шинэчилсэн: 2026 оны 3 дугаар сар</div>

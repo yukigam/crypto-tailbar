@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from "react";
+import IconButton from "../components/IconButton";
 import { getPosts, urlFor } from '../lib/sanity'; 
 // ── PALETTE ──────────────────────────────────────────
 const C = {
@@ -196,15 +197,15 @@ const GLOSSARY = [
   { term:"DYOR", mn:"Өөрөө судал", def:"Do Your Own Research — бусдын үгэнд найдалгүй судлаарай" },
 ];
 
-const COVER_GRADIENTS = {
-  btc: "linear-gradient(135deg,#fff7ed,#fed7aa)",
-  wallet: "linear-gradient(135deg,#f0fdf4,#bbf7d0)",
-  defi: "linear-gradient(135deg,#faf5ff,#ddd6fe)",
-  eth: "linear-gradient(135deg,#eff6ff,#bfdbfe)",
-  law: "linear-gradient(135deg,#fef2f2,#fecaca)",
-  staking: "linear-gradient(135deg,#ecfdf5,#a7f3d0)",
-  mining: "linear-gradient(135deg,#f8fafc,#e2e8f0)",
-  nft: "linear-gradient(135deg,#f0fdfa,#99f6e4)",
+const COVER_IMAGES = {
+  btc: "https://images.unsplash.com/photo-1518546305927-5a555bb7020d?auto=format&fit=crop&q=80&w=1000",
+  wallet: "https://images.unsplash.com/photo-1633158829585-23ba8f7c8caf?auto=format&fit=crop&q=80&w=1000",
+  defi: "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&q=80&w=1000",
+  eth: "https://images.unsplash.com/photo-1622790698141-94e30457ef12?auto=format&fit=crop&q=80&w=1000",
+  law: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&q=80&w=1000",
+  staking: "https://images.unsplash.com/photo-1640344583441-73988739688e?auto=format&fit=crop&q=80&w=1000",
+  mining: "https://images.unsplash.com/photo-1644143379190-08a5f0556396?auto=format&fit=crop&q=80&w=1000",
+  nft: "https://images.unsplash.com/photo-1643101809754-43a91784ebec?auto=format&fit=crop&q=80&w=1000",
 };
 const COVER_ICON = { btc:"₿", wallet:"👛", defi:"🏦", eth:"Ξ", law:"⚖️", staking:"🌱", mining:"⛏", nft:"🖼" };
 
@@ -262,7 +263,7 @@ export default function CryptoTailbar() {
     <div style={{minHeight:"100vh",background:C.bg,color:C.ink,fontFamily:"'Georgia','Times New Roman',serif"}}>
 
       {/* ── HEADER ── */}
-      <header style={{background:C.white,borderBottom:`2px solid ${C.ink}`,position:"sticky",top:0,zIndex:200}}>
+      <header style={{background:C.white,borderBottom:`1px solid ${C.border}`,position:"sticky",top:0,zIndex:200, boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)'}}>
         {/* Top strip */}
         <div style={{background:C.ink,padding:"6px 24px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
           <div style={{display:"flex",gap:16,fontSize:11,color:"#aaa",letterSpacing:"0.05em"}}>
@@ -288,7 +289,7 @@ export default function CryptoTailbar() {
           </div>
           <div style={{flex:2}}/>
           <div style={{display:"flex",gap:8}}>
-            <button onClick={()=>setSearchOpen(o=>!o)} style={{background:"none",border:`1.5px solid ${C.borderDark}`,color:C.inkLight,padding:"8px 13px",borderRadius:6,cursor:"pointer",fontSize:14,fontFamily:"sans-serif"}}>🔍</button>
+            <IconButton onClick={()=>setSearchOpen(o=>!o)} style={{background:"none",border:`1.5px solid ${C.borderDark}`,color:C.inkLight,padding:"8px 13px",borderRadius:6,cursor:"pointer",fontSize:14,fontFamily:"sans-serif"}}><span role="img" aria-label="search">🔍</span></IconButton>
           </div>
         </div>
 
@@ -296,7 +297,7 @@ export default function CryptoTailbar() {
         <nav style={{borderTop:`1px solid ${C.border}`,background:C.white}}>
           <div style={{maxWidth:1200,margin:"0 auto",padding:"0 24px",display:"flex",overflowX:"auto"}}>
             {[["home","Нүүр"],["glossary","Толь бичиг"],["about","Бидний тухай"]].concat(CATEGORIES.slice(0,5).map(c=>[c.id,c.label])).map(([id,label])=>(
-              <button key={id} onClick={()=>id==="home"?setScreen("home"):id==="glossary"||id==="about"?setScreen(id):openCat(id)}
+              <IconButton key={id} onClick={()=>id==="home"?setScreen("home"):id==="glossary"||id==="about"?setScreen(id):openCat(id)}
                 style={{background:"none",border:"none",borderBottom:`2.5px solid ${(screen===id||(screen==="category"&&activeCat===id))?"#1a1a14":"transparent"}`,color:(screen===id||(screen==="category"&&activeCat===id))?C.ink:C.inkLight,padding:"11px 16px",cursor:"pointer",fontFamily:"sans-serif",fontSize:13,fontWeight:(screen===id||(screen==="category"&&activeCat===id))?700:400,whiteSpace:"nowrap",transition:"color 0.15s"}}>
                 {label}
               </button>
@@ -337,8 +338,10 @@ export default function CryptoTailbar() {
             <div style={{display:"grid",gridTemplateColumns:"5fr 3fr",gap:1,marginBottom:36,border:`1.5px solid ${C.ink}`,borderRadius:4,overflow:"hidden"}}>
               {/* Main hero */}
               {allPosts.slice(0,1).map(p=>(
-                <div key={p.id} onClick={()=>openPost(p)} style={{cursor:"pointer",padding:"32px 36px",background:COVER_GRADIENTS[p.cover],position:"relative",borderRight:`1px solid ${C.ink}`}}>
-                  <div style={{fontSize:60,marginBottom:16,opacity:0.5}}>{COVER_ICON[p.cover]}</div>
+                <div key={p.id} onClick={()=>openPost(p)} className="image-container" style={{cursor:"pointer",padding:"32px 36px",position:"relative",borderRight:`1px solid ${C.ink}`, minHeight: '400px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end'}}>
+                  <img src={COVER_IMAGES[p.cover]} alt={p.title} style={{position:'absolute', top:0, left:0, width:'100%', height:'100%', objectFit:'cover', zIndex:0}} />
+                  <div className="gradient-overlay" style={{zIndex:1}} />
+                  <div style={{position:'relative', zIndex:2}}>
                   <div style={{display:"flex",gap:8,marginBottom:12,alignItems:"center"}}>
                     <span style={{background:C.ink,color:"#fff",padding:"3px 10px",fontSize:10,fontWeight:800,letterSpacing:"0.1em",fontFamily:"sans-serif"}}>ОНЦЛОХ</span>
                     <span style={{background:C.accent,color:"#fff",padding:"3px 10px",fontSize:10,fontWeight:700,fontFamily:"sans-serif"}}>{p.catLabel.toUpperCase()}</span>
@@ -352,20 +355,23 @@ export default function CryptoTailbar() {
                     <span>·</span><span>⏱ {p.readTime} мин</span>
                     <span>·</span><span>👁 {p.views}</span>
                   </div>
+                  </div>
                 </div>
               ))}
               {/* Side stack */}
               <div style={{display:"flex",flexDirection:"column"}}>
                 {allPosts.slice(1,4).map((p,i)=>(
-                  <div key={p.id} onClick={()=>openPost(p)} style={{padding:"18px 22px",background:COVER_GRADIENTS[p.cover],cursor:"pointer",flex:1,borderBottom:i<2?`1px solid ${C.ink}`:"none",transition:"opacity 0.15s"}}
-                    onMouseEnter={e=>e.currentTarget.style.opacity="0.85"}
-                    onMouseLeave={e=>e.currentTarget.style.opacity="1"}>
-                    <div style={{display:"flex",gap:6,marginBottom:8,alignItems:"center"}}>
-                      <span style={{fontSize:16}}>{COVER_ICON[p.cover]}</span>
-                      <span style={{fontSize:9,color:C.inkFaint,letterSpacing:"0.1em",fontWeight:700,fontFamily:"sans-serif"}}>{p.catLabel.toUpperCase()}</span>
+                  <div key={p.id} onClick={()=>openPost(p)} className="image-container" style={{padding:"18px 22px",cursor:"pointer",flex:1,borderBottom:i<2?`1px solid ${C.ink}`:"none",transition:"opacity 0.15s", position:'relative', display:'flex', flexDirection:'column', justifyContent:'flex-end'}}>
+                    <img src={COVER_IMAGES[p.cover]} alt={p.title} style={{position:'absolute', top:0, left:0, width:'100%', height:'100%', objectFit:'cover', zIndex:0}} />
+                    <div className="gradient-overlay" style={{zIndex:1}} />
+                    <div style={{position:'relative', zIndex:2}}>
+                      <div style={{display:"flex",gap:6,marginBottom:8,alignItems:"center"}}>
+                        <span style={{fontSize:16, color: 'white'}}>{COVER_ICON[p.cover]}</span>
+                        <span style={{fontSize:9,color:'rgba(255,255,255,0.8)',letterSpacing:"0.1em",fontWeight:700,fontFamily:"sans-serif"}}>{p.catLabel.toUpperCase()}</span>
+                      </div>
+                      <div style={{fontSize:"clamp(13px,1.5vw,16px)",fontWeight:800,color:'white',lineHeight:1.3,fontFamily:"Georgia,serif",marginBottom:6}}>{p.title}</div>
+                      <div style={{fontSize:11,color:'rgba(255,255,255,0.7)',fontFamily:"sans-serif"}}>{p.readTime} мин · {p.views}</div>
                     </div>
-                    <div style={{fontSize:"clamp(13px,1.5vw,16px)",fontWeight:800,color:C.ink,lineHeight:1.3,fontFamily:"Georgia,serif",marginBottom:6}}>{p.title}</div>
-                    <div style={{fontSize:11,color:C.inkFaint,fontFamily:"sans-serif"}}>{p.readTime} мин · {p.views}</div>
                   </div>
                 ))}
               </div>
@@ -381,9 +387,7 @@ export default function CryptoTailbar() {
                   </div>
                   <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:10}}>
                     {CATEGORIES.map(cat=>(
-                      <div key={cat.id} onClick={()=>openCat(cat.id)} style={{padding:"16px",background:C.white,border:`1.5px solid ${C.border}`,borderRadius:8,cursor:"pointer",textAlign:"center",transition:"all 0.15s"}}
-                        onMouseEnter={e=>{e.currentTarget.style.borderColor=cat.color;e.currentTarget.style.background=C.accentLight;}}
-                        onMouseLeave={e=>{e.currentTarget.style.borderColor=C.border;e.currentTarget.style.background=C.white;}}>
+                      <div key={cat.id} onClick={()=>openCat(cat.id)} className="modern-card" style={{padding:"16px",background:C.white,cursor:"pointer",textAlign:"center"}}>
                         <div style={{fontSize:26,marginBottom:8}}>{cat.icon}</div>
                         <div style={{fontSize:13,fontWeight:700,color:C.ink,fontFamily:"sans-serif"}}>{cat.label}</div>
                         <div style={{fontSize:11,color:C.inkFaint,fontFamily:"sans-serif",marginTop:4}}>{cat.count} нийтлэл</div>
@@ -405,7 +409,10 @@ export default function CryptoTailbar() {
                       <div onClick={()=>openPost(p)} style={{display:"flex",gap:18,padding:"20px 0",cursor:"pointer"}}
                         onMouseEnter={e=>e.currentTarget.querySelector(".ptitle").style.color=C.accent}
                         onMouseLeave={e=>e.currentTarget.querySelector(".ptitle").style.color=C.ink}>
-                        <div style={{width:100,height:80,borderRadius:6,background:COVER_GRADIENTS[p.cover],flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:32}}>{COVER_ICON[p.cover]}</div>
+                        <div className="image-container" style={{width:100,height:80,borderRadius:6,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:32, position: 'relative'}}>
+                          <img src={COVER_IMAGES[p.cover]} alt={p.title} style={{position:'absolute', top:0, left:0, width:'100%', height:'100%', objectFit:'cover'}} />
+                          <span style={{position:'relative', zIndex:1}}>{COVER_ICON[p.cover]}</span>
+                        </div>
                         <div style={{flex:1}}>
                           <div style={{display:"flex",gap:8,marginBottom:7,alignItems:"center",flexWrap:"wrap"}}>
                             <span style={{fontSize:10,color:C.white,background:C.accent,padding:"2px 8px",fontWeight:700,letterSpacing:"0.08em",fontFamily:"sans-serif"}}>{p.catLabel.toUpperCase()}</span>
@@ -458,7 +465,7 @@ export default function CryptoTailbar() {
                     <>
                       <input value={newsletterEmail} onChange={e=>setNewsletterEmail(e.target.value)} placeholder="Таны и-мэйл..."
                         style={{width:"100%",padding:"9px 12px",background:"#fff",border:`1.5px solid ${C.borderDark}`,borderRadius:6,color:C.ink,fontSize:13,outline:"none",fontFamily:"sans-serif",boxSizing:"border-box",marginBottom:8}}/>
-                      <button onClick={()=>{if(newsletterEmail.includes("@")){setNewsletterDone(true);}}} style={{width:"100%",padding:"10px",background:C.accent,border:"none",color:"#fff",borderRadius:6,fontWeight:700,cursor:"pointer",fontSize:13,fontFamily:"sans-serif"}}>Бүртгүүлэх →</button>
+                      <IconButton onClick={()=>{if(newsletterEmail.includes("@")){setNewsletterDone(true);}}} style={{width:"100%",padding:"10px",background:C.accent,border:"none",color:"#fff",borderRadius:6,fontWeight:700,cursor:"pointer",fontSize:13,fontFamily:"sans-serif"}}>Бүртгүүлэх →</IconButton>
                     </>
                   )}
                 </div>
@@ -467,7 +474,7 @@ export default function CryptoTailbar() {
                 <div style={{border:`1.5px solid ${C.border}`,borderRadius:8,overflow:"hidden"}}>
                   <div style={{padding:"12px 16px",background:C.bgDark,borderBottom:`1px solid ${C.border}`,fontSize:13,fontWeight:800,fontFamily:"sans-serif",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
                     <span>📖 Крипто толь</span>
-                    <button onClick={()=>setScreen("glossary")} style={{background:"none",border:"none",color:C.accent,cursor:"pointer",fontSize:12,fontFamily:"sans-serif",fontWeight:600}}>Бүгдийг харах →</button>
+                    <IconButton onClick={()=>setScreen("glossary")} style={{background:"none",border:"none",color:C.accent,boxShadow:'none',padding:0, fontSize:12,fontWeight:600}}>Бүгдийг харах →</IconButton>
                   </div>
                   {GLOSSARY.slice(0,5).map((g,i)=>(
                     <div key={g.term} style={{padding:"10px 14px",borderBottom:i<4?`1px solid ${C.border}`:"none",background:C.white}}>
@@ -482,7 +489,7 @@ export default function CryptoTailbar() {
                   <div style={{fontSize:10,color:"#f7931a",letterSpacing:"0.15em",fontWeight:700,fontFamily:"sans-serif",marginBottom:10}}>SPONSORED</div>
                   <div style={{fontSize:15,fontWeight:800,color:C.ink,marginBottom:8,fontFamily:"Georgia,serif"}}>Binance Монгол — Крипто арилжааны #1 платформ</div>
                   <p style={{fontSize:12,color:C.inkLight,margin:"0 0 12px",lineHeight:1.5,fontFamily:"sans-serif"}}>Хамгийн бага шимтгэлтэй. Монгол хэлний дэмжлэгтэй.</p>
-                  <button style={{width:"100%",padding:"9px",background:"#f7931a",border:"none",color:"#000",borderRadius:6,fontWeight:700,cursor:"pointer",fontSize:13,fontFamily:"sans-serif"}} onClick={()=>window.open('https://www.binance.com/referral/earn-together/refer2earn-usdc/claim?ref=GRO_28502_O2DNH','_blank')}>Нэгдэх →</button>
+                  <IconButton style={{width:"100%",padding:"9px",background:"#f7931a",border:"none",color:"#000",borderRadius:6,fontWeight:700,cursor:"pointer",fontSize:13,fontFamily:"sans-serif"}} onClick={()=>window.open('https://www.binance.com/referral/earn-together/refer2earn-usdc/claim?ref=GRO_28502_O2DNH','_blank')}>Нэгдэх →</IconButton>
                 </div>
 
                 
@@ -496,7 +503,7 @@ export default function CryptoTailbar() {
           <div style={{paddingTop:32}}>
             <div style={{display:"grid",gridTemplateColumns:"1fr 300px",gap:40}}>
               <article>
-                <button onClick={()=>setScreen("home")} style={{background:"none",border:`1px solid ${C.borderDark}`,color:C.inkLight,cursor:"pointer",padding:"6px 14px",borderRadius:4,fontSize:13,fontFamily:"sans-serif",marginBottom:24,display:"flex",alignItems:"center",gap:6}}>
+                <IconButton onClick={()=>setScreen("home")} style={{background:"none",border:`1px solid ${C.borderDark}`,color:C.inkLight,cursor:"pointer",padding:"6px 14px",borderRadius:4,fontSize:13,fontFamily:"sans-serif",marginBottom:24,display:"flex",alignItems:"center",gap:6}}>
                   ← Буцах
                 </button>
                 {/* Breadcrumb */}
@@ -535,8 +542,10 @@ export default function CryptoTailbar() {
                 </div>
 
                 {/* Cover */}
-                <div style={{height:280,background:COVER_GRADIENTS[activePost.cover],borderRadius:10,display:"flex",alignItems:"center",justifyContent:"center",fontSize:90,marginBottom:28,border:`1px solid ${C.border}`}}>
-                  {COVER_ICON[activePost.cover]}
+                <div className="image-container" style={{height:350,borderRadius:12,display:"flex",alignItems:"center",justifyContent:"center",fontSize:90,marginBottom:28,border:`1px solid ${C.border}`, position:'relative'}}>
+                  <img src={COVER_IMAGES[activePost.cover]} alt={activePost.title} style={{position:'absolute', top:0, left:0, width:'100%', height:'100%', objectFit:'cover'}} />
+                  <div className="gradient-overlay" />
+                  <span style={{position:'relative', zIndex:1, opacity: 0.8}}>{COVER_ICON[activePost.cover]}</span>
                 </div>
 
                 {/* Intro */}
@@ -603,7 +612,10 @@ export default function CryptoTailbar() {
                       <div key={p.id} onClick={()=>openPost(p)} style={{border:`1px solid ${C.border}`,borderRadius:8,overflow:"hidden",cursor:"pointer",background:C.white}}
                         onMouseEnter={e=>e.currentTarget.style.borderColor=C.accent}
                         onMouseLeave={e=>e.currentTarget.style.borderColor=C.border}>
-                        <div style={{height:80,background:COVER_GRADIENTS[p.cover],display:"flex",alignItems:"center",justifyContent:"center",fontSize:32}}>{COVER_ICON[p.cover]}</div>
+                        <div className="image-container" style={{height:100,display:"flex",alignItems:"center",justifyContent:"center",fontSize:32, position:'relative'}}>
+                          <img src={COVER_IMAGES[p.cover]} alt={p.title} style={{position:'absolute', top:0, left:0, width:'100%', height:'100%', objectFit:'cover'}} />
+                          <span style={{position:'relative', zIndex:1}}>{COVER_ICON[p.cover]}</span>
+                        </div>
                         <div style={{padding:"12px"}}>
                           <div style={{fontSize:11,color:C.accent,fontWeight:700,fontFamily:"sans-serif",marginBottom:5}}>{p.catLabel.toUpperCase()}</div>
                           <div style={{fontSize:13,fontWeight:700,color:C.ink,lineHeight:1.3,fontFamily:"Georgia,serif"}}>{p.title}</div>
@@ -633,7 +645,7 @@ export default function CryptoTailbar() {
                   <div style={{fontSize:15,fontWeight:800,color:C.ink,marginBottom:8,fontFamily:"Georgia,serif"}}>📧 Долоо хоног бүр</div>
                   <p style={{fontSize:12,color:C.inkLight,margin:"0 0 12px",fontFamily:"sans-serif"}}>Крипто мэдлэгийг энгийнээр и-мэйлд авах</p>
                   <input placeholder="И-мэйл хаяг..." style={{width:"100%",padding:"9px 12px",background:"#fff",border:`1px solid ${C.borderDark}`,borderRadius:6,color:C.ink,fontSize:13,outline:"none",fontFamily:"sans-serif",boxSizing:"border-box",marginBottom:8}}/>
-                  <button style={{width:"100%",padding:"9px",background:C.accent,border:"none",color:"#fff",borderRadius:6,fontWeight:700,cursor:"pointer",fontSize:13,fontFamily:"sans-serif"}}>Бүртгүүлэх</button>
+                  <IconButton style={{width:"100%",padding:"9px",background:C.accent,border:"none",color:"#fff",borderRadius:6,fontWeight:700,cursor:"pointer",fontSize:13,fontFamily:"sans-serif"}}>Бүртгүүлэх</IconButton>
                 </div>
                 
               </aside>
@@ -662,7 +674,10 @@ export default function CryptoTailbar() {
                       <div onClick={()=>openPost(p)} style={{display:"flex",gap:18,padding:"20px 0",cursor:"pointer"}}
                         onMouseEnter={e=>e.currentTarget.querySelector(".pt2").style.color=C.accent}
                         onMouseLeave={e=>e.currentTarget.querySelector(".pt2").style.color=C.ink}>
-                        <div style={{width:120,height:90,borderRadius:8,background:COVER_GRADIENTS[p.cover],flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:36}}>{COVER_ICON[p.cover]}</div>
+                        <div className="image-container" style={{width:120,height:90,borderRadius:8,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:36, position:'relative'}}>
+                          <img src={COVER_IMAGES[p.cover]} alt={p.title} style={{position:'absolute', top:0, left:0, width:'100%', height:'100%', objectFit:'cover'}} />
+                          <span style={{position:'relative', zIndex:1}}>{COVER_ICON[p.cover]}</span>
+                        </div>
                         <div style={{flex:1}}>
                           <div style={{display:"flex",gap:8,marginBottom:8,alignItems:"center"}}>
                             <span style={{fontSize:10,color:diffColor(p.difficulty),fontWeight:700,fontFamily:"sans-serif"}}>{p.difficulty}</span>
@@ -787,7 +802,7 @@ export default function CryptoTailbar() {
               <div style={{fontSize:13,fontWeight:600,color:C.ink,marginBottom:6,fontFamily:"sans-serif"}}>Мессеж</div>
               <textarea placeholder="Дэлгэрэнгүй бичнэ үү..." rows={5} style={{width:"100%",padding:"10px 14px",background:C.bg,border:`1.5px solid ${C.borderDark}`,borderRadius:6,color:C.ink,fontSize:14,outline:"none",fontFamily:"sans-serif",boxSizing:"border-box",resize:"vertical"}}/>
             </div>
-            <button style={{width:"100%",padding:"12px",background:C.accent,border:"none",color:"#fff",borderRadius:6,fontWeight:700,cursor:"pointer",fontSize:15,fontFamily:"sans-serif"}}>Илгээх →</button>
+            <IconButton style={{width:"100%",padding:"12px",background:C.accent,border:"none",color:"#fff",borderRadius:6,fontWeight:700,cursor:"pointer",fontSize:15,fontFamily:"sans-serif"}}>Илгээх →</IconButton>
           </div>
         </div>
       )}

@@ -1,5 +1,63 @@
-{
-  box-sizing: border-box;
+:root {
+  --bg: #fafaf7;
+  --bg-dark: #f2f2ed;
+  --ink: #1a1a14;
+  --ink-light: #5a5a50;
+  --accent: #0a7c4e;
+  --accent-light: #e8f5ef;
+  --accent-bright: #12a868;
+  --border: #e4e4dc;
+  --radius: 12px;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--ink);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   margin: 0;
-  padding: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  font-family: inherit;
+}
+
+.modern-card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.modern-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px -10px rgba(0,0,0,0.1);
+  border-color: var(--accent);
+}
+
+.image-container {
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-dark);
+}
+
+.image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.modern-card:hover .image-container img {
+  transform: scale(1.05);
+}
+
+.gradient-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.4) 100%);
 }

@@ -921,26 +921,26 @@ export default function CryptoTailbar() {
               <div style={{fontSize:26,fontWeight:900,fontFamily:"Georgia,serif",marginBottom:12}}>
                 <span style={{color:"#fff"}}>Крипто</span><span style={{color:C.accentBright}}>Тайлбарлагч</span>
               </div>
-              <p style={{fontSize:13,lineHeight:1.7,color:"#666",margin:"0 0 16px"}}>Монголын хамгийн найдвартай крипто мэдлэгийн эх сурвалж. Энгийн хэлэнд ойлгомжтой тайлбар.</p>
+              <p style={{fontSize:13,lineHeight:1.7,color:"#bbb",margin:"0 0 16px"}}>Монголын хамгийн найдвартай крипто мэдлэгийн эх сурвалж. Энгийн хэлэнд ойлгомжтой тайлбар.</p>
               <div style={{display:"flex",gap:10,marginBottom:14}}>
                 {[["Telegram","https://t.me/"],["Twitter","https://twitter.com/"],["Facebook","https://facebook.com/"],["YouTube","https://youtube.com/"]].map(([s,url])=>(
                   <a key={s} href={url} target="_blank" rel="noopener noreferrer"
-                    style={{width:32,height:32,borderRadius:"50%",background:"#2a2a2a",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,textDecoration:"none",color:"#888",transition:"all 0.15s"}}
-                    onMouseEnter={e=>{e.currentTarget.style.background=C.accent;e.currentTarget.style.color="#fff";}}
-                    onMouseLeave={e=>{e.currentTarget.style.background="#2a2a2a";e.currentTarget.style.color="#888";}}>
+                    style={{width:32,height:32,borderRadius:"50%",background:"#333",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,textDecoration:"none",color:"#fff",transition:"all 0.15s", border: "1px solid #444"}}
+                    onMouseEnter={e=>{e.currentTarget.style.background=C.accent;e.currentTarget.style.borderColor=C.accent;}}
+                    onMouseLeave={e=>{e.currentTarget.style.background="#333";e.currentTarget.style.borderColor="#444";}}>
                     {s[0]}
                   </a>
                 ))}
               </div>
-              <div style={{fontSize:11,color:"#444"}}>© 2026 КрыптоТайлбарлагч. Бүх эрх хамгаалагдсан.</div>
+              <div style={{fontSize:11,color:"#777"}}>© 2026 КриптоТайлбарлагч. Бүх эрх хамгаалагдсан.</div>
             </div>
 
             {/* Агуулга */}
             <div>
               <div style={{fontSize:11,fontWeight:700,letterSpacing:"0.1em",color:C.accentBright,marginBottom:14}}>АГУУЛГА</div>
               {[["beginner","Эхлэгчдэд"],["bitcoin","Bitcoin"],["ethereum","Ethereum"],["defi","DeFi"],["nft","NFT & Web3"]].map(([id,label])=>(
-                <div key={id} onClick={()=>openCat(id)} style={{fontSize:13,color:"#555",marginBottom:8,cursor:"pointer",transition:"color 0.15s"}}
-                  onMouseEnter={e=>e.target.style.color="#fff"} onMouseLeave={e=>e.target.style.color="#555"}>{label}</div>
+                <div key={id} onClick={()=>openCat(id)} style={{fontSize:13,color:"#bbb",marginBottom:8,cursor:"pointer",transition:"all 0.15s"}}
+                  onMouseEnter={e=>{e.target.style.color="#fff"; e.target.style.textDecoration="underline";}} onMouseLeave={e=>{e.target.style.color="#bbb"; e.target.style.textDecoration="none";}}>{label}</div>
               ))}
             </div>
 
@@ -948,8 +948,8 @@ export default function CryptoTailbar() {
             <div>
               <div style={{fontSize:11,fontWeight:700,letterSpacing:"0.1em",color:C.accentBright,marginBottom:14}}>ПЛАТФОРМ</div>
               {[["about","Бидний тухай"],["writer","Нийтлэгч болох"],["advertise","Advertise"],["privacy","Нууцлал"],["contact","Холбоо барих"]].map(([id,label])=>(
-                <div key={id} onClick={()=>setScreen(id)} style={{fontSize:13,color:"#555",marginBottom:8,cursor:"pointer",transition:"color 0.15s"}}
-                  onMouseEnter={e=>e.target.style.color="#fff"} onMouseLeave={e=>e.target.style.color="#555"}>{label}</div>
+                <div key={id} onClick={()=>setScreen(id)} style={{fontSize:13,color:"#bbb",marginBottom:8,cursor:"pointer",transition:"all 0.15s"}}
+                  onMouseEnter={e=>{e.target.style.color="#fff"; e.target.style.textDecoration="underline";}} onMouseLeave={e=>{e.target.style.color="#bbb"; e.target.style.textDecoration="none";}}>{label}</div>
               ))}
             </div>
 
@@ -958,12 +958,12 @@ export default function CryptoTailbar() {
               <div style={{fontSize:11,fontWeight:700,letterSpacing:"0.1em",color:C.accentBright,marginBottom:14}}>НИЙГЭМЛЭГ</div>
               {[["https://t.me/","Telegram 📱"],["https://twitter.com/","Twitter/X 🐦"],["https://facebook.com/","Facebook 👥"],["https://youtube.com/","YouTube ▶️"],["https://discord.com/","Discord 💬"]].map(([url,label])=>(
                 <a key={label} href={url} target="_blank" rel="noopener noreferrer"
-                  style={{display:"block",fontSize:13,color:"#555",marginBottom:8,cursor:"pointer",textDecoration:"none",transition:"color 0.15s"}}
-                  onMouseEnter={e=>e.target.style.color="#fff"} onMouseLeave={e=>e.target.style.color="#555"}>{label}</a>
+                  style={{display:"block",fontSize:13,color:"#bbb",marginBottom:8,cursor:"pointer",textDecoration:"none",transition:"all 0.15s"}}
+                  onMouseEnter={e=>{e.target.style.color="#fff"; e.target.style.textDecoration="underline";}} onMouseLeave={e=>{e.target.style.color="#bbb"; e.target.style.textDecoration="none";}}>{label}</a>
               ))}
             </div>
           </div>
-          <div style={{borderTop:"1px solid #1e1e1e",paddingTop:16,fontSize:11,color:"#333",textAlign:"center"}}>
+          <div style={{borderTop:"1px solid #2a2a2a",paddingTop:16,fontSize:11,color:"#777",textAlign:"center"}}>
             Энэхүү сайт дах агуулга нь санхүүгийн зөвлөгөө биш. Крипто хөрөнгө оруулалт нь эрсдэлтэй. Мэргэжилтэнтэй зөвлөлдөөрэй.
           </div>
         </div>

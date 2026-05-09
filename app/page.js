@@ -225,7 +225,10 @@ export default function CryptoTailbar() {
   const [newsletterEmail, setNewsletterEmail] = useState("");
   const [newsletterDone, setNewsletterDone] = useState(false);
   const [allPosts, setAllPosts] = useState(POSTS);
-  useEffect(()=>{
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
     getPosts().then(data=>{
       if(data&&data.length>0){
         const mapped=data.map((p,i)=>({
@@ -258,6 +261,8 @@ export default function CryptoTailbar() {
   const catPosts = activeCat ? allPosts.filter(p=>p.cat===activeCat) : [];
   const searchResults = searchQ.length>1 ? allPosts.filter(p=>p.title.toLowerCase().includes(searchQ.toLowerCase())||p.tags.some(t=>t.toLowerCase().includes(searchQ.toLowerCase()))) : [];
   const filtered_glossary = glossaryQ ? GLOSSARY.filter(g=>g.term.toLowerCase().includes(glossaryQ.toLowerCase())||g.mn.includes(glossaryQ)) : GLOSSARY;
+
+  if (!mounted) return <div style={{minHeight:"100vh", background:C.bg}} />;
 
   return(
     <div style={{minHeight:"100vh",background:C.bg,color:C.ink,fontFamily:"'Georgia','Times New Roman',serif"}}>

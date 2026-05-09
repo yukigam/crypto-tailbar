@@ -265,8 +265,8 @@ export default function CryptoTailbar() {
       {/* ── HEADER ── */}
       <header style={{background:C.white,borderBottom:`1px solid ${C.border}`,position:"sticky",top:0,zIndex:200, boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)'}}>
         {/* Top strip */}
-        <div style={{background:C.ink,padding:"6px 24px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-          <div style={{display:"flex",gap:16,fontSize:11,color:"#aaa",letterSpacing:"0.05em"}}>
+        <div className="container-wide mobile-stack" style={{background:C.ink,padding:"6px 24px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+          <div style={{display:"flex",gap:16,fontSize:11,color:"#aaa",letterSpacing:"0.05em", flexWrap: "wrap"}}>
             <span style={{color:"#fff",fontWeight:700}}>КРИПТО ТАЙЛБАРЛАГЧ</span>
             <span>·</span>
             <span>{new Date().toLocaleDateString("mn-MN",{year:"numeric",month:"long",day:"numeric"})}</span>
@@ -279,7 +279,7 @@ export default function CryptoTailbar() {
         </div>
 
         {/* Logo row */}
-        <div style={{maxWidth:1200,margin:"0 auto",padding:"18px 24px",display:"flex",alignItems:"center",gap:20}}>
+        <div className="container-wide mobile-stack" style={{padding:"18px 24px",display:"flex",alignItems:"center",gap:20}}>
           <div onClick={()=>setScreen("home")} style={{cursor:"pointer",flex:1}}>
             <div style={{display:"flex",alignItems:"baseline",gap:3}}>
               <span style={{fontSize:"clamp(26px,3.5vw,42px)",fontWeight:900,letterSpacing:"-2px",color:C.ink,lineHeight:1,fontFamily:"Georgia,serif"}}>Крипто</span>
@@ -287,7 +287,7 @@ export default function CryptoTailbar() {
             </div>
             <div style={{fontSize:11,color:C.inkFaint,letterSpacing:"0.15em",marginTop:2,fontFamily:"sans-serif",fontWeight:400}}>МОНГОЛ ХЭЛЭН ДЭХ КРИПТО МЭДЛЭГ</div>
           </div>
-          <div style={{flex:2}}/>
+          <div className="mobile-hide" style={{flex:2}}/>
           <div style={{display:"flex",gap:8}}>
             <IconButton onClick={()=>setSearchOpen(o=>!o)} style={{background:"none",border:`1.5px solid ${C.borderDark}`,color:C.inkLight,padding:"8px 13px",borderRadius:6,cursor:"pointer",fontSize:14,fontFamily:"sans-serif"}}><span role="img" aria-label="search">🔍</span></IconButton>
           </div>
@@ -295,7 +295,7 @@ export default function CryptoTailbar() {
 
         {/* Nav */}
         <nav style={{borderTop:`1px solid ${C.border}`,background:C.white}}>
-          <div style={{maxWidth:1200,margin:"0 auto",padding:"0 24px",display:"flex",overflowX:"auto"}}>
+          <div className="container-wide" style={{padding:"0 24px",display:"flex",overflowX:"auto"}}>
             {[["home","Нүүр"],["glossary","Толь бичиг"],["about","Бидний тухай"]].concat(CATEGORIES.slice(0,5).map(c=>[c.id,c.label])).map(([id,label])=>(
               <IconButton key={id} onClick={()=>id==="home"?setScreen("home"):id==="glossary"||id==="about"?setScreen(id):openCat(id)}
                 style={{background:"none",border:"none",borderBottom:`2.5px solid ${(screen===id||(screen==="category"&&activeCat===id))?"#1a1a14":"transparent"}`,color:(screen===id||(screen==="category"&&activeCat===id))?C.ink:C.inkLight,padding:"11px 16px",cursor:"pointer",fontFamily:"sans-serif",fontSize:13,fontWeight:(screen===id||(screen==="category"&&activeCat===id))?700:400,whiteSpace:"nowrap",transition:"color 0.15s"}}>
@@ -308,7 +308,7 @@ export default function CryptoTailbar() {
         {/* Search */}
         {searchOpen&&(
           <div style={{background:C.white,borderBottom:`1px solid ${C.border}`,padding:"14px 24px"}}>
-            <div style={{maxWidth:1200,margin:"0 auto"}}>
+            <div className="container-wide">
               <input autoFocus value={searchQ} onChange={e=>setSearchQ(e.target.value)} placeholder="Нийтлэл хайх... (жишээ: Bitcoin, DeFi, Staking)"
                 style={{width:"100%",padding:"11px 16px",background:C.bg,border:`1.5px solid ${C.borderDark}`,borderRadius:8,color:C.ink,fontSize:15,outline:"none",fontFamily:"sans-serif",boxSizing:"border-box"}}/>
               {searchResults.length>0&&(
@@ -329,13 +329,13 @@ export default function CryptoTailbar() {
         )}
       </header>
 
-      <div style={{maxWidth:1200,margin:"0 auto",padding:"0 24px"}}>
+      <div className="container-wide">
 
         {/* ══ HOME ══════════════════════════════════════ */}
         {screen==="home"&&(
           <div style={{paddingTop:36}}>
             {/* Hero featured */}
-            <div style={{display:"grid",gridTemplateColumns:"5fr 3fr",gap:1,marginBottom:36,border:`1.5px solid ${C.ink}`,borderRadius:4,overflow:"hidden"}}>
+            <div className="hero-grid" style={{marginBottom:36,border:`1.5px solid ${C.ink}`,borderRadius:4,overflow:"hidden"}}>
               {/* Main hero */}
               {allPosts.slice(0,1).map(p=>(
                 <div key={p.id} onClick={()=>openPost(p)} className="image-container" style={{cursor:"pointer",padding:"32px 36px",position:"relative",borderRight:`1px solid ${C.ink}`, minHeight: '400px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end'}}>
@@ -377,7 +377,7 @@ export default function CryptoTailbar() {
               </div>
             </div>
 
-            <div style={{display:"grid",gridTemplateColumns:"1fr 300px",gap:36}}>
+            <div className="responsive-grid">
               {/* Left main */}
               <div>
                 {/* Categories */}
@@ -385,7 +385,7 @@ export default function CryptoTailbar() {
                   <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:18,paddingBottom:10,borderBottom:`2px solid ${C.ink}`}}>
                     <h2 style={{margin:0,fontSize:22,fontWeight:900,fontFamily:"Georgia,serif"}}>Ангиллууд</h2>
                   </div>
-                  <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:10}}>
+                  <div className="category-grid">
                     {CATEGORIES.map(cat=>(
                       <div key={cat.id} onClick={()=>openCat(cat.id)} className="modern-card" style={{padding:"16px",background:C.white,cursor:"pointer",textAlign:"center"}}>
                         <div style={{fontSize:26,marginBottom:8}}>{cat.icon}</div>
@@ -501,7 +501,7 @@ export default function CryptoTailbar() {
         {/* ══ POST ══════════════════════════════════════ */}
         {screen==="post"&&activePost&&(
           <div style={{paddingTop:32}}>
-            <div style={{display:"grid",gridTemplateColumns:"1fr 300px",gap:40}}>
+            <div className="responsive-grid">
               <article>
                 <IconButton onClick={()=>setScreen("home")} style={{background:"none",border:`1px solid ${C.borderDark}`,color:C.inkLight,cursor:"pointer",padding:"6px 14px",borderRadius:4,fontSize:13,fontFamily:"sans-serif",marginBottom:24,display:"flex",alignItems:"center",gap:6}}>
                   ← Буцах
@@ -666,7 +666,7 @@ export default function CryptoTailbar() {
                   <div style={{fontSize:14,color:C.inkFaint,fontFamily:"sans-serif"}}>{catPosts.length} нийтлэл</div>
                 </div>
               </div>
-              <div style={{display:"grid",gridTemplateColumns:"1fr 300px",gap:36}}>
+              <div className="responsive-grid">
                 <div>
                   {catPosts.length===0&&<div style={{color:C.inkFaint,fontFamily:"sans-serif",padding:"40px 0",textAlign:"center"}}>Энэ ангилалд нийтлэл байхгүй байна</div>}
                   {catPosts.map((p,i)=>(
@@ -713,14 +713,14 @@ export default function CryptoTailbar() {
         {/* ══ GLOSSARY ══════════════════════════════════ */}
         {screen==="glossary"&&(
           <div style={{paddingTop:32,paddingBottom:48}}>
-            <div style={{maxWidth:800,margin:"0 auto"}}>
+            <div className="container-wide" style={{maxWidth:800}}>
               <div style={{marginBottom:28,paddingBottom:20,borderBottom:`2px solid ${C.ink}`}}>
                 <h1 style={{margin:"0 0 8px",fontSize:36,fontWeight:900,fontFamily:"Georgia,serif"}}>📖 Крипто толь бичиг</h1>
                 <p style={{margin:"0 0 16px",color:C.inkLight,fontSize:16,fontFamily:"sans-serif"}}>Крипто ертөнцийн {GLOSSARY.length} чухал нэр томьёоны монгол тайлбар</p>
                 <input value={glossaryQ} onChange={e=>setGlossaryQ(e.target.value)} placeholder="Нэр томьёо хайх..."
                   style={{width:"100%",padding:"11px 16px",background:C.bg,border:`1.5px solid ${C.borderDark}`,borderRadius:8,color:C.ink,fontSize:14,outline:"none",fontFamily:"sans-serif",boxSizing:"border-box"}}/>
               </div>
-              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+              <div className="grid-2-cols" style={{gap:12}}>
                 {filtered_glossary.map(g=>(
                   <div key={g.term} style={{padding:"16px 18px",background:C.white,border:`1.5px solid ${C.border}`,borderRadius:8,transition:"border-color 0.15s"}}
                     onMouseEnter={e=>e.currentTarget.style.borderColor=C.accent}
@@ -738,13 +738,13 @@ export default function CryptoTailbar() {
 
         {/* ══ ABOUT ══════════════════════════════════════ */}
         {screen==="about"&&(
-          <div style={{paddingTop:32,paddingBottom:48,maxWidth:780,margin:"0 auto"}}>
+          <div className="container-wide" style={{paddingTop:32,paddingBottom:48,maxWidth:780}}>
             <h1 style={{margin:"0 0 8px",fontSize:36,fontWeight:900,fontFamily:"Georgia,serif"}}>Бидний тухай</h1>
             <div style={{height:3,width:60,background:C.accent,marginBottom:28}}/>
             <p style={{fontSize:17,color:C.inkLight,lineHeight:1.8,fontFamily:"sans-serif",marginBottom:24}}>
               <strong style={{color:C.ink}}>Крипто Тайлбарлагч</strong> бол 2025 онд үүссэн Монголын хамгийн том крипто мэдлэгийн блог платформ юм. Бидний зорилго — крипто ертөнцийг монгол хүнд ойлгомжтойгоор тайлбарлах.
             </p>
-            <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:16,marginBottom:32}}>
+            <div className="category-grid" style={{marginBottom:32}}>
               {[["50,000+","Сарын унших"],["30+","Нийтлэл"],["4","Мэргэжилтэн"]].map(([v,l])=>(
                 <div key={l} style={{padding:"20px",background:C.accentLight,border:`1.5px solid ${C.accent}33`,borderRadius:8,textAlign:"center"}}>
                   <div style={{fontSize:28,fontWeight:900,color:C.accent,fontFamily:"Georgia,serif"}}>{v}</div>
@@ -753,7 +753,7 @@ export default function CryptoTailbar() {
               ))}
             </div>
             <h2 style={{fontSize:22,fontWeight:800,fontFamily:"Georgia,serif",marginBottom:16}}>Авторууд</h2>
-            <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:14}}>
+            <div className="grid-2-cols">
               {[{n:"Б.Мөнхбаяр",t:"Крипто судлаач",d:"Блокчейн технологийг 2017 оноос судалж байна. Bitcoin болон Ethereum-ийн техникийн шинжилгээнд мэргэшсэн."},
                 {n:"Д.Сарнай",t:"Блокчейн хөгжүүлэгч",d:"Smart Contract болон DeFi protocol-ийн хөгжүүлэгч. Solidity, Rust хэлнүүдэд мэргэшсэн."},
                 {n:"Н.Болдбаатар",t:"DeFi судлаач",d:"Decentralized Finance, yield farming болон liquidity protocol судлаач."},
@@ -772,11 +772,11 @@ export default function CryptoTailbar() {
 
       {/* ══ CONTACT ══════════════════════════════════════ */}
       {screen==="contact"&&(
-        <div style={{paddingTop:32,paddingBottom:48,maxWidth:700,margin:"0 auto"}}>
+        <div className="container-wide" style={{paddingTop:32,paddingBottom:48,maxWidth:700}}>
           <IconButton onClick={()=>setScreen("home")} style={{background:"none",border:`1px solid ${C.borderDark}`,color:C.inkLight,cursor:"pointer",padding:"6px 14px",borderRadius:4,fontSize:13,fontFamily:"sans-serif",marginBottom:24}}>← Буцах</IconButton>
           <h1 style={{margin:"0 0 8px",fontSize:36,fontWeight:900,fontFamily:"Georgia,serif"}}>Холбоо барих</h1>
           <div style={{height:3,width:60,background:C.accent,marginBottom:28}}/>
-          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,marginBottom:32}}>
+          <div className="grid-2-cols" style={{marginBottom:32}}>
             {[{icon:"📧",title:"И-мэйл",val:"info@cryptotailbar.mn",sub:"24 цагийн дотор хариулна"},
               {icon:"📱",title:"Telegram",val:"@cryptotailbar",sub:"Хурдан холбоо барих"},
               {icon:"📍",title:"Хаяг",val:"Улаанбаатар, Монгол",sub:"Сүхбаатар дүүрэг"},
@@ -816,7 +816,7 @@ export default function CryptoTailbar() {
           <p style={{fontSize:16,color:C.inkLight,lineHeight:1.8,fontFamily:"sans-serif",marginBottom:28}}>
             Крипто, блокчейн, Web3 чиглэлээр монгол хэлэнд мэдлэгтэй бол манай командтай нэгдэж нийтлэл бичих боломжтой.
           </p>
-          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:14,marginBottom:32}}>
+          <div className="category-grid" style={{marginBottom:32}}>
             {[{icon:"✍️",t:"Чөлөөт нийтлэгч",d:"Нийтлэл тутмаас орлого авна"},
               {icon:"📅",t:"Байнгын нийтлэгч",d:"Сар бүр тогтмол орлого"},
               {icon:"⭐",t:"Гол редактор",d:"Бүтэн цагийн ажлын байр"},
@@ -863,7 +863,7 @@ export default function CryptoTailbar() {
           <p style={{fontSize:16,color:C.inkLight,lineHeight:1.8,fontFamily:"sans-serif",marginBottom:32}}>
             Монголын крипто болон санхүүгийн сонирхолтой залуучуудад хүрэх хамгийн шууд арга. Сар бүр <strong style={{color:C.ink}}>50,000+</strong> зочинтой.
           </p>
-          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,marginBottom:32}}>
+          <div className="grid-2-cols" style={{marginBottom:32}}>
             {[
               {name:"Banner зар",size:"728×90 px",place:"Header доор",price:"$50/сар",hot:false},
               {name:"Sidebar зар",size:"300×250 px",place:"Нийтлэлийн хажуу",price:"$80/сар",hot:true},
@@ -892,7 +892,7 @@ export default function CryptoTailbar() {
 
       {/* ══ PRIVACY ═══════════════════════════════════════ */}
       {screen==="privacy"&&(
-        <div style={{paddingTop:32,paddingBottom:48,maxWidth:780,margin:"0 auto"}}>
+        <div className="container-wide" style={{paddingTop:32,paddingBottom:48,maxWidth:780}}>
           <IconButton onClick={()=>setScreen("home")} style={{background:"none",border:`1px solid ${C.borderDark}`,color:C.inkLight,cursor:"pointer",padding:"6px 14px",borderRadius:4,fontSize:13,fontFamily:"sans-serif",marginBottom:24}}>← Буцах</IconButton>
           <h1 style={{margin:"0 0 8px",fontSize:36,fontWeight:900,fontFamily:"Georgia,serif"}}>Нууцлалын бодлого</h1>
           <div style={{height:3,width:60,background:C.accent,marginBottom:8}}/>
@@ -915,8 +915,8 @@ export default function CryptoTailbar() {
 
       {/* ── FOOTER ── */}
       <footer style={{background:C.ink,color:"#aaa",marginTop:48,padding:"40px 24px 20px"}}>
-        <div style={{maxWidth:1200,margin:"0 auto"}}>
-          <div style={{display:"grid",gridTemplateColumns:"2fr 1fr 1fr 1fr",gap:32,marginBottom:32}}>
+        <div className="container-wide">
+          <div className="category-grid" style={{gap:32,marginBottom:32}}>
             <div>
               <div style={{fontSize:26,fontWeight:900,fontFamily:"Georgia,serif",marginBottom:12}}>
                 <span style={{color:"#fff"}}>Крипто</span><span style={{color:C.accentBright}}>Тайлбарлагч</span>

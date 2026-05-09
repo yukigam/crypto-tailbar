@@ -347,10 +347,10 @@ export default function CryptoTailbar() {
                     <span style={{background:C.accent,color:"#fff",padding:"3px 10px",fontSize:10,fontWeight:700,fontFamily:"sans-serif"}}>{p.catLabel.toUpperCase()}</span>
                     <span style={{fontSize:10,color:diffColor(p.difficulty),fontWeight:700,fontFamily:"sans-serif",background:"rgba(255,255,255,0.7)",padding:"3px 8px",borderRadius:3}}>{p.difficulty}</span>
                   </div>
-                  <h1 style={{margin:"0 0 14px",fontSize:"clamp(20px,2.5vw,32px)",fontWeight:900,lineHeight:1.2,color:C.ink,fontFamily:"Georgia,serif"}}>{p.title}</h1>
-                  <p style={{margin:"0 0 18px",color:C.inkLight,fontSize:15,lineHeight:1.65,fontFamily:"sans-serif"}}>{p.intro}</p>
-                  <div style={{display:"flex",gap:14,fontSize:12,color:C.inkFaint,fontFamily:"sans-serif",alignItems:"center"}}>
-                    <span style={{fontWeight:700,color:C.accent}}>{p.author}</span>
+                  <h1 style={{margin:"0 0 14px",fontSize:"clamp(20px,2.5vw,32px)",fontWeight:900,lineHeight:1.2,color:"#fff",fontFamily:"Georgia,serif", textShadow: "1px 1px 2px rgba(0,0,0,0.8)"}}>{p.title}</h1>
+                  <p style={{margin:"0 0 18px",color:"#eee",fontSize:15,lineHeight:1.65,fontFamily:"sans-serif", textShadow: "1px 1px 2px rgba(0,0,0,0.5)"}}>{p.intro}</p>
+                  <div style={{display:"flex",gap:14,fontSize:12,color:"#eee",fontFamily:"sans-serif",alignItems:"center", textShadow: "1px 1px 1px rgba(0,0,0,0.5)"}}>
+                    <span style={{fontWeight:700,color:C.accentBright}}>{p.author}</span>
                     <span>·</span><span>{p.date}</span>
                     <span>·</span><span>⏱ {p.readTime} мин</span>
                     <span>·</span><span>👁 {p.views}</span>
@@ -369,8 +369,8 @@ export default function CryptoTailbar() {
                         <span style={{fontSize:16, color: 'white'}}>{COVER_ICON[p.cover]}</span>
                         <span style={{fontSize:9,color:'rgba(255,255,255,0.8)',letterSpacing:"0.1em",fontWeight:700,fontFamily:"sans-serif"}}>{p.catLabel.toUpperCase()}</span>
                       </div>
-                      <div style={{fontSize:"clamp(13px,1.5vw,16px)",fontWeight:800,color:'white',lineHeight:1.3,fontFamily:"Georgia,serif",marginBottom:6}}>{p.title}</div>
-                      <div style={{fontSize:11,color:'rgba(255,255,255,0.7)',fontFamily:"sans-serif"}}>{p.readTime} мин · {p.views}</div>
+                      <div style={{fontSize:"clamp(13px,1.5vw,16px)",fontWeight:800,color:'#fff',lineHeight:1.3,fontFamily:"Georgia,serif",marginBottom:6, textShadow: "1px 1px 2px rgba(0,0,0,0.8)"}}>{p.title}</div>
+                      <div style={{fontSize:11,color:'rgba(255,255,255,0.9)',fontFamily:"sans-serif", textShadow: "1px 1px 1px rgba(0,0,0,0.5)"}}>{p.readTime} мин · {p.views}</div>
                     </div>
                   </div>
                 ))}

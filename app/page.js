@@ -341,7 +341,7 @@ export default function CryptoTailbar() {
         {screen==="home"&&(
           <div style={{paddingTop:36}}>
             {/* Hero featured */}
-            <div key={new Date().getTime()} className="hero-grid" style={{marginBottom:36,border:`1.5px solid ${C.ink}`,borderRadius:4,overflow:"hidden"}}>
+            <div key="hero-section" className="hero-grid" style={{marginBottom:36,border:`1.5px solid ${C.ink}`,borderRadius:4,overflow:"hidden"}}>
               {/* Main hero */}
               {allPosts.slice(0,1).map(p=>(
                 <div key={p.id} onClick={()=>openPost(p)} className="image-container" style={{cursor:"pointer",padding:"32px 36px",position:"relative",borderRight:`1px solid ${C.ink}`, minHeight: '400px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end'}}>

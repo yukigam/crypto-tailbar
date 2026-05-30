@@ -286,7 +286,6 @@ export default function CryptoTailbar() {
                   <div style={{display:"flex",gap:8,marginBottom:12,alignItems:"center"}}>
                     <span style={{background:C.ink,color:"#fff",padding:"3px 10px",fontSize:10,fontWeight:800,letterSpacing:"0.1em",fontFamily:"sans-serif"}}>ОНЦЛОХ</span>
                     <span style={{background:C.accent,color:"#fff",padding:"3px 10px",fontSize:10,fontWeight:700,fontFamily:"sans-serif"}}>{p.catLabel.toUpperCase()}</span>
-                    <span style={{fontSize:10,color:diffColor(p.difficulty),fontWeight:700,fontFamily:"sans-serif",background:"rgba(255,255,255,0.7)",padding:"3px 8px",borderRadius:3}}>{p.difficulty}</span>
                   </div>
                   <h1 style={{margin:"0 0 14px",fontSize:"clamp(20px,2.5vw,32px)",fontWeight:900,lineHeight:1.2,color:C.ink,fontFamily:"Georgia,serif"}}>{p.title}</h1>
                   <p style={{margin:"0 0 18px",color:C.inkLight,fontSize:15,lineHeight:1.65,fontFamily:"sans-serif"}}>{p.intro}</p>
@@ -353,7 +352,6 @@ export default function CryptoTailbar() {
                         <div style={{flex:1}}>
                           <div style={{display:"flex",gap:8,marginBottom:7,alignItems:"center",flexWrap:"wrap"}}>
                             <span style={{fontSize:10,color:C.white,background:C.accent,padding:"2px 8px",fontWeight:700,letterSpacing:"0.08em",fontFamily:"sans-serif"}}>{p.catLabel.toUpperCase()}</span>
-                            <span style={{fontSize:10,color:diffColor(p.difficulty),fontWeight:700,fontFamily:"sans-serif"}}>{p.difficulty}</span>
                           </div>
                           <h3 className="ptitle" style={{margin:"0 0 6px",fontSize:"clamp(14px,1.8vw,17px)",fontWeight:800,lineHeight:1.3,color:C.ink,fontFamily:"Georgia,serif",transition:"color 0.15s"}}>{p.title}</h3>
                           <div style={{fontSize:12,color:C.inkFaint,fontFamily:"sans-serif",display:"flex",gap:10,flexWrap:"wrap"}}>
@@ -455,9 +453,6 @@ export default function CryptoTailbar() {
                 {/* Labels */}
                 <div style={{display:"flex",gap:8,marginBottom:16,flexWrap:"wrap",alignItems:"center"}}>
                   <span style={{background:C.accent,color:"#fff",padding:"4px 12px",fontSize:11,fontWeight:700,letterSpacing:"0.08em",fontFamily:"sans-serif"}}>{activePost.catLabel.toUpperCase()}</span>
-                  <span style={{fontSize:11,color:diffColor(activePost.difficulty),fontWeight:700,fontFamily:"sans-serif",border:`1px solid ${diffColor(activePost.difficulty)}`,padding:"3px 10px"}}>
-                    {activePost.difficulty==="Амархан"?"🟢":"🟡"} {activePost.difficulty}
-                  </span>
                   <span style={{fontSize:11,color:C.inkFaint,fontFamily:"sans-serif"}}>⏱ {activePost.readTime} минут унших</span>
                 </div>
 
@@ -609,7 +604,6 @@ export default function CryptoTailbar() {
                         <div style={{width:120,height:90,borderRadius:8,background:COVER_GRADIENTS[p.cover],flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:36}}>{COVER_ICON[p.cover]}</div>
                         <div style={{flex:1}}>
                           <div style={{display:"flex",gap:8,marginBottom:8,alignItems:"center"}}>
-                            <span style={{fontSize:10,color:diffColor(p.difficulty),fontWeight:700,fontFamily:"sans-serif"}}>{p.difficulty}</span>
                             <span style={{fontSize:10,color:C.inkFaint,fontFamily:"sans-serif"}}>⏱ {p.readTime} мин</span>
                           </div>
                           <h3 className="pt2" style={{margin:"0 0 8px",fontSize:"clamp(15px,2vw,19px)",fontWeight:800,lineHeight:1.3,color:C.ink,fontFamily:"Georgia,serif",transition:"color 0.15s"}}>{p.title}</h3>

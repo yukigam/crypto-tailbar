@@ -261,11 +261,38 @@ const POSTS_FALLBACK = [
   }
 ];
 
-// ── FALLBACK GLOSSARY ────────────────────────────────
-const GLOSSARY_FALLBACK = [
-  { term: "Blockchain", mn: "Блокчейн", def: "Мэдээллийг гинжин хэлхээ шиг холбоотой блокуудад хуваан, тархмал сүлжээнд зэрэг бүртгэж хадгалдаг технологи." },
-  { term: "Smart Contract", mn: "Ухаалаг гэрээ", def: "Блокчейн дээр бичигдсэн, тодорхой нөхцөл биелмэгц зуучлагчгүйгээр автоматаар ажилладаг компьютер програм." },
-  { term: "DeFi", mn: "Төвлөрсөн бус санхүү", def: "Уламжлалт зуучлагч (банк, нотариат) ашиглахгүйгээр блокчейн болон ухаалаг гэрээнд суурилан санхүүгийн үйлчилгээ үзүүлэх систем." },
+// ── STATIC DICTIONARY DATA (30 essential crypto terms) ────────────────────────────────
+const dictionaryData = [
+  { id: 1, term: "Bitcoin", translation: "Биткоин", definition: "Хамгийн анхны бөгөөд хамгийн алдартай, төвлөрсөн бус цахим мөнгөн тэмдэг, блокчейн технологийн суурь." },
+  { id: 2, term: "Smart Contract", translation: "Ухаалаг гэрээ", definition: "Блокчейн дээр бичигдсэн, тодорхой нөхцөл биелмэгц зуучлагчгүйгээр автоматаар ажилладаг компьютер програм." },
+  { id: 3, term: "DeFi", translation: "Төвлөрнөн бус санхүү", definition: "Уламжлалт зуучлагч (банк, нотариат) ашиглахгүйгээр блокчейн болон ухаалаг гэрээнд суурилан санхүүгийн үйлчилгээ үзүүлэх систем." },
+  { id: 4, term: "Ethereum", translation: "Этериум", definition: "Ухаалаг гэрээ болон төвлөрсөн бус аппликейшн (dApps) хөгжүүлэх боломжтой нээлттэй блокчейн платформ." },
+  { id: 5, term: "Altcoin", translation: "Альткоин", definition: "Биткоиноос бусад бүх төрлийн криптовалютыг нэрлэх ерөнхий нэр томьёо." },
+  { id: 6, term: "Stablecoin", translation: "Стейблкоин", definition: "Ханш нь амлалттайгаар бодит хөрөнгө (жишээ нь, ам.доллар)-той 1:1 харьцаатай уягдсан, үнийн хэлбэлзэлгүй крипто валют." },
+  { id: 7, term: "Gas Fee", translation: "Газ-ын шимтгэл", definition: "Блокчейн сүлжээнд гүйлгээ хийх эсвэл ухаалаг гэрээ ажиллуулахад майнерууд эсвэл валидаторуудад төлдөг ажиллагааны хураамж." },
+  { id: 8, term: "Wallet", translation: "Крипто түрийвч", definition: "Крипто хөрөнгийг хадгалах, илгээх, хүлээн авахад ашиглагддаг нийтийн болон хувийн түлхүүрийг удирдах дижитал хэрэгсэл." },
+  { id: 9, term: "Private Key", translation: "Хувийн түлхүүр", definition: "Крипто түрийвч рүү нэвтрэх, гүйлгээг баталгаажуулах зориулалттай, хэнд ч дэлгэж болохгүй нууц код." },
+  { id: 10, term: "Public Key", translation: "Нийтийн түлхүүр", definition: "Бусдаас крипто хөрөнгө хүлээн авахад ашигладаг, банкны дансны дугаартай ижил үүрэгтэй ил хаяг." },
+  { id: 11, term: "Airdrop", translation: "Эйрдроп", definition: "Шинэ крипто төслүүд өөрсдийгөө сурталчлах зорилгоор хэрэглэгчдэд үнэ төлбөргүй токен тараах үйл явц." },
+  { id: 12, term: "Market Cap", translation: "Зах зээлийн үнэлгээ", definition: "Криптовалютын нийт эргэлтэд байгаа тоог одоогийн ханшаар үржүүлж гаргасан нийт үнийн дүн." },
+  { id: 13, term: "Whale", translation: "Крипто халим", definition: "Зах зээлийн ханшид нөлөөлөхүйц асар их хэмжээний криптовалют эзэмшдэг хувь хүн эсвэл байгууллага." },
+  { id: 14, term: "FOMO", translation: "ФОМО / Боломжоос хоцрох айдас", definition: "Ханш огцом өсөх үед ашиг хийж чадахгүй хоцрохоос айж, яаруу сандруу худалдан авалт хийх хөрөнгө оруулагчийн сэтгэл зүй." },
+  { id: 15, term: "FUD", translation: "ФУД / Айдас, эргэлзээ", definition: "Зах зээлийн ханшийг унагах зорилгоор санаатайгаар тараадаг сөрөг, худал эсвэл эргэлзээтэй мэдээлэл." },
+  { id: 16, term: "Bull Market", translation: "Өсөлтийн зах зээл", definition: "Хөрөнгө оруулагчдын итгэл өндөр байж, крипто хөрөнгүүдийн үнэ урт хугацаанд тасралтгүй өсөх үе шат." },
+  { id: 17, term: "Bear Market", translation: "Уналтын зах зээл", definition: "Зах зээл дээр борлуулалт давамгайлж, крипто хөрөнгийн ханш урт хугацаанд дараалан унах үе шат." },
+  { id: 18, term: "DEX", translation: "Төвлөрсөн бус бирж", definition: "Хэрэглэгчид дундын зуучлагчгүйгээр, өөрсдийн түрийвчнээс шууд крипто хөрөнгө арилжих боломжтой платформ." },
+  { id: 19, term: "CEX", translation: "Төвлөрсөн бирж", definition: "Хэрэглэгчдийн хөрөнгийг дундаа хадгалж, арилжааг зохицуулдаг компаниудын удирддаг бирж (Жишээ нь: Binance)." },
+  { id: 20, term: "Halving", translation: "Халвинг / Олборлолт талстралт", definition: "Биткоины сүлжээнд шинээр үүсэх блок бүрийн майнеруудад өгөх шагнал 4 жил тутамд 50%-иар буурах үйл явц." },
+  { id: 21, term: "Liquidity", translation: "Хөрвөх чадвар", definition: "Крипто хөрөнгийг зах зээлийн ханшид их хэмжээний өөрчлөлт оруулахгүйгээр бэлэн мөнгө эсвэл өөр токен руу хурдан хөрвүүлэх боломж." },
+  { id: 22, term: "Staking", translation: "Стейкинг", definition: "Блокчейн сүлжээний аюулгүй байдлыг хангахын тулд өөрийн крипто хөрөнгийг түгжиж, хариуд нь хүү/урамшуулал авах үйл ажиллагаа." },
+  { id: 23, term: "Mining", translation: "Майнинг / Олборлолт", definition: "Компьютерын хүч ашиглан математикийн хүнд бодлого бодож, гүйлгээг баталгаажуулан шинээр крипто үүсгэх үйл явц." },
+  { id: 24, term: "NFT", translation: "Үл орлуулагддаг токен", definition: "Дижитал урлаг, өмчийг дахин давтагдашгүй ганц хувь гэдгийг блокчейн дээр баталгаажуулсан тоон гэрчилгээ." },
+  { id: 25, term: "HODL", translation: "ХОДЛ / Удаан хадгалах", definition: "Ханшийн савлагаанаас үл хамааран крипто хөрөнгийг заралгүйгээр урт хугацаанд тууштай хадгалах тактик." },
+  { id: 26, term: "Whitepaper", translation: "Цагаан ном", definition: "Крипто төслийн багийнхан технологи, эдийн засгийн бүтэц (Tokenomics), шийдэх асуудлаа дэлгэрэнгүй тайлбарласан албан ёсны танилцуулга." },
+  { id: 27, term: "Rug Pull", translation: "Раг Пулл / Луйвар", definition: "Төслийг хөгжүүлэгчид хөрөнгө оруулагчдын мөнгийг цуглуулсны дараа төслөө хаян, бүх мөнгийг аваад зугтах луйврын хэлбэр." },
+  { id: 28, term: "Satoshi", translation: "Сатоши", definition: "Биткоины хамгийн жижиг бутархай нэгж (1 Биткоин = 100,000,000 Сатоши). Мөн Биткоиныг бүтээгчийн нэр." },
+  { id: 29, term: "Gas Limit", translation: "Газ Лимит", definition: "Хэрэглэгч гүйлгээ хийхдээ зарцуулахад бэлэн байгаа Газ-ын хамгийн дээд хэмжээ." },
+  { id: 30, term: "Fiat", translation: "Фиат мөнгө", definition: "Төв банк болон засгийн газраас албан ёсоор гаргадаг уламжлалт цаасан мөнгөн тэмдэг (Жишээ нь: Төгрөг, Доллар)." }
 ];
 
 // ── BEGINNER GUIDE (Static, shown when "Эхлэгчдэд" category is selected) ──
@@ -494,7 +521,8 @@ export default function CryptoTailbarClient({ initialPosts = [], initialCategori
       count: allPosts.filter(p => p.cat === c.id).length
     }));
 
-  const allGlossary = initialGlossary.length > 0 ? initialGlossary : GLOSSARY_FALLBACK;
+  // Always use static dictionaryData — Sanity is not used for this section
+  const allGlossary = dictionaryData;
 
   const actualBinanceLink = binanceLink || 'https://www.binance.com/register?ref=561538131';
 
@@ -513,16 +541,16 @@ export default function CryptoTailbarClient({ initialPosts = [], initialCategori
   const searchResultsGlossary = cleanQ.length > 0
     ? allGlossary.filter(g =>
       g.term.toLowerCase().includes(cleanQ) ||
-      g.mn.toLowerCase().includes(cleanQ) ||
-      g.def.toLowerCase().includes(cleanQ)
+      g.translation.toLowerCase().includes(cleanQ) ||
+      g.definition.toLowerCase().includes(cleanQ)
     )
     : [];
 
   const filteredGlossary = glossaryQ
     ? allGlossary.filter(g =>
       g.term.toLowerCase().includes(glossaryQ.toLowerCase()) ||
-      g.mn.toLowerCase().includes(glossaryQ.toLowerCase()) ||
-      g.def.toLowerCase().includes(glossaryQ.toLowerCase())
+      g.translation.toLowerCase().includes(glossaryQ.toLowerCase()) ||
+      g.definition.toLowerCase().includes(glossaryQ.toLowerCase())
     )
     : allGlossary;
 
@@ -651,9 +679,9 @@ export default function CryptoTailbarClient({ initialPosts = [], initialCategori
                       <div style={{ fontSize: 12, fontWeight: 800, color: C.accentBlue, letterSpacing: "0.08em", marginBottom: 12, textTransform: "uppercase" }}>Нэр томьёо ({searchResultsGlossary.length})</div>
                       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                         {searchResultsGlossary.map(g => (
-                          <div key={g.term} className="modern-card" style={{ padding: "14px 18px", background: C.bgDark }}>
-                            <div style={{ fontSize: 15, fontWeight: 800, color: C.ink }}>{g.term} <span style={{ color: C.accentBlue, fontSize: 13, fontWeight: "800" }}>({g.mn})</span></div>
-                            <div style={{ fontSize: 13, color: C.inkLight, marginTop: 6, lineHeight: 1.5 }}>{g.def}</div>
+                          <div key={g.id} className="modern-card" style={{ padding: "14px 18px", background: C.bgDark }}>
+                            <div style={{ fontSize: 15, fontWeight: 800, color: C.ink }}>{g.term} <span style={{ color: C.accentBlue, fontSize: 13, fontWeight: "800" }}>({g.translation})</span></div>
+                            <div style={{ fontSize: 13, color: C.inkLight, marginTop: 6, lineHeight: 1.5 }}>{g.definition}</div>
                           </div>
                         ))}
                       </div>
@@ -687,7 +715,6 @@ export default function CryptoTailbarClient({ initialPosts = [], initialCategori
                   <div style={{ display: "flex", gap: 10, marginBottom: 16, alignItems: "center" }}>
                     <span style={{ background: C.accentGlow, color: "#fff", padding: "4px 12px", fontSize: 10, fontWeight: 900, borderRadius: 6, letterSpacing: "0.05em", boxShadow: "0 0 10px rgba(56, 189, 248, 0.4)" }}>ОНЦЛОХ</span>
                     <span style={{ background: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.2)", color: "#fff", padding: "4px 10px", fontSize: 10, fontWeight: 800, borderRadius: 6 }}>{p.catLabel.toUpperCase()}</span>
-                    <span style={{ fontSize: 10, color: diffColor(p.difficulty), fontWeight: 900, background: "#0f172a", padding: "4px 10px", borderRadius: 6, border: `1px solid ${C.border}` }}>{p.difficulty}</span>
                   </div>
                   <h1 style={{ margin: "0 0 14px", fontSize: "clamp(24px, 3.5vw, 38px)", fontWeight: 900, lineHeight: 1.25, color: "#fff", textShadow: "0 2px 10px rgba(0,0,0,0.5)" }}>{p.title}</h1>
                   <p style={{ margin: "0 0 24px", color: C.inkLight, fontSize: 16, lineHeight: 1.65, fontWeight: "500" }}>{p.intro}</p>
@@ -727,7 +754,6 @@ export default function CryptoTailbarClient({ initialPosts = [], initialCategori
                         <div style={{ flex: 1 }}>
                           <div style={{ display: "flex", gap: 10, marginBottom: 8, alignItems: "center" }}>
                             <span style={{ fontSize: 10, color: C.accentPurple, fontWeight: 800, letterSpacing: "0.05em" }}>{p.catLabel.toUpperCase()}</span>
-                            <span style={{ fontSize: 10, color: diffColor(p.difficulty), fontWeight: 900, background: C.bg, padding: "2px 8px", borderRadius: 4, border: `1px solid ${C.border}` }}>{p.difficulty}</span>
                           </div>
                           <h3 style={{ margin: "0 0 8px", fontSize: 18, fontWeight: 850, color: C.ink, lineHeight: 1.35 }}>{p.title}</h3>
                           <p style={{ margin: 0, fontSize: 13, color: C.inkLight, lineHeight: 1.55, fontWeight: "500" }} className="line-clamp-2">{p.subtitle}</p>
@@ -936,36 +962,122 @@ export default function CryptoTailbarClient({ initialPosts = [], initialCategori
 
         {/* ══ SCREEN: GLOSSARY ══════════════════════════ */}
         {screen === "glossary" && (
-          <div style={{ maxWidth: 850, margin: "0 auto" }}>
-            <div style={{ marginBottom: 32 }}>
-              <h1 style={{ margin: "0 0 8px", fontSize: 32, fontWeight: 900, color: C.ink }}>📖 Крипто толь бичиг</h1>
-              <p style={{ margin: 0, color: C.inkLight, fontSize: 15, fontWeight: "500" }}>Чухал нэр томьёо, блокчейн ойлголтуудын хамгийн энгийн дэлгэрэнгүй тайлбар</p>
+          <div style={{ maxWidth: 980, margin: "0 auto" }}>
+
+            {/* Page header */}
+            <div style={{ marginBottom: 36 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 10 }}>
+                <div style={{ background: "linear-gradient(135deg, #38bdf8, #818cf8)", borderRadius: 14, padding: "10px 14px", fontSize: 22, lineHeight: 1 }}>📖</div>
+                <div>
+                  <h1 style={{ margin: 0, fontSize: 30, fontWeight: 900, color: C.ink, letterSpacing: "-0.5px" }}>Крипто толь бичиг</h1>
+                  <p style={{ margin: "4px 0 0", color: C.inkLight, fontSize: 14, fontWeight: 500 }}>
+                    {dictionaryData.length} чухал нэр томьёо — блокчейн ертөнцийн хамгийн энгийн тайлбар
+                  </p>
+                </div>
+              </div>
+
+              {/* Search bar */}
+              <div style={{ position: "relative" }}>
+                <input
+                  value={glossaryQ}
+                  onChange={e => setGlossaryQ(e.target.value)}
+                  placeholder="Нэр томьёо, монгол орчуулга эсвэл тайлбараар хайх..."
+                  style={{
+                    width: "100%",
+                    padding: "15px 20px 15px 50px",
+                    background: C.bgDark,
+                    border: `2px solid ${glossaryQ ? C.accentBlue : C.border}`,
+                    borderRadius: 14,
+                    color: C.ink,
+                    fontSize: 15,
+                    outline: "none",
+                    fontWeight: 600,
+                    boxSizing: "border-box",
+                    transition: "border-color 0.2s",
+                    boxShadow: glossaryQ ? `0 0 0 3px rgba(56,189,248,0.12)` : "0 2px 12px rgba(0,0,0,0.18)"
+                  }}
+                  className="glossary-search-input"
+                />
+                <span style={{ position: "absolute", left: 17, top: "50%", transform: "translateY(-50%)", fontSize: 17, opacity: 0.7 }}>🔍</span>
+                {glossaryQ && (
+                  <button
+                    onClick={() => setGlossaryQ("")}
+                    style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: C.border, border: "none", borderRadius: 6, color: C.inkLight, cursor: "pointer", fontSize: 12, fontWeight: 800, padding: "3px 9px" }}
+                  >✕</button>
+                )}
+              </div>
+
+              {/* Results count */}
+              {glossaryQ && (
+                <div style={{ marginTop: 10, fontSize: 13, color: C.inkLight, fontWeight: 600 }}>
+                  {filteredGlossary.length > 0
+                    ? <><span style={{ color: C.accentBlue, fontWeight: 800 }}>{filteredGlossary.length}</span> нэр томьёо олдлоо</>
+                    : <span style={{ color: C.neonPink }}>Илэрц олдсонгүй</span>}
+                </div>
+              )}
             </div>
 
-            <div style={{ position: "relative", marginBottom: 28 }}>
-              <input
-                value={glossaryQ}
-                onChange={e => setGlossaryQ(e.target.value)}
-                placeholder="Толь бичгээс нэр томьёо хайх..."
-                style={{ width: "100%", padding: "14px 16px 14px 44px", background: C.bgDark, border: `2px solid ${C.border}`, borderRadius: 12, color: C.ink, fontSize: 15, outline: "none", fontWeight: "600", boxShadow: "0 2px 10px rgba(0,0,0,0.15)" }}
-                className="glossary-search-input"
-              />
-              <span style={{ position: "absolute", left: 16, top: "50%", transform: "translateY(-50%)", fontSize: 16, opacity: 0.8 }}>🔍</span>
-            </div>
-
+            {/* Grid */}
             {filteredGlossary.length === 0 ? (
-              <div style={{ textAlign: "center", padding: "48px 0", color: C.inkLight, border: `2px dashed ${C.border}`, borderRadius: 14, background: C.bgDark, fontSize: 15 }}>
+              <div style={{ textAlign: "center", padding: "64px 0", color: C.inkLight, border: `2px dashed ${C.border}`, borderRadius: 16, background: C.bgDark, fontSize: 15 }}>
+                <div style={{ fontSize: 36, marginBottom: 12 }}>🔍</div>
                 Нэр томьёо олдсонгүй: &quot;<strong style={{ color: C.accentBlue }}>{glossaryQ}</strong>&quot;
               </div>
             ) : (
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }} className="glossary-grid">
-                {filteredGlossary.map(g => (
-                  <div key={g.term} className="modern-card hover-glow" style={{ padding: "24px", background: C.bgDark, border: `2px solid ${C.border}`, borderRadius: 14 }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 10 }}>
-                      <span style={{ fontSize: 18, fontWeight: 900, color: "#fff" }}>{g.term}</span>
-                      <span style={{ fontSize: 13, fontWeight: 800, color: C.accentBlue, background: C.bg, padding: "2px 10px", borderRadius: 6, border: `1px solid ${C.border}` }}>{g.mn}</span>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 20 }} className="glossary-grid">
+                {filteredGlossary.map((g) => (
+                  <div
+                    key={g.id}
+                    className="modern-card hover-glow"
+                    style={{
+                      padding: "22px 24px",
+                      background: C.bgDark,
+                      border: `1.5px solid ${C.border}`,
+                      borderRadius: 16,
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 10,
+                      transition: "border-color 0.2s, box-shadow 0.2s"
+                    }}
+                  >
+                    {/* Number badge + term row */}
+                    <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 10 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <span style={{
+                          fontSize: 11,
+                          fontWeight: 900,
+                          color: C.accentBlue,
+                          background: "rgba(56,189,248,0.10)",
+                          border: `1px solid rgba(56,189,248,0.25)`,
+                          borderRadius: 6,
+                          padding: "2px 7px",
+                          letterSpacing: "0.04em",
+                          flexShrink: 0
+                        }}>#{g.id}</span>
+                        <span style={{ fontSize: 18, fontWeight: 900, color: "#f1f5f9", lineHeight: 1.2 }}>{g.term}</span>
+                      </div>
                     </div>
-                    <p style={{ margin: 0, fontSize: 14, color: C.inkLight, lineHeight: 1.6, fontWeight: "500" }}>{g.def}</p>
+
+                    {/* Mongolian translation pill */}
+                    <div>
+                      <span style={{
+                        display: "inline-block",
+                        fontSize: 12,
+                        fontWeight: 800,
+                        color: C.accentPurple,
+                        background: "rgba(192,132,252,0.10)",
+                        border: `1px solid rgba(192,132,252,0.25)`,
+                        borderRadius: 20,
+                        padding: "3px 12px",
+                        letterSpacing: "0.02em"
+                      }}>{g.translation}</span>
+                    </div>
+
+                    {/* Divider */}
+                    <div style={{ height: 1, background: C.border, margin: "2px 0" }} />
+
+                    {/* Definition */}
+                    <p style={{ margin: 0, fontSize: 13.5, color: C.inkLight, lineHeight: 1.7, fontWeight: 500 }}>{g.definition}</p>
                   </div>
                 ))}
               </div>
@@ -997,7 +1109,6 @@ export default function CryptoTailbarClient({ initialPosts = [], initialCategori
 
               <div style={{ display: "flex", gap: 10, marginBottom: 16, alignItems: "center" }}>
                 <span style={{ fontSize: 10, background: "rgba(192, 132, 252, 0.12)", border: `1px solid ${C.accentPurple}55`, color: C.accentPurple, padding: "4px 10px", borderRadius: 6, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.05em" }}>{activePost.catLabel}</span>
-                <span style={{ fontSize: 10, color: diffColor(activePost.difficulty), fontWeight: 900, background: C.bgDark, border: `1px solid ${C.border}`, padding: "2px 8px", borderRadius: 4 }}>{activePost.difficulty}</span>
               </div>
 
               <h1 style={{ margin: "0 0 16px", fontSize: "clamp(24px, 3.5vw, 38px)", fontWeight: 900, lineHeight: 1.25, color: "#fff" }}>{activePost.title}</h1>

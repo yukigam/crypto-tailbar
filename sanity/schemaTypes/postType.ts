@@ -38,9 +38,33 @@ export const postType = defineType({
       ]
     }),
     defineField({
+      name: 'category',
+      title: 'Category',
+      type: 'string',
+      description: 'Version 1: single category slug for navigation tabs',
+      options: {
+        list: [
+          {title: 'Эхлэгчдэд', value: 'beginners'},
+          {title: 'Bitcoin', value: 'bitcoin'},
+          {title: 'Ethereum', value: 'ethereum'},
+          {title: 'DeFi', value: 'defi'},
+          {title: 'Арилжаа', value: 'trading'},
+          {title: 'Түрийвч', value: 'wallet'},
+          {title: 'NFT & Web3', value: 'nft-web3'},
+          {title: 'Майнинг', value: 'mining'},
+          {title: 'Толь бичиг', value: 'dictionary'},
+          {title: 'Бидний тухай', value: 'about'},
+        ],
+        layout: 'dropdown',
+      },
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
       name: 'categories',
+      title: 'Categories (legacy)',
       type: 'array',
       of: [defineArrayMember({type: 'reference', to: {type: 'category'}})],
+      hidden: true,
     }),
     defineField({
       name: 'publishedAt',

@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import IconButton from "../components/IconButton";
+import { CATEGORIES, normalizeCategoryId, LEGACY_TITLE_TO_CATEGORY, SPECIAL_CATEGORY_SCREENS, isNavItemActive } from "../lib/categories";
 
 // ── PREMIUM SLATE GRAY PALETTE (High Contrast & Professional) ──
 const C = {
@@ -20,17 +21,8 @@ const C = {
   gold: "#fbbf24",            // Amber gold for affiliate/important tags
 };
 
-// ── FALLBACK CATEGORIES ──────────────────────────────
-const CATEGORIES = [
-  { id: "beginner", label: "Эхлэгчдэд", icon: "🔰", count: 1 },
-  { id: "bitcoin", label: "Bitcoin", icon: "₿", count: 1 },
-  { id: "ethereum", label: "Ethereum", icon: "Ξ", count: 1 },
-  { id: "defi", label: "DeFi", icon: "🦄", count: 1 },
-  { id: "trading", label: "Арилжаа", icon: "📈", count: 1 },
-  { id: "wallets", label: "Түрийвч", icon: "👛", count: 1 },
-  { id: "nft", label: "NFT & Web3", icon: "🖼️", count: 1 },
-  { id: "mining", label: "Майнинг", icon: "⛏️", count: 1 },
-];
+// ── FALLBACK CATEGORIES (used when Sanity counts are unavailable) ──
+const FALLBACK_CATEGORIES = CATEGORIES.map((c) => ({ ...c, count: 1 }));
 
 // ── FALLBACK POSTS (Fully Enriched with Comprehensive Mongolian Guides & FAQ) ──
 const POSTS_FALLBACK = [
@@ -234,7 +226,7 @@ const POSTS_FALLBACK = [
   {
     id: "fallback-2",
     slug: "metamask-setup-guide",
-    cat: "wallets",
+    cat: "wallet",
     catLabel: "Түрийвч",
     title: "Крипто түрийвч гэж юу вэ? MetaMask ашиглах заавар",
     subtitle: "Хөрөнгөө хамгаалах хамгийн чухал ойлголтууд болох Private Key, Seed Phrase, Hot болон Cold Wallet-ийн ялгаа.",
@@ -299,7 +291,7 @@ const dictionaryData = [
 const BEGINNER_GUIDE = {
   id: "static-beginner-guide",
   slug: "crypto-beginners-guide",
-  cat: "beginner",
+  cat: "beginners",
   catLabel: "Эхлэгчдэд",
   title: "Крипто Ертөнцийн Анхны Алхам: Шинэ Төгсөгчдөд Зориулсан Гарын Авлага",
   subtitle: "Криптовалют гэж юу вэ? Блокчэйн хэрхэн ажилладаг вэ? Луйвраас хэрхэн сэргийлэх вэ?",
@@ -345,7 +337,7 @@ const BEGINNER_GUIDE = {
 const NFT_GUIDE = {
   id: "static-nft-guide",
   slug: "nft-complete-guide",
-  cat: "nft",
+  cat: "nft-web3",
   catLabel: "NFT & Web3",
   title: "NFT (Non-Fungible Token) гэж юу вэ? Дижитал өмчлөлийн шинэ эрин",
   subtitle: "Давтагдашгүй токенууд хэрхэн ажилладаг, тэдгээрийн үнэ цэнэ юун дээр тогтдог вэ?",
@@ -433,6 +425,12 @@ const MINING_GUIDE = {
   ]
 };
 
+const STATIC_CAT_MAP = {
+  beginners: BEGINNER_GUIDE,
+  "nft-web3": NFT_GUIDE,
+  mining: MINING_GUIDE,
+};
+
 const COVER_ICON = {
   btc: "₿",
   eth: "Ξ",
@@ -468,8 +466,12 @@ const diffColor = (d) => {
 export default function CryptoTailbarClient({ initialPosts = [], initialCategories = [], initialGlossary = [], binanceLink }) {
   const [mounted, setMounted] = useState(false);
   const [screen, setScreen] = useState("home"); // home, category, post, glossary, about
-  const [activeCat, setActiveCat] = useState("beginner");
+  const [activeCat, setActiveCat] = useState("beginners");
   const [activePost, setActivePost] = useState(null);
+  const [categoryPostsCache, setCategoryPostsCache] = useState({});
+  const [categoryLoading, setCategoryLoading] = useState(false);
+  const categoryFetchRef = useRef(null);
+  const categoryPostsCacheRef = useRef({});
 
   // Search State
   const [searchOpen, setSearchOpen] = useState(false);
@@ -494,29 +496,20 @@ export default function CryptoTailbarClient({ initialPosts = [], initialCategori
     ...POSTS_FALLBACK.filter(fb => !initialPosts.some(ip => ip.slug === fb.slug))
   ];
 
-  const localCatMap = {
-    "Эхлэгчдэд": "beginner",
-    "Bitcoin": "bitcoin",
-    "Ethereum": "ethereum",
-    "DeFi": "defi",
-    "Арилжаа": "trading",
-    "Түрийвч": "wallets",
-    "NFT & Web3": "nft",
-    "Майнинг": "mining"
-  };
+  const localCatMap = LEGACY_TITLE_TO_CATEGORY;
 
   // Harmonize categories dynamically
   const allCategories = (initialCategories && initialCategories.length > 0)
     ? initialCategories.map(c => {
-      const catId = c.id || localCatMap[c.title] || (c.title ? c.title.toLowerCase() : "beginner");
+      const catId = normalizeCategoryId(c.id || localCatMap[c.title] || c.title);
       return {
         id: catId,
         label: c.label || c.title || "Ангилал",
-        icon: c.icon || "📄",
+        icon: c.icon || CATEGORIES.find(x => x.id === catId)?.icon || "📄",
         count: allPosts.filter(p => p.cat === catId).length
       };
     })
-    : CATEGORIES.map(c => ({
+    : FALLBACK_CATEGORIES.map(c => ({
       ...c,
       count: allPosts.filter(p => p.cat === c.id).length
     }));
@@ -565,10 +558,55 @@ export default function CryptoTailbarClient({ initialPosts = [], initialCategori
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const fetchCategoryPosts = useCallback(async (catId) => {
+    if (STATIC_CAT_MAP[catId] || SPECIAL_CATEGORY_SCREENS[catId] || categoryPostsCacheRef.current[catId]) return;
+
+    if (categoryFetchRef.current) {
+      categoryFetchRef.current.abort();
+    }
+    const controller = new AbortController();
+    categoryFetchRef.current = controller;
+
+    setCategoryLoading(true);
+    try {
+      const res = await fetch(
+        `/api/posts?category=${encodeURIComponent(catId)}`,
+        { signal: controller.signal }
+      );
+      if (!res.ok) return;
+      const data = await res.json();
+      if (!controller.signal.aborted) {
+        categoryPostsCacheRef.current[catId] = data.posts || [];
+        setCategoryPostsCache((prev) => ({
+          ...prev,
+          [catId]: data.posts || [],
+        }));
+      }
+    } catch (err) {
+      if (err.name !== 'AbortError') {
+        console.error('Category fetch failed:', err);
+      }
+    } finally {
+      if (!controller.signal.aborted) {
+        setCategoryLoading(false);
+        categoryFetchRef.current = null;
+      }
+    }
+  }, []);
+
   const openCat = (catId) => {
-    setActiveCat(catId);
-    setScreen("category");
+    const normalizedId = normalizeCategoryId(catId);
+    setActiveCat(normalizedId);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    const specialScreen = SPECIAL_CATEGORY_SCREENS[normalizedId];
+    if (specialScreen) {
+      setScreen(specialScreen);
+      return;
+    }
+
+    setScreen("category");
+    fetchCategoryPosts(normalizedId);
   };
 
   const handleNewsletterSubmit = (e) => {
@@ -613,19 +651,19 @@ export default function CryptoTailbarClient({ initialPosts = [], initialCategori
         {/* glass nav bar links */}
         <nav style={{ borderTop: `1px solid ${C.border}`, background: "rgba(30, 41, 59, 0.6)" }}>
           <div className="container-wide" style={{ padding: "0 24px", display: "flex", overflowX: "auto" }}>
-            {[["home", "Нүүр"], ["glossary", "Толь бичиг"], ["about", "Бидний тухай"]].concat(allCategories.map(c => [c.id, c.label])).map(([id, label]) => (
+            {[["home", "Нүүр"]].concat(allCategories.map(c => [c.id, c.label])).map(([id, label]) => (
               <IconButton
                 key={id}
-                onClick={() => id === "home" ? setScreen("home") : id === "glossary" || id === "about" ? setScreen(id) : openCat(id)}
+                onClick={() => id === "home" ? setScreen("home") : openCat(id)}
                 style={{
                   background: "none",
                   border: "none",
-                  borderBottom: `3px solid ${(screen === id || (screen === "category" && activeCat === id)) ? C.accentBlue : "transparent"}`,
-                  color: (screen === id || (screen === "category" && activeCat === id)) ? C.ink : C.inkLight,
+                  borderBottom: `3px solid ${isNavItemActive(screen, activeCat, id) ? C.accentBlue : "transparent"}`,
+                  color: isNavItemActive(screen, activeCat, id) ? C.ink : C.inkLight,
                   padding: "16px 22px",
                   cursor: "pointer",
                   fontSize: 14,
-                  fontWeight: (screen === id || (screen === "category" && activeCat === id)) ? 800 : 600,
+                  fontWeight: isNavItemActive(screen, activeCat, id) ? 800 : 600,
                   whiteSpace: "nowrap",
                   transition: "all 0.2s"
                 }}
@@ -836,7 +874,7 @@ export default function CryptoTailbarClient({ initialPosts = [], initialCategori
                     </div>
                   </div>
 
-                  <button onClick={() => openCat('wallets')} className="security-btn" style={{ border: `2px solid ${C.gold}`, background: "transparent", color: C.gold, padding: "14px 24px", borderRadius: 8, fontSize: 14, fontWeight: 900, cursor: "pointer", transition: "all 0.3s ease", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, width: "100%", boxSizing: "border-box" }}>
+                  <button onClick={() => openCat('wallet')} className="security-btn" style={{ border: `2px solid ${C.gold}`, background: "transparent", color: C.gold, padding: "14px 24px", borderRadius: 8, fontSize: 14, fontWeight: 900, cursor: "pointer", transition: "all 0.3s ease", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, width: "100%", boxSizing: "border-box" }}>
                     Аюулгүй байдлын гарын авлага унших
                     <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                       <line x1="5" y1="12" x2="19" y2="12" />
@@ -853,15 +891,19 @@ export default function CryptoTailbarClient({ initialPosts = [], initialCategori
         {/* ══ SCREEN: CATEGORY VIEW (Spacious Two-Column Grid Layout) ══ */}
         {screen === "category" && (() => {
           const categoryObj = allCategories.find(c => c.id === activeCat) || { label: "Ангилал", icon: "📄" };
-          // Static guide-тай ангиллуудад Sanity постын оронд тухайн guide-г харуулна
-          const STATIC_CAT_MAP = {
-            beginner: BEGINNER_GUIDE,
-            nft: NFT_GUIDE,
-            mining: MINING_GUIDE,
-          };
+          const cachedSanity = categoryPostsCache[activeCat];
           const catPosts = STATIC_CAT_MAP[activeCat]
             ? [STATIC_CAT_MAP[activeCat]]
-            : allPosts.filter(p => p.cat === activeCat);
+            : cachedSanity
+              ? [
+                  ...cachedSanity,
+                  ...allPosts.filter(
+                    (p) =>
+                      p.cat === activeCat &&
+                      !cachedSanity.some((sp) => sp.slug === p.slug)
+                  ),
+                ]
+              : allPosts.filter((p) => p.cat === activeCat);
 
           return (
             <div className="layout-grid" style={{ display: "grid", gridTemplateColumns: "2.4fr 1fr", gap: 32 }}>
@@ -872,7 +914,9 @@ export default function CryptoTailbarClient({ initialPosts = [], initialCategori
                   <span style={{ fontSize: 38, background: C.bgDark, padding: 12, borderRadius: 16, border: `2px solid ${C.border}` }}>{categoryObj.icon}</span>
                   <div>
                     <h1 style={{ margin: 0, fontSize: 32, fontWeight: 900, color: C.ink }}>{categoryObj.label}</h1>
-                    <p style={{ margin: "6px 0 0", color: C.accentBlue, fontSize: 14, fontWeight: "700" }}>Нийт {catPosts.length} нийтлэл олдлоо</p>
+                    <p style={{ margin: "6px 0 0", color: C.accentBlue, fontSize: 14, fontWeight: "700" }}>
+                      {categoryLoading ? "Ачааллаж байна..." : `Нийт ${catPosts.length} нийтлэл олдлоо`}
+                    </p>
                   </div>
                 </div>
 
@@ -1242,18 +1286,18 @@ export default function CryptoTailbarClient({ initialPosts = [], initialCategori
             </div>
 
             {[
-              ["Ангилал", ["beginner", "bitcoin", "ethereum", "defi", "trading"]],
-              ["Ашигтай линк", ["glossary", "about"]],
+              ["Ангилал", ["beginners", "bitcoin", "ethereum", "defi", "trading"]],
+              ["Ашигтай линк", ["dictionary", "about"]],
             ].map(([title, links]) => (
               <div key={title}>
                 <div style={{ fontSize: 12, fontWeight: 900, letterSpacing: "0.08em", color: C.ink, marginBottom: 16, textTransform: "uppercase" }}>{title}</div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                   {links.map(l => {
-                    const label = l === "glossary" ? "Толь бичиг" : l === "about" ? "Бидний тухай" : (allCategories.find(c => c.id === l)?.label || l);
+                    const label = allCategories.find(c => c.id === l)?.label || l;
                     return (
                       <div
                         key={l}
-                        onClick={() => l === "glossary" || l === "about" ? setScreen(l) : openCat(l)}
+                        onClick={() => openCat(l)}
                         className="hover-accent"
                         style={{ fontSize: 13, color: C.inkLight, cursor: "pointer", fontWeight: "600" }}
                       >

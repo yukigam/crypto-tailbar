@@ -431,6 +431,8 @@ const STATIC_CAT_MAP = {
   mining: MINING_GUIDE,
 };
 
+const SECURITY_GUIDE_SLUG = 'digital-asset-security-guide';
+
 const COVER_ICON = {
   btc: "₿",
   eth: "Ξ",
@@ -463,7 +465,7 @@ const diffColor = (d) => {
   return C.neonPink;
 };
 
-export default function CryptoTailbarClient({ initialPosts = [], initialCategories = [], initialGlossary = [], binanceLink }) {
+export default function CryptoTailbarClient({ initialPosts = [], initialCategories = [], initialGlossary = [], binanceLink, initialPostSlug = null }) {
   const [mounted, setMounted] = useState(false);
   const [screen, setScreen] = useState("home"); // home, category, post, glossary, about
   const [activeCat, setActiveCat] = useState("beginners");
@@ -557,6 +559,15 @@ export default function CryptoTailbarClient({ initialPosts = [], initialCategori
     setOpenFaqIndex(null);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  useEffect(() => {
+    if (!mounted || !initialPostSlug) return;
+    const post = allPosts.find((p) => p.slug === initialPostSlug);
+    if (!post) return;
+    openPost(post);
+  }, [mounted, initialPostSlug, initialPosts]);
+
+  const securityGuidePost = allPosts.find((p) => p.slug === SECURITY_GUIDE_SLUG);
 
   const fetchCategoryPosts = useCallback(async (catId) => {
     if (STATIC_CAT_MAP[catId] || SPECIAL_CATEGORY_SCREENS[catId] || categoryPostsCacheRef.current[catId]) return;
@@ -874,13 +885,23 @@ export default function CryptoTailbarClient({ initialPosts = [], initialCategori
                     </div>
                   </div>
 
-                  <button onClick={() => openCat('wallet')} className="security-btn" style={{ border: `2px solid ${C.gold}`, background: "transparent", color: C.gold, padding: "14px 24px", borderRadius: 8, fontSize: 14, fontWeight: 900, cursor: "pointer", transition: "all 0.3s ease", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, width: "100%", boxSizing: "border-box" }}>
+                  <a
+                    href={`/post/${SECURITY_GUIDE_SLUG}`}
+                    onClick={(e) => {
+                      if (securityGuidePost) {
+                        e.preventDefault();
+                        openPost(securityGuidePost);
+                      }
+                    }}
+                    className="security-btn"
+                    style={{ border: `2px solid ${C.gold}`, background: "transparent", color: C.gold, padding: "14px 24px", borderRadius: 8, fontSize: 14, fontWeight: 900, cursor: "pointer", transition: "all 0.3s ease", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, width: "100%", boxSizing: "border-box", textDecoration: "none" }}
+                  >
                     Аюулгүй байдлын гарын авлага унших
                     <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                       <line x1="5" y1="12" x2="19" y2="12" />
                       <polyline points="12 5 19 12 12 19" />
                     </svg>
-                  </button>
+                  </a>
                 </div>
               </aside>
 

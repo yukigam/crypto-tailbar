@@ -465,9 +465,19 @@ const diffColor = (d) => {
   return C.neonPink;
 };
 
-export default function CryptoTailbarClient({ initialPosts = [], initialCategories = [], initialGlossary = [], binanceLink, initialPostSlug = null }) {
+/**
+ * @param {{
+ *   initialPosts?: any[],
+ *   initialCategories?: any[],
+ *   initialGlossary?: any[],
+ *   binanceLink?: string,
+ *   initialPostSlug?: string | null,
+ *   initialScreen?: string | null,
+ * }} props
+ */
+export default function CryptoTailbarClient({ initialPosts = [], initialCategories = [], initialGlossary = [], binanceLink, initialPostSlug = null, initialScreen = null }) {
   const [mounted, setMounted] = useState(false);
-  const [screen, setScreen] = useState("home"); // home, category, post, glossary, about
+  const [screen, setScreen] = useState(initialScreen || "home"); // home, category, post, glossary, about, privacy, terms
   const [activeCat, setActiveCat] = useState("beginners");
   const [activePost, setActivePost] = useState(null);
   const [categoryPostsCache, setCategoryPostsCache] = useState({});
@@ -1150,15 +1160,166 @@ export default function CryptoTailbarClient({ initialPosts = [], initialCategori
           </div>
         )}
 
-        {/* ══ SCREEN: ABOUT US ══════════════════════════ */}
+        {/* ══ SCREEN: ABOUT US & CONTACT ══════════════════════════ */}
         {screen === "about" && (
           <div style={{ maxWidth: 780, margin: "0 auto", padding: "10px 0" }}>
             <h1 style={{ margin: "0 0 8px", fontSize: 32, fontWeight: 900, color: C.ink }}>Бидний тухай</h1>
-            <div style={{ height: 4, width: 60, background: C.accentGlow, borderRadius: 2, marginBottom: 24 }} />
+            <div style={{ height: 4, width: 60, background: C.accentGlow, borderRadius: 2, marginBottom: 32 }} />
 
-            <p style={{ fontSize: 16, color: C.inkLight, lineHeight: 1.8, marginBottom: 24, fontWeight: "500" }}>
-              <strong style={{ color: "#fff" }}>КриптоТайлбарлагч вэбсайт нь</strong> монголчууддаа крипто болон блокчейн технологийг анхан шатнаас нь үнэ төлбөргүй, ойлгомжтой хүргэх зорилготой хувийн блог юм. Төвлөрсөн бус санхүү, Bitcoin, Ethereum болон бусад технологийн сэдвүүдийг монгол хэлээр энгийн, үнэн зөв хэлээр тайлбарлан нийтэлдэг.
-            </p>
+            <div className="modern-card" style={{ background: C.bgDark, border: `1.5px solid ${C.border}`, borderRadius: 16, padding: "32px", marginBottom: 28 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 20 }}>
+                <div style={{ background: "rgba(56,189,248,0.12)", padding: "12px", borderRadius: 12, fontSize: 28 }}>ℹ️</div>
+                <h2 style={{ margin: 0, fontSize: 22, fontWeight: 900, color: C.ink }}>Бидний тухай</h2>
+              </div>
+              <p style={{ fontSize: 16, color: C.inkLight, lineHeight: 1.8, marginBottom: 16, fontWeight: "500" }}>
+                <strong style={{ color: "#fff" }}>КриптоТайлбарлагч</strong> нь монголчуудад крипто болон блокчейн технологийг анхан шатнаас нь <strong style={{ color: C.accentBlue }}>үнэ төлбөргүй, ойлгомжтой</strong> хүргэх зорилготой хувийн блог юм.
+              </p>
+              <p style={{ fontSize: 15, color: C.inkLight, lineHeight: 1.8, marginBottom: 16, fontWeight: "500" }}>
+                Бид Bitcoin, Ethereum, DeFi, NFT болон бусад блокчейн технологийн сэдвүүдийг монгол хэлээр энгийн, үнэн зөв хэлбэрээр тайлбарлан нийтэлдэг. Манай контент нь зөвхөн боловсролын зориулалттай бөгөөд санхүүгийн зөвлөгөө биш болно.
+              </p>
+              <p style={{ fontSize: 15, color: C.inkLight, lineHeight: 1.8, fontWeight: "500" }}>
+                Манай зорилго бол Монголын крипто нийгэмлэгийг хамгийн найдвартай, шинэлэг мэдлэгээр хангаж, хэн бүхэн санхүүгийн технологийн ертөнцөд аюулгүй орж чадах орчин бүрдүүлэх явдал юм.
+              </p>
+            </div>
+
+            <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+              <a href="/privacy" onClick={(e) => { e.preventDefault(); setScreen("privacy"); window.scrollTo({ top: 0, behavior: "smooth" }); }} style={{ fontSize: 13, color: C.inkFaint, textDecoration: "underline", fontWeight: 600, cursor: "pointer" }}>Нууцлалын бодлого</a>
+              <span style={{ color: C.border }}>·</span>
+              <a href="/terms" onClick={(e) => { e.preventDefault(); setScreen("terms"); window.scrollTo({ top: 0, behavior: "smooth" }); }} style={{ fontSize: 13, color: C.inkFaint, textDecoration: "underline", fontWeight: 600, cursor: "pointer" }}>Үйлчилгээний нөхцөл</a>
+            </div>
+
+            <div className="modern-card" style={{ background: "rgba(255, 200, 50, 0.08)", border: `1.5px solid rgba(255, 200, 50, 0.3)`, borderRadius: 16, padding: "28px 32px", marginTop: 28 }}>
+              <div style={{ display: "flex", alignItems: "flex-start", gap: 14 }}>
+                <span style={{ fontSize: 24, flexShrink: 0, marginTop: 2 }}>⚠️</span>
+                <div>
+                  <p style={{ fontSize: 15, color: "#fbbf24", lineHeight: 1.8, fontWeight: 700, margin: 0 }}>
+                    Энэхүү вэбсайт нь крипто сонирхогчдод зориулсан автомат мэдээллийн сан бөгөөд ямар нэгэн хэрэглэгчийн дэмжлэг, тусламжийн үйлчилгээ үзүүлэхгүй.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ══ SCREEN: PRIVACY POLICY ══════════════════════════ */}
+        {screen === "privacy" && (
+          <div style={{ maxWidth: 780, margin: "0 auto", padding: "10px 0" }}>
+            <h1 style={{ margin: "0 0 8px", fontSize: 32, fontWeight: 900, color: C.ink }}>Нууцлалын Бодлого</h1>
+            <div style={{ height: 4, width: 60, background: C.accentGlow, borderRadius: 2, marginBottom: 8 }} />
+            <p style={{ fontSize: 13, color: C.inkFaint, fontWeight: 600, marginBottom: 32 }}>Сүүлд шинэчлэгдсэн: 2026 оны 6-р сарын 1</p>
+
+            {[
+              {
+                title: "1. Танилцуулга",
+                body: "КриптоТайлбарлагч (cryptotailbar.mn) вэбсайтад тавтай морил. Энэхүү Нууцлалын бодлого нь таны хувийн мэдээллийг хэрхэн цуглуулж, ашиглаж, хамгаалж байгааг тайлбарлана. Манай вэбсайтыг ашигласнаар та энэхүү бодлогыг зөвшөөрч буй гэж үзнэ."
+              },
+              {
+                title: "2. Бид ямар мэдээлэл цуглуулдаг вэ?",
+                body: "Бид дараах мэдээллийг автоматаар цуглуулж болно:\n• Хөтчийн төрөл ба хувилбар\n• Таны зочилсон хуудсууд болон хандалтын хугацаа\n• IP хаяг (anonymized байдлаар)\n• Устгах системийн мэдээлэл\n\nХэрэв та байгаль хамгаалах хэлбэрт мэдэгдэж бүртгүүлбэл и-мэйл хаяг цуглуулж болно."
+              },
+              {
+                title: "3. Google AdSense ба Зар Сурталчилгаа",
+                body: "Манай вэбсайт нь Google AdSense зарын үйлчилгээг ашигладаг. Google болон гуравдагч зар сурталчлагчид хэрэглэгчийн хандалтын мэдээлэл болон күүкиг (cookie) ашиглан танд хамааралтай зар харуулж болно.\n\nGoogle-ийн зарын күүки болон мэдээлэл цуглуулалтыг идэвхгүй болгохын тулд Google Ads Settings-т орж тохируулж болно: https://adssettings.google.com\n\nGoogle-ийн нууцлалын бодлогын дэлгэрэнгүйг https://policies.google.com/privacy хаягаар үзнэ үү."
+              },
+              {
+                title: "4. Google Analytics",
+                body: "Бид вэбсайтын ашиглалтыг судлах зорилгоор Google Analytics ашигладаг. Энэхүү үйлчилгээ нь күүки ашиглан хэрэглэгчийн зан байдал, хуудас хандалт болон статистик мэдээллийг цуглуулдаг.\n\nGoogle Analytics-ийн мэдээлэл цуглуулалтыг хязгаарлахын тулд Google Analytics Opt-out Browser Add-on-ийг суулгаж болно."
+              },
+              {
+                title: "5. Күүки (Cookie) Хэрэглээ",
+                body: "Манай вэбсайт күүки ашиглаж болно. Күүки нь таны хөтөч дэх жижиг текст файл юм. Бид дараах зорилгоор күүки ашигладаг:\n• Вэбсайтын ажиллагааг сайжруулах\n• Хэрэглэгчийн хандалтыг тоолох\n• Хамааралтай зар харуулах\n\nТа хөтчийнхөө тохиргооноос күүкийг идэвхгүй болгож болно, гэхдээ зарим хуудсын ажиллагаа хязгаарлагдаж магадгүй."
+              },
+              {
+                title: "6. Мэдээллийн Хамгаалалт",
+                body: "Бид таны хувийн мэдээллийг хамгаалахын тулд салбарын стандарт аюулгүй байдлын арга хэмжээг авдаг. Гэсэн ч интернэтээр дамжуулах мэдээлэл 100% найдвартай байх баталгаа байхгүй болохыг анхааруулна."
+              },
+              {
+                title: "7. Гуравдагч Талын Холбоосууд",
+                body: "Манай вэбсайт дотор Binance гэх мэт гуравдагч талын вэбсайт руу чиглэсэн холбоосууд байж болно. Эдгээр сайтуудын нууцлалын бодлогод бид хариуцлага хүлээхгүй тул тэдгээрийн бодлогыг тусад нь уншихыг зөвлөж байна."
+              },
+              {
+                title: "8. Хүүхдийн Нууцлал",
+                body: "Манай вэбсайт нь 13 нас хүрээгүй хүүхдэд зориулагдаагүй бөгөөд бид 13 нас хүрээгүй хэрэглэгчдийн хувийн мэдээллийг санаатайгаар цуглуулдаггүй."
+              },
+              {
+                title: "9. Бодлогын Өөрчлөлт",
+                body: "Бид энэхүү Нууцлалын бодлогыг хэдийд ч өөрчилж болно. Өөрчлөлт орсон тохиолдолд уг хуудсанд шинэчлэгдсэн огноог тавьж мэдэгдэнэ. Та энэхүү хуудсыг үе үе шалгаж байхыг зөвлөж байна."
+              },
+              {
+                title: "10. Холбоо барих",
+                body: "Нууцлалын бодлогтой холбоотой асуулт байвал: contact@cryptotailbar.mn"
+              }
+            ].map((section, i) => (
+              <div key={i} className="modern-card" style={{ background: C.bgDark, border: `1.5px solid ${C.border}`, borderRadius: 16, padding: "28px 32px", marginBottom: 16 }}>
+                <h2 style={{ margin: "0 0 14px", fontSize: 18, fontWeight: 900, color: C.ink, borderLeft: `4px solid ${C.accentBlue}`, paddingLeft: 14 }}>{section.title}</h2>
+                <p style={{ margin: 0, fontSize: 15, color: C.inkLight, lineHeight: 1.85, fontWeight: 500, whiteSpace: "pre-line" }}>{section.body}</p>
+              </div>
+            ))}
+
+            <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 24 }}>
+              <a href="/terms" onClick={(e) => { e.preventDefault(); setScreen("terms"); window.scrollTo({ top: 0, behavior: "smooth" }); }} style={{ fontSize: 13, color: C.inkFaint, textDecoration: "underline", fontWeight: 600, cursor: "pointer" }}>Үйлчилгээний нөхцөл</a>
+              <span style={{ color: C.border }}>·</span>
+              <a href="/about" onClick={(e) => { e.preventDefault(); setScreen("about"); window.scrollTo({ top: 0, behavior: "smooth" }); }} style={{ fontSize: 13, color: C.inkFaint, textDecoration: "underline", fontWeight: 600, cursor: "pointer" }}>Холбоо барих</a>
+            </div>
+          </div>
+        )}
+
+        {/* ══ SCREEN: TERMS & CONDITIONS ══════════════════════════ */}
+        {screen === "terms" && (
+          <div style={{ maxWidth: 780, margin: "0 auto", padding: "10px 0" }}>
+            <h1 style={{ margin: "0 0 8px", fontSize: 32, fontWeight: 900, color: C.ink }}>Үйлчилгээний Нөхцөл</h1>
+            <div style={{ height: 4, width: 60, background: C.accentGlow, borderRadius: 2, marginBottom: 8 }} />
+            <p style={{ fontSize: 13, color: C.inkFaint, fontWeight: 600, marginBottom: 32 }}>Сүүлд шинэчлэгдсэн: 2026 оны 6-р сарын 1</p>
+
+            {[
+              {
+                title: "1. Нөхцөлийг Зөвшөөрөх",
+                body: "КриптоТайлбарлагч (cryptotailbar.mn) вэбсайтыг ашигласнаар та энэхүү Үйлчилгээний нөхцөлтэй бүрэн танилцаж, зөвшөөрсөн гэж үзнэ. Хэрэв та эдгээр нөхцөлтэй санал нийлэхгүй бол вэбсайтыг ашиглахаас татгалзана уу."
+              },
+              {
+                title: "2. Контентийн Мэдэгдэл (Disclaimer)",
+                body: "Манай вэбсайт дахь бүх нийтлэл, мэдээлэл нь зөвхөн боловсролын болон танин мэдэхүйн зорилготой бөгөөд энэ нь:\n\n• Хөрөнгө оруулалтын зөвлөгөө БИШ\n• Санхүүгийн зөвлөгөө БИШ\n• Хуулийн зөвлөгөө БИШ\n\nКрипто хөрөнгийн зах зээл нь маш эрсдэлтэй бөгөөд хэрэглэгч өөрийн судалгааг (DYOR — Do Your Own Research) заавал хийж, мэргэжлийн санхүүгийн зөвлөхтэй зөвлөлдөхийг зөвлөж байна."
+              },
+              {
+                title: "3. Санхүүгийн Эрсдэлийн Анхааруулга",
+                body: "Криптовалют болон блокчейн хөрөнгөд хөрөнгө оруулах нь өндөр эрсдэлтэй бөгөөд таны хөрөнгийн бүх эсвэл зарим хэсгийг алдах магадлалтай. Ханш хэдхэн цагт огцом буурах эсвэл огцом өсөх боломжтой. Манай вэбсайтын мэдээлэлд тулгуурлан гаргасан хөрөнгө оруулалтын шийдвэрийн үр дагаварт бид хариуцлага хүлээхгүй."
+              },
+              {
+                title: "4. Оюуны Өмчийн Эрх",
+                body: "Манай вэбсайт дахь бүх контент (нийтлэл, дизайн, логотип, зураг г.м.) нь КриптоТайлбарлагч-ийн оюуны өмч бөгөөд зохиогчийн эрхийн хуулиар хамгаалагдсан. Та манай контентийг:\n\n• Хувийн хэрэгцээнд ашиглаж болно\n• Эх сурвалжийг заан иш татаж болно\n• Арилжааны зориулалтаар ашиглахдаа бичгээр зөвшөөрөл авна"
+              },
+              {
+                title: "5. Affiliate (Бусдыг Урих) Мэдэгдэл",
+                body: "Манай вэбсайт нь Binance болон бусад крипто платформуудтай affiliate (орлогын хуваалцалт) хамтын ажиллагаатай. Манай вэбсайтаас холбосон affiliate холбоосоор та бүртгүүлбэл бид комисс авч болно. Энэ нь таны зардал нэмэгдүүлэхгүй бөгөөд зарим тохиолдолд хөнгөлөлт авах боломжтой."
+              },
+              {
+                title: "6. Гуравдагч Этгээдийн Холбоосууд",
+                body: "Манай вэбсайт дотор гуравдагч талын вэбсайт руу чиглэсэн холбоосууд байж болно. Эдгээр вэбсайтын контент, нууцлалын бодлого болон үйл ажиллагаанд бид хариуцлага хүлээхгүй."
+              },
+              {
+                title: "7. Хязгаарлагдмал Хариуцлага",
+                body: "Хуулиар зөвшөөрөгдсөн хамгийн өргөн хүрээнд КриптоТайлбарлагч нь манай вэбсайтыг ашиглахаас үүдсэн шууд болон шууд бус аливаа хохирол, алдагдалд хариуцлага хүлээхгүй."
+              },
+              {
+                title: "8. Нөхцөлийн Өөрчлөлт",
+                body: "Бид энэхүү Үйлчилгээний нөхцөлийг хэдийд ч өөрчилж болно. Өөрчлөлт орсон тохиолдолд уг хуудсанд шинэчлэгдсэн огноог тавьж мэдэгдэнэ. Вэбсайтыг үргэлжлүүлэн ашигласнаар та шинэ нөхцөлийг зөвшөөрсөн гэж үзнэ."
+              },
+              {
+                title: "9. Холбоо барих",
+                body: "Үйлчилгээний нөхцөлтэй холбоотой асуулт байвал: contact@cryptotailbar.mn"
+              }
+            ].map((section, i) => (
+              <div key={i} className="modern-card" style={{ background: C.bgDark, border: `1.5px solid ${C.border}`, borderRadius: 16, padding: "28px 32px", marginBottom: 16 }}>
+                <h2 style={{ margin: "0 0 14px", fontSize: 18, fontWeight: 900, color: C.ink, borderLeft: `4px solid ${C.accentPurple}`, paddingLeft: 14 }}>{section.title}</h2>
+                <p style={{ margin: 0, fontSize: 15, color: C.inkLight, lineHeight: 1.85, fontWeight: 500, whiteSpace: "pre-line" }}>{section.body}</p>
+              </div>
+            ))}
+
+            <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 24 }}>
+              <a href="/privacy" onClick={(e) => { e.preventDefault(); setScreen("privacy"); window.scrollTo({ top: 0, behavior: "smooth" }); }} style={{ fontSize: 13, color: C.inkFaint, textDecoration: "underline", fontWeight: 600, cursor: "pointer" }}>Нууцлалын бодлого</a>
+              <span style={{ color: C.border }}>·</span>
+              <a href="/about" onClick={(e) => { e.preventDefault(); setScreen("about"); window.scrollTo({ top: 0, behavior: "smooth" }); }} style={{ fontSize: 13, color: C.inkFaint, textDecoration: "underline", fontWeight: 600, cursor: "pointer" }}>Холбоо барих</a>
+            </div>
           </div>
         )}
 
@@ -1329,10 +1490,46 @@ export default function CryptoTailbarClient({ initialPosts = [], initialCategori
                 </div>
               </div>
             ))}
+
+            {/* Legal Links — crawlable <a> tags for Google AdSense & bots */}
+            <div>
+              <div style={{ fontSize: 12, fontWeight: 900, letterSpacing: "0.08em", color: C.ink, marginBottom: 16, textTransform: "uppercase" }}>Хуулийн мэдээлэл</div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                <a
+                  href="/privacy"
+                  onClick={(e) => { e.preventDefault(); setScreen("privacy"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                  className="hover-accent"
+                  style={{ fontSize: 13, color: C.inkLight, cursor: "pointer", fontWeight: "600", textDecoration: "none" }}
+                >
+                  🔒 Нууцлалын Бодлого
+                </a>
+                <a
+                  href="/terms"
+                  onClick={(e) => { e.preventDefault(); setScreen("terms"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                  className="hover-accent"
+                  style={{ fontSize: 13, color: C.inkLight, cursor: "pointer", fontWeight: "600", textDecoration: "none" }}
+                >
+                  📋 Үйлчилгээний Нөхцөл
+                </a>
+                <a
+                  href="/about"
+                  onClick={(e) => { e.preventDefault(); setScreen("about"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                  className="hover-accent"
+                  style={{ fontSize: 13, color: C.inkLight, cursor: "pointer", fontWeight: "600", textDecoration: "none" }}
+                >
+                  ℹ️ Бидний тухай
+                </a>
+              </div>
+            </div>
           </div>
 
           <div style={{ borderTop: `2px solid ${C.border}`, paddingTop: 24, fontSize: 12, color: C.inkFaint, textAlign: "center", lineHeight: 1.6, fontWeight: "600" }}>
             Энэхүү вэбсайт дахь бүх мэдээлэл нь зөвхөн танин мэдэхүйн зориулалттай бөгөөд санхүүгийн зөвлөгөө биш болно. Крипто хөрөнгө оруулалт нь өндөр эрсдэлтэй тул өөрийн судалгааг заавал хийгээрэй.
+            <div style={{ marginTop: 16, display: "flex", gap: 16, justifyContent: "center", flexWrap: "wrap" }}>
+              <a href="/privacy" onClick={(e) => { e.preventDefault(); setScreen("privacy"); window.scrollTo({ top: 0, behavior: "smooth" }); }} style={{ color: C.inkFaint, textDecoration: "underline", fontSize: 11, fontWeight: 600 }}>Нууцлалын Бодлого</a>
+              <span>·</span>
+              <a href="/terms" onClick={(e) => { e.preventDefault(); setScreen("terms"); window.scrollTo({ top: 0, behavior: "smooth" }); }} style={{ color: C.inkFaint, textDecoration: "underline", fontSize: 11, fontWeight: 600 }}>Үйлчилгээний Нөхцөл</a>
+            </div>
           </div>
         </div>
       </footer>

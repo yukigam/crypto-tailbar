@@ -704,7 +704,7 @@ export default function CryptoTailbar() {
               <p style={{fontSize:13,lineHeight:1.7,color:"#666",margin:"0 0 16px"}}>Монголын хамгийн найдвартай крипто мэдлэгийн эх сурвалж. Энгийн хэлэнд ойлгомжтой тайлбар.</p>
               <div style={{fontSize:11,color:"#444"}}>© 2026 КрыптоТайлбарлагч. Бүх эрх хамгаалагдсан.</div>
             </div>
-            {[["Агуулга",["Эхлэгчдэд","Bitcoin","Ethereum","DeFi","NFT & Web3"]],["Платформ",["Бидний тухай","Нийтлэгч болох","Advertise","Нууцлал","Холбоо барих"]],["Нийгэмлэг",["Telegram","Twitter/X","Facebook","YouTube","Discord"]]].map(([t,ls])=>(
+            {[["Агуулга",["Эхлэгчдэд","Bitcoin","Ethereum","DeFi","NFT & Web3"]],["Платформ",["Бидний тухай","Нийтлэгч болох","Advertise","Нууцлал"]],["Нийгэмлэг",["Telegram","Twitter/X","Facebook","YouTube","Discord"]]].map(([t,ls])=>(
               <div key={t}>
                 <div style={{fontSize:11,fontWeight:700,letterSpacing:"0.1em",color:C.accentBright,marginBottom:14}}>{t.toUpperCase()}</div>
                 {ls.map(l=><div key={l} style={{fontSize:13,color:"#555",marginBottom:8,cursor:"pointer"}} onMouseEnter={e=>e.target.style.color="#fff"} onMouseLeave={e=>e.target.style.color="#555"}>{l}</div>)}

@@ -1211,7 +1211,7 @@ export default function CryptoTailbarClient({ initialPosts = [], initialCategori
             {[
               {
                 title: "1. Танилцуулга",
-                body: "КриптоТайлбарлагч (cryptotailbar.mn) вэбсайтад тавтай морил. Энэхүү Нууцлалын бодлого нь таны хувийн мэдээллийг хэрхэн цуглуулж, ашиглаж, хамгаалж байгааг тайлбарлана. Манай вэбсайтыг ашигласнаар та энэхүү бодлогыг зөвшөөрч буй гэж үзнэ."
+                body: "КриптоТайлбарлагч вэбсайтад тавтай морил. Энэхүү Нууцлалын бодлого нь таны хувийн мэдээллийг хэрхэн цуглуулж, ашиглаж, хамгаалж байгааг тайлбарлана. Манай вэбсайтыг ашигласнаар та энэхүү бодлогыг зөвшөөрч буй гэж үзнэ."
               },
               {
                 title: "2. Бид ямар мэдээлэл цуглуулдаг вэ?",
@@ -1247,7 +1247,7 @@ export default function CryptoTailbarClient({ initialPosts = [], initialCategori
               },
               {
                 title: "10. Холбоо барих",
-                body: "Нууцлалын бодлогтой холбоотой асуулт байвал: contact@cryptotailbar.mn"
+                body: "Нууцлалын бодлоготой холбоотой асуулт байвал: КриптоТайлбарлагч"
               }
             ].map((section, i) => (
               <div key={i} className="modern-card" style={{ background: C.bgDark, border: `1.5px solid ${C.border}`, borderRadius: 16, padding: "28px 32px", marginBottom: 16 }}>
@@ -1274,7 +1274,7 @@ export default function CryptoTailbarClient({ initialPosts = [], initialCategori
             {[
               {
                 title: "1. Нөхцөлийг Зөвшөөрөх",
-                body: "КриптоТайлбарлагч (cryptotailbar.mn) вэбсайтыг ашигласнаар та энэхүү Үйлчилгээний нөхцөлтэй бүрэн танилцаж, зөвшөөрсөн гэж үзнэ. Хэрэв та эдгээр нөхцөлтэй санал нийлэхгүй бол вэбсайтыг ашиглахаас татгалзана уу."
+                body: "КриптоТайлбарлагч вэбсайтыг ашигласнаар та энэхүү Үйлчилгээний нөхцөлтэй бүрэн танилцаж, зөвшөөрсөн гэж үзнэ. Хэрэв та эдгээр нөхцөлтэй санал нийлэхгүй бол вэбсайтыг ашиглахаас татгалзана уу."
               },
               {
                 title: "2. Контентийн Мэдэгдэл (Disclaimer)",
@@ -1306,7 +1306,7 @@ export default function CryptoTailbarClient({ initialPosts = [], initialCategori
               },
               {
                 title: "9. Холбоо барих",
-                body: "Үйлчилгээний нөхцөлтэй холбоотой асуулт байвал: contact@cryptotailbar.mn"
+                body: "Үйлчилгээний нөхцөлтэй холбоотой асуулт байвал: КриптоТайлбарлагч"
               }
             ].map((section, i) => (
               <div key={i} className="modern-card" style={{ background: C.bgDark, border: `1.5px solid ${C.border}`, borderRadius: 16, padding: "28px 32px", marginBottom: 16 }}>

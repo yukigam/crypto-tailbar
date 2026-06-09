@@ -2,8 +2,7 @@ import CryptoTailbarClient from '../CryptoTailbarClient';
 import { getClientPageData } from '../../lib/clientPageData';
 import type { Metadata } from 'next';
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+export const revalidate = 86400;
 
 export const metadata: Metadata = {
   title: 'Үйлчилгээний Нөхцөл | КриптоТайлбарлагч',

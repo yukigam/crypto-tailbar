@@ -5,7 +5,8 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
+      disallow: '/studio/',
     },
-    sitemap: 'https://crypto-tailbar-gyrr.vercel.app/sitemap.xml',
+    sitemap: 'https://crypto-tailbar.vercel.app/sitemap.xml',
   }
 }

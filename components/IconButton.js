@@ -24,20 +24,6 @@ const IconButton = ({ children, onClick, style, className, ...props }) => {
         outline: 'none',
         ...style
       }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = 'translateY(-2px)';
-        e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)';
-        if (!style?.background && !style?.backgroundColor) {
-          e.currentTarget.style.background = 'linear-gradient(135deg, #0c8f5a 0%, #15c178 100%)';
-        }
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = 'translateY(0)';
-        e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)';
-        if (!style?.background && !style?.backgroundColor) {
-          e.currentTarget.style.background = 'linear-gradient(135deg, #0a7c4e 0%, #12a868 100%)';
-        }
-      }}
       {...props}
     >
       {children}

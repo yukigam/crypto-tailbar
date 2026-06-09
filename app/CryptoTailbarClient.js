@@ -632,18 +632,19 @@ export default function CryptoTailbarClient({ initialPosts = [], initialCategori
 
   const handleNewsletterSubmit = (e) => {
     e.preventDefault();
-    if (emailInput.trim()) {
+    const email = emailInput.trim();
+    if (email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       setNewsletterDone(true);
       setEmailInput("");
     }
   };
 
   if (!mounted) {
-    return <div style={{ minHeight: "100vh", background: C.bg }} />;
+    return <div style={{ minHeight: "100vh", background: C.bg }} role="status" aria-label="Ачааллаж байна" />;
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: C.bg, color: C.ink, fontFamily: "'Inter', system-ui, sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: C.bg, color: C.ink }}>
 
       {/* ── HEADER ── */}
       <header className="glass-nav" style={{ position: "sticky", top: 0, zIndex: 200, borderBottom: `1px solid ${C.border}` }}>
@@ -670,12 +671,13 @@ export default function CryptoTailbarClient({ initialPosts = [], initialCategori
         </div>
 
         {/* glass nav bar links */}
-        <nav style={{ borderTop: `1px solid ${C.border}`, background: "rgba(30, 41, 59, 0.6)" }}>
+        <nav style={{ borderTop: `1px solid ${C.border}`, background: "rgba(30, 41, 59, 0.6)" }} aria-label="Үндсэн навигаци">
           <div className="container-wide" style={{ padding: "0 24px", display: "flex", overflowX: "auto" }}>
             {[["home", "Нүүр"]].concat(allCategories.map(c => [c.id, c.label])).map(([id, label]) => (
               <IconButton
                 key={id}
                 onClick={() => id === "home" ? setScreen("home") : openCat(id)}
+                aria-label={label}
                 style={{
                   background: "none",
                   border: "none",
@@ -706,6 +708,7 @@ export default function CryptoTailbarClient({ initialPosts = [], initialCategori
                   value={searchQ}
                   onChange={e => setSearchQ(e.target.value)}
                   placeholder="Нийтлэл, нэр томьёо эсвэл сэдэв хайх... (жишээ: Bitcoin, DeFi, Түрийвч)"
+                  aria-label="Хайх"
                   style={{ width: "100%", padding: "16px 20px 16px 48px", background: C.bg, border: `2px solid ${C.accentBlue}`, borderRadius: 12, color: C.ink, fontSize: 16, outline: "none", boxSizing: "border-box", transition: "all 0.2s", fontWeight: "600", boxShadow: "0 0 15px rgba(56, 189, 248, 0.25)" }}
                 />
                 <span style={{ position: "absolute", left: 18, top: "50%", transform: "translateY(-50%)", fontSize: 18, opacity: 0.8 }}>🔍</span>
@@ -767,7 +770,7 @@ export default function CryptoTailbarClient({ initialPosts = [], initialCategori
             {/* Featured Hero Article */}
             {allPosts.slice(0, 1).map(p => (
               <div key={p.id} onClick={() => openPost(p)} className="hero-card modern-card hover-glow" style={{ cursor: "pointer", position: "relative", overflow: "hidden", minHeight: 420, borderRadius: 16, display: "flex", flexDirection: "column", justifyContent: "flex-end", padding: "48px 40px", marginBottom: 40, border: `2px solid ${C.border}` }}>
-                <img src={getImgSrc(p)} alt={p.title} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", zIndex: 0, transition: "transform 0.5s ease" }} className="hero-img" />
+                <img src={getImgSrc(p)} alt={p.title} loading="eager" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", zIndex: 0, transition: "transform 0.5s ease" }} className="hero-img" />
                 <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(15, 23, 42, 0.98) 20%, rgba(15, 23, 42, 0.6) 60%, rgba(15, 23, 42, 0.15) 100%)", zIndex: 1 }} />
 
                 <div style={{ position: "relative", zIndex: 2, maxWidth: 850 }}>
@@ -808,7 +811,7 @@ export default function CryptoTailbarClient({ initialPosts = [], initialCategori
                     {allPosts.map(p => (
                       <div key={p.id} onClick={() => openPost(p)} className="modern-card hover-glow list-article-card" style={{ display: "flex", gap: 24, padding: "20px", cursor: "pointer", background: C.bgDark, alignItems: "center", border: `1px solid ${C.border}` }}>
                         <div className="img-wrap" style={{ width: 160, height: 110, borderRadius: 12, overflow: "hidden", position: "relative", flexShrink: 0, border: `1px solid ${C.border}` }}>
-                          <img src={getImgSrc(p)} alt={p.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                          <img src={getImgSrc(p)} alt={p.title} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                         </div>
                         <div style={{ flex: 1 }}>
                           <div style={{ display: "flex", gap: 10, marginBottom: 8, alignItems: "center" }}>
@@ -960,7 +963,7 @@ export default function CryptoTailbarClient({ initialPosts = [], initialCategori
                     {catPosts.map(p => (
                       <div key={p.id} onClick={() => openPost(p)} className="modern-card hover-glow" style={{ cursor: "pointer", background: C.bgDark, overflow: "hidden", borderRadius: 14, display: "flex", flexDirection: "column", height: "100%", border: `2px solid ${C.border}` }}>
                         <div style={{ height: 180, width: "100%", position: "relative", borderBottom: `2px solid ${C.border}` }}>
-                          <img src={getImgSrc(p)} alt={p.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                          <img src={getImgSrc(p)} alt={p.title} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                           <span style={{ position: "absolute", right: 12, top: 12, background: "rgba(15, 23, 42, 0.85)", border: `1px solid ${C.border}`, color: C.ink, fontSize: 11, padding: "4px 10px", borderRadius: 8, fontWeight: 800 }}>
                             ⏱ {p.readTime} мин
                           </span>
@@ -1343,7 +1346,7 @@ export default function CryptoTailbarClient({ initialPosts = [], initialCategori
 
             {/* Feature cover image */}
             <div style={{ width: "100%", height: 380, borderRadius: 16, overflow: "hidden", position: "relative", marginBottom: 32, border: `2px solid ${C.border}` }}>
-              <img src={getImgSrc(activePost)} alt={activePost.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              <img src={getImgSrc(activePost)} alt={activePost.title} loading="eager" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
             </div>
 
             {/* Divider */}
@@ -1358,7 +1361,7 @@ export default function CryptoTailbarClient({ initialPosts = [], initialCategori
                   {sect.image && (
                     <div style={{ marginTop: 24, paddingLeft: 18 }}>
                       <div style={{ borderRadius: 16, overflow: "hidden", border: `2px solid ${C.border}`, boxShadow: "0 10px 30px rgba(0,0,0,0.5)" }}>
-                        <img src={sect.image} alt={sect.title} style={{ width: "100%", height: "auto", display: "block", objectFit: "cover" }} />
+                        <img src={sect.image} alt={sect.title} loading="lazy" style={{ width: "100%", height: "auto", display: "block", objectFit: "cover" }} />
                       </div>
                     </div>
                   )}
@@ -1393,6 +1396,8 @@ export default function CryptoTailbarClient({ initialPosts = [], initialCategori
                       >
                         <button
                           onClick={() => setOpenFaqIndex(isFaqOpen ? null : idx)}
+                          aria-expanded={isFaqOpen}
+                          aria-controls={`faq-answer-${idx}`}
                           style={{
                             width: "100%",
                             background: "none",
@@ -1416,7 +1421,7 @@ export default function CryptoTailbarClient({ initialPosts = [], initialCategori
                         </button>
 
                         {isFaqOpen && (
-                          <div style={{
+                          <div id={`faq-answer-${idx}`} role="region" style={{
                             padding: "0 24px 24px",
                             color: C.inkLight,
                             fontSize: 15,

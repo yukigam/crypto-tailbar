@@ -14,6 +14,14 @@ export async function GET(request) {
     );
   }
 
-  const posts = await getPostsByCategory(category);
-  return NextResponse.json({ posts: mapSanityPosts(posts) });
+  try {
+    const posts = await getPostsByCategory(category);
+    return NextResponse.json({ posts: mapSanityPosts(posts) });
+  } catch (error) {
+    console.error('API route error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
 }

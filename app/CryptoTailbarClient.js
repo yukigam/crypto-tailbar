@@ -580,7 +580,7 @@ export default function CryptoTailbarClient({ initialPosts = [], initialCategori
   const securityGuidePost = allPosts.find((p) => p.slug === SECURITY_GUIDE_SLUG);
 
   const fetchCategoryPosts = useCallback(async (catId) => {
-    if (STATIC_CAT_MAP[catId] || SPECIAL_CATEGORY_SCREENS[catId] || categoryPostsCacheRef.current[catId]) return;
+    if (SPECIAL_CATEGORY_SCREENS[catId] || categoryPostsCacheRef.current[catId]) return;
 
     if (categoryFetchRef.current) {
       categoryFetchRef.current.abort();
@@ -926,9 +926,9 @@ export default function CryptoTailbarClient({ initialPosts = [], initialCategori
         {screen === "category" && (() => {
           const categoryObj = allCategories.find(c => c.id === activeCat) || { label: "Ангилал", icon: "📄" };
           const cachedSanity = categoryPostsCache[activeCat];
-          const catPosts = STATIC_CAT_MAP[activeCat]
-            ? [STATIC_CAT_MAP[activeCat]]
-            : cachedSanity
+          const catPosts = [
+            ...(STATIC_CAT_MAP[activeCat] ? [STATIC_CAT_MAP[activeCat]] : []),
+            ...(cachedSanity
               ? [
                   ...cachedSanity,
                   ...allPosts.filter(
@@ -937,7 +937,8 @@ export default function CryptoTailbarClient({ initialPosts = [], initialCategori
                       !cachedSanity.some((sp) => sp.slug === p.slug)
                   ),
                 ]
-              : allPosts.filter((p) => p.cat === activeCat);
+              : allPosts.filter((p) => p.cat === activeCat)),
+          ];
 
           return (
             <div className="layout-grid" style={{ display: "grid", gridTemplateColumns: "2.4fr 1fr", gap: 32 }}>

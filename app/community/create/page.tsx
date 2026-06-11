@@ -6,7 +6,7 @@ import { createPost } from './actions';
 export default function CreatePostPage() {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [status, setStatus] = useState<'idle' | 'loading' | 'error'>('idle');
   const [message, setMessage] = useState('');
 
   async function handleSubmit(e: React.FormEvent) {
@@ -20,45 +20,10 @@ export default function CreatePostPage() {
 
     const result = await createPost(form);
 
-    if (result.success) {
-      setStatus('success');
-      setTitle('');
-      setContent('');
-    } else {
+    if (result?.error) {
       setStatus('error');
-      setMessage(result.error || 'Алдаа гарлаа');
+      setMessage(result.error);
     }
-  }
-
-  if (status === 'success') {
-    return (
-      <div style={{ minHeight: '100vh', background: '#0f172a', color: '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
-        <div style={{ textAlign: 'center', maxWidth: 480 }}>
-          <div style={{ fontSize: 64, marginBottom: 16 }}>✅</div>
-          <h1 style={{ fontSize: 28, fontWeight: 900, color: '#fff', margin: '0 0 12px' }}>Амжилттай илгээгдлээ</h1>
-          <p style={{ fontSize: 15, lineHeight: 1.7, color: '#94a3b8', marginBottom: 28 }}>
-            Таны пост хяналтанд орж, баталгаажсаны дараа нийтлэгдэх болно.
-          </p>
-          <a
-            href="/"
-            style={{
-              display: 'inline-block',
-              padding: '12px 32px',
-              borderRadius: 12,
-              border: 'none',
-              background: 'linear-gradient(135deg, #38bdf8, #c084fc)',
-              color: '#fff',
-              fontSize: 15,
-              fontWeight: 800,
-              cursor: 'pointer',
-              textDecoration: 'none',
-            }}
-          >
-            Нүүр хуудас руу буцах
-          </a>
-        </div>
-      </div>
-    );
   }
 
   return (
@@ -85,6 +50,7 @@ export default function CreatePostPage() {
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Нийтлэлийн гарчиг..."
               required
+              minLength={5}
               style={{
                 width: '100%',
                 padding: '14px 18px',
@@ -113,6 +79,7 @@ export default function CreatePostPage() {
               onChange={(e) => setContent(e.target.value)}
               placeholder="Нийтлэлийн үндсэн текст эсвэл санал бодлоо бичнэ үү..."
               required
+              minLength={20}
               rows={10}
               style={{
                 width: '100%',

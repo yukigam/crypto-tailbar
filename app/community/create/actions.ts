@@ -1,6 +1,7 @@
 'use server';
 
 import { createClient } from 'next-sanity';
+import { redirect } from 'next/navigation';
 
 const writeClient = createClient({
   projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || '88ym68hf',
@@ -41,29 +42,31 @@ export async function createPost(formData: FormData) {
   const title = formData.get('title') as string;
   const content = formData.get('content') as string;
 
-  if (!title || !title.trim()) {
-    return { error: 'Гарчиг оруулна уу' };
-  }
-  if (!content || !content.trim()) {
-    return { error: 'Текст оруулна уу' };
-  }
+  const trimmedTitle = title?.trim() || '';
+  const trimmedContent = content?.trim() || '';
 
-  const draftId = `drafts.community-${Date.now()}`;
+  if (trimmedTitle.length < 5) {
+    return { error: 'Гарчиг хамгийн багадаа 5 тэмдэгт байх ёстой' };
+  }
+  if (trimmedContent.length < 20) {
+    return { error: 'Нийтлэлийн агуулга хэтэрхий богино байна' };
+  }
 
   try {
     await writeClient.create({
-      _id: draftId,
       _type: 'post',
-      title: title.trim(),
+      title: trimmedTitle,
       slug: {
         _type: 'slug',
-        current: slugify(title),
+        current: slugify(trimmedTitle),
       },
-      body: buildBlockContent(content.trim()),
+      body: buildBlockContent(trimmedContent),
+      publishedAt: new Date().toISOString(),
     });
-    return { success: true };
   } catch (err) {
     console.error('Sanity create error:', err);
     return { error: 'Пост илгээхэд алдаа гарлаа. Дахин оролдоно уу.' };
   }
+
+  redirect('/');
 }

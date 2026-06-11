@@ -543,7 +543,7 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
       (p.subtitle && p.subtitle.toLowerCase().includes(cleanQ)) ||
       (p.intro && p.intro.toLowerCase().includes(cleanQ)) ||
       (p.tags && p.tags.some(t => t.toLowerCase().includes(cleanQ))) ||
-      (p.sections && p.sections.some(s => s.title.toLowerCase().includes(cleanQ) || s.body.toLowerCase().includes(cleanQ)))
+      (p.sections && p.sections.some(s => (s.title && s.title.toLowerCase().includes(cleanQ)) || (s.body && s.body.toLowerCase().includes(cleanQ))))
     )
     : [];
 
@@ -731,7 +731,7 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
                             <div style={{ fontSize: 26 }}>{COVER_ICON[p.cover] || "📄"}</div>
                             <div style={{ flex: 1 }}>
                               <div style={{ fontSize: 15, fontWeight: 800, color: C.ink }}>{p.title}</div>
-                              <div style={{ fontSize: 12, color: C.inkFaint, marginTop: 4, fontWeight: "600" }}>{p.catLabel} · ⏱ {p.readTime} мин</div>
+                              <div style={{ fontSize: 12, color: C.inkFaint, marginTop: 4, fontWeight: "600" }}>{p.catLabel ? `${p.catLabel} · ` : ""}⏱ {p.readTime} мин</div>
                             </div>
                           </div>
                         ))}

@@ -77,7 +77,7 @@ export async function createPost(formData: FormData) {
       title: trimmedTitle,
       slug: { _type: 'slug', current: slug },
       body: buildBlockContent(trimmedContent),
-      source: 'community',
+      isUserPost: true,
       publishedAt: new Date().toISOString(),
     });
   } catch (err) {

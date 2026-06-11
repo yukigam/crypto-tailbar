@@ -1,6 +1,14 @@
 'use server';
 
-import { client } from '../../../lib/sanity';
+import { createClient } from 'next-sanity';
+
+const writeClient = createClient({
+  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || '88ym68hf',
+  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
+  apiVersion: '2024-01-01',
+  useCdn: false,
+  token: process.env.SANITY_API_WRITE_TOKEN || process.env.SANITY_API_TOKEN,
+});
 
 function slugify(text: string): string {
   return text
@@ -43,7 +51,7 @@ export async function createPost(formData: FormData) {
   const draftId = `drafts.community-${Date.now()}`;
 
   try {
-    await client.create({
+    await writeClient.create({
       _id: draftId,
       _type: 'post',
       title: title.trim(),

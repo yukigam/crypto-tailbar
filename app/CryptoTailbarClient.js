@@ -475,7 +475,7 @@ const diffColor = (d) => {
  *   initialScreen?: string | null,
  * }} props
  */
-export default function CryptoTailbarClient({ initialPosts = [], initialCategories = [], initialGlossary = [], binanceLink, initialPostSlug = null, initialScreen = null }) {
+export default function CryptoTailbarClient({ initialPosts = [], initialUncategorized = [], initialCategories = [], initialGlossary = [], binanceLink, initialPostSlug = null, initialScreen = null }) {
   const [mounted, setMounted] = useState(false);
   const [screen, setScreen] = useState(initialScreen || "home"); // home, category, post, glossary, about, privacy, terms
   const [activeCat, setActiveCat] = useState("beginners");
@@ -507,6 +507,10 @@ export default function CryptoTailbarClient({ initialPosts = [], initialCategori
     ...initialPosts,
     ...POSTS_FALLBACK.filter(fb => !initialPosts.some(ip => ip.slug === fb.slug))
   ];
+
+  const uncategorizedPosts = initialUncategorized.length > 0
+    ? initialUncategorized
+    : allPosts.filter(p => !p.cat);
 
   const localCatMap = LEGACY_TITLE_TO_CATEGORY;
 
@@ -768,7 +772,7 @@ export default function CryptoTailbarClient({ initialPosts = [], initialCategori
         {screen === "home" && (
           <div>
             {/* Featured Hero Article */}
-            {allPosts.slice(0, 1).map(p => (
+            {uncategorizedPosts.slice(0, 1).map(p => (
               <div key={p.id} onClick={() => openPost(p)} className="hero-card modern-card hover-glow" style={{ cursor: "pointer", position: "relative", overflow: "hidden", minHeight: 420, borderRadius: 16, display: "flex", flexDirection: "column", justifyContent: "flex-end", padding: "48px 40px", marginBottom: 40, border: `2px solid ${C.border}` }}>
                 <img src={getImgSrc(p)} alt={p.title} loading="eager" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", zIndex: 0, transition: "transform 0.5s ease" }} className="hero-img" />
                 <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(15, 23, 42, 0.98) 20%, rgba(15, 23, 42, 0.6) 60%, rgba(15, 23, 42, 0.15) 100%)", zIndex: 1 }} />
@@ -776,7 +780,7 @@ export default function CryptoTailbarClient({ initialPosts = [], initialCategori
                 <div style={{ position: "relative", zIndex: 2, maxWidth: 850 }}>
                   <div style={{ display: "flex", gap: 10, marginBottom: 16, alignItems: "center" }}>
                     <span style={{ background: C.accentGlow, color: "#fff", padding: "4px 12px", fontSize: 10, fontWeight: 900, borderRadius: 6, letterSpacing: "0.05em", boxShadow: "0 0 10px rgba(56, 189, 248, 0.4)" }}>ОНЦЛОХ</span>
-                    <span style={{ background: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.2)", color: "#fff", padding: "4px 10px", fontSize: 10, fontWeight: 800, borderRadius: 6 }}>{p.catLabel.toUpperCase()}</span>
+                    {p.catLabel && <span style={{ background: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.2)", color: "#fff", padding: "4px 10px", fontSize: 10, fontWeight: 800, borderRadius: 6 }}>{p.catLabel.toUpperCase()}</span>}
                   </div>
                   <h1 style={{ margin: "0 0 14px", fontSize: "clamp(24px, 3.5vw, 38px)", fontWeight: 900, lineHeight: 1.25, color: "#fff", textShadow: "0 2px 10px rgba(0,0,0,0.5)" }}>{p.title}</h1>
                   <p style={{ margin: "0 0 24px", color: C.inkLight, fontSize: 16, lineHeight: 1.65, fontWeight: "500" }}>{p.intro}</p>
@@ -804,18 +808,18 @@ export default function CryptoTailbarClient({ initialPosts = [], initialCategori
                   </div>
                 </div>
 
-                {/* Latest Articles */}
+                {/* Latest Market News */}
                 <div>
-                  <h2 style={{ fontSize: 20, fontWeight: 850, borderBottom: `2px solid ${C.border}`, paddingBottom: 12, marginBottom: 24, color: C.ink }}>Сүүлийн нийтлэлүүд</h2>
+                  <h2 style={{ fontSize: 20, fontWeight: 850, borderBottom: `2px solid ${C.border}`, paddingBottom: 12, marginBottom: 24, color: C.ink }}>Зах зээлийн сүүлийн үеийн мэдээ</h2>
                   <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-                    {allPosts.map(p => (
+                    {uncategorizedPosts.map(p => (
                       <div key={p.id} onClick={() => openPost(p)} className="modern-card hover-glow list-article-card" style={{ display: "flex", gap: 24, padding: "20px", cursor: "pointer", background: C.bgDark, alignItems: "center", border: `1px solid ${C.border}` }}>
                         <div className="img-wrap" style={{ width: 160, height: 110, borderRadius: 12, overflow: "hidden", position: "relative", flexShrink: 0, border: `1px solid ${C.border}` }}>
                           <img src={getImgSrc(p)} alt={p.title} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                         </div>
                         <div style={{ flex: 1 }}>
                           <div style={{ display: "flex", gap: 10, marginBottom: 8, alignItems: "center" }}>
-                            <span style={{ fontSize: 10, color: C.accentPurple, fontWeight: 800, letterSpacing: "0.05em" }}>{p.catLabel.toUpperCase()}</span>
+                            {p.catLabel && <span style={{ fontSize: 10, color: C.accentPurple, fontWeight: 800, letterSpacing: "0.05em" }}>{p.catLabel.toUpperCase()}</span>}
                           </div>
                           <h3 style={{ margin: "0 0 8px", fontSize: 18, fontWeight: 850, color: C.ink, lineHeight: 1.35 }}>{p.title}</h3>
                           <p style={{ margin: 0, fontSize: 13, color: C.inkLight, lineHeight: 1.55, fontWeight: "500" }} className="line-clamp-2">{p.subtitle}</p>

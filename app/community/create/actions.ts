@@ -12,11 +12,27 @@ const writeClient = createClient({
 });
 
 function slugify(text: string): string {
+  const map: Record<string, string> = {
+    'а':'a','б':'b','в':'v','г':'g','д':'d','е':'e','ё':'yo',
+    'ж':'zh','з':'z','и':'i','й':'y','к':'k','л':'l','м':'m',
+    'н':'n','о':'o','ө':'o','п':'p','р':'r','с':'s','т':'t',
+    'у':'u','ү':'u','ф':'f','х':'kh','ц':'ts','ч':'ch','ш':'sh',
+    'щ':'shch','ъ':'','ы':'y','ь':'','э':'e','ю':'yu','я':'ya',
+    'А':'a','Б':'b','В':'v','Г':'g','Д':'d','Е':'e','Ё':'yo',
+    'Ж':'zh','З':'z','И':'i','Й':'y','К':'k','Л':'l','М':'m',
+    'Н':'n','О':'o','Ө':'o','П':'p','Р':'r','С':'s','Т':'t',
+    'У':'u','Ү':'u','Ф':'f','Х':'kh','Ц':'ts','Ч':'ch','Ш':'sh',
+    'Щ':'shch','Ъ':'','Ы':'y','Ь':'','Э':'e','Ю':'yu','Я':'ya',
+  };
+  const suffix = Date.now().toString(36).slice(-6);
   return text
+    .split('')
+    .map(ch => map[ch] || ch)
+    .join('')
     .toLowerCase()
-    .replace(/[^a-z0-9\u0400-\u04ff]+/g, '-')
+    .replace(/[^a-z0-9]+/g, '-')
     .replace(/(^-|-$)/g, '')
-    .slice(0, 200);
+    .slice(0, 193) + '-' + suffix;
 }
 
 function buildBlockContent(text: string) {
@@ -52,15 +68,16 @@ export async function createPost(formData: FormData) {
     return { error: 'Нийтлэлийн агуулга хэтэрхий богино байна' };
   }
 
+  const slug = slugify(trimmedTitle);
+
   try {
     await writeClient.create({
+      _id: `community-${Date.now()}`,
       _type: 'post',
       title: trimmedTitle,
-      slug: {
-        _type: 'slug',
-        current: slugify(trimmedTitle),
-      },
+      slug: { _type: 'slug', current: slug },
       body: buildBlockContent(trimmedContent),
+      source: 'community',
       publishedAt: new Date().toISOString(),
     });
   } catch (err) {
@@ -68,5 +85,5 @@ export async function createPost(formData: FormData) {
     return { error: 'Пост илгээхэд алдаа гарлаа. Дахин оролдоно уу.' };
   }
 
-  redirect('/');
+  redirect('/community');
 }

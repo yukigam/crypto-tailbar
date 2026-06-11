@@ -153,6 +153,20 @@ button {
   transform: scale(1.05);
 }
 
+.hover-accent:hover {
+  filter: brightness(1.15);
+}
+
+.hover-card:hover {
+  border-color: #38bdf8 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(56, 189, 248, 0.08);
+}
+
+.hover-card {
+  transition: all 0.2s ease;
+}
+
 .gradient-overlay {
   position: absolute;
   top: 0;

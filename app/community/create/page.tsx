@@ -68,9 +68,9 @@ export default function CreatePostPage() {
           ← Нүүр хуудас руу буцах
         </a>
 
-        <h1 style={{ fontSize: 32, fontWeight: 900, color: '#fff', margin: '0 0 8px' }}>Санаа, нийтлэл оруулах</h1>
+        <h1 style={{ fontSize: 32, fontWeight: 900, color: '#fff', margin: '0 0 8px' }}>Нийтлэл, Пост оруулах</h1>
         <p style={{ fontSize: 15, color: '#94a3b8', lineHeight: 1.6, margin: '0 0 36px' }}>
-          Крипто ертөнцийн таны бодол, санаа, дүн шинжилгээг хуваалцаарай. Оруулсан пост нь хяналтанд орсны дараа нийтлэгдэх болно.
+          Крипто зах зээлийн талаарх өөрийн шинжилгээ, сүүлийн үеийн мэдээ, эсвэл сонирхолтой бодлоо бусадтайгаа чөлөөтэй хуваалцаарай. Таны оруулсан пост хяналтанд орсны дараа вэбсайт дээр нийтлэгдэх болно.
         </p>
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>

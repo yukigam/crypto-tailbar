@@ -668,6 +668,13 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
           </div>
 
           <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+            <a
+              href="/community/create"
+              style={{ background: "rgba(192,132,252,0.12)", border: `1px solid ${C.accentPurple}55`, color: C.ink, padding: "9px 18px", borderRadius: 8, cursor: "pointer", fontSize: 13, display: "flex", alignItems: "center", gap: 8, fontWeight: "700", textDecoration: "none", transition: "all 0.2s" }}
+              className="hover-accent"
+            >
+              ✍️ Санаа оруулах
+            </a>
             <IconButton onClick={() => setSearchOpen(o => !o)} style={{ background: "rgba(255,255,255,0.06)", border: `1px solid ${C.border}`, color: C.ink, padding: "9px 18px", borderRadius: 8, cursor: "pointer", fontSize: 13, display: "flex", alignItems: "center", gap: 8, fontWeight: "700", transition: "all 0.2s" }} className="search-toggle-btn">
               🔍 {searchOpen ? "Хаах" : "Хайх"}
             </IconButton>

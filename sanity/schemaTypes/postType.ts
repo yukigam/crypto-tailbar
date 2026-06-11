@@ -57,7 +57,6 @@ export const postType = defineType({
         ],
         layout: 'dropdown',
       },
-      validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'categories',

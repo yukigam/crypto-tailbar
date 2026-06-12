@@ -60,7 +60,7 @@ export async function GET(request) {
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { postId, name, comment, parent } = body;
+    const { postId, name, comment, parentId } = body;
 
     if (!postId || !name || !comment) {
       return NextResponse.json(
@@ -92,8 +92,8 @@ export async function POST(request) {
       post: { _type: 'reference', _ref: postId },
       createdAt: new Date().toISOString(),
     };
-    if (parent) {
-      doc.parent = { _type: 'reference', _ref: parent };
+    if (parentId) {
+      doc.parent = { _type: 'reference', _ref: parentId };
     }
 
     await writeClient.create(doc);

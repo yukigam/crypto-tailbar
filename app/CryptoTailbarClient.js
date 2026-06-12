@@ -585,48 +585,68 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleCommentSubmit = async (e) => {
+  const submitComment = async ({ name, comment, parentId }) => {
+    const res = await fetch('/api/comments', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        postId: activePost.sanityId,
+        name,
+        comment,
+        parentId: parentId || undefined,
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Алдаа гарлаа');
+  };
+
+  const handleMainCommentSubmit = async (e) => {
     e.preventDefault();
     setCommentError('');
     setCommentSubmitting(true);
-
     const trimmedName = commentName.trim();
     const trimmedComment = commentText.trim();
-    const replyingToId = replyingTo;
-
     try {
-      const res = await fetch('/api/comments', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          postId: activePost.sanityId,
-          name: trimmedName,
-          comment: trimmedComment,
-          parent: replyingToId || undefined,
-        }),
-      });
-      const data = await res.json();
-
-      if (!res.ok) {
-        setCommentError(data.error || 'Алдаа гарлаа');
-        setCommentSubmitting(false);
-        return;
-      }
-
+      await submitComment({ name: trimmedName, comment: trimmedComment, parentId: null });
       const newComment = {
         _id: `new-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
         name: trimmedName,
         comment: trimmedComment,
         createdAt: new Date().toISOString(),
-        parent: replyingToId || null,
+        parent: null,
+      };
+      setComments((prev) => [...prev, newComment]);
+      setCommentName('');
+      setCommentText('');
+      setCommentSubmitting(false);
+    } catch (err) {
+      setCommentError(err.message);
+      setCommentSubmitting(false);
+    }
+  };
+
+  const handleReplySubmit = async (e, parentId) => {
+    e.preventDefault();
+    setCommentError('');
+    setCommentSubmitting(true);
+    const trimmedName = commentName.trim();
+    const trimmedComment = commentText.trim();
+    try {
+      await submitComment({ name: trimmedName, comment: trimmedComment, parentId });
+      const newComment = {
+        _id: `new-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+        name: trimmedName,
+        comment: trimmedComment,
+        createdAt: new Date().toISOString(),
+        parent: parentId,
       };
       setComments((prev) => [...prev, newComment]);
       setCommentName('');
       setCommentText('');
       setReplyingTo(null);
       setCommentSubmitting(false);
-    } catch {
-      setCommentError('Сэтгэгдэл илгээхэд алдаа гарлаа');
+    } catch (err) {
+      setCommentError(err.message);
       setCommentSubmitting(false);
     }
   };
@@ -1627,9 +1647,9 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
                                 ))}
                               </div>
                             )}
-                            {replyingTo === c._id && (
+                              {replyingTo === c._id && (
                               <div style={{ marginLeft: 24, marginTop: 12, marginBottom: 16 }}>
-                                <form onSubmit={handleCommentSubmit} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                                <form onSubmit={(e) => handleReplySubmit(e, c._id)} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                                   <input
                                     type="text"
                                     value={commentName}
@@ -1706,7 +1726,7 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
                   {!activePost.sanityId ? (
                     <p style={{ color: C.inkFaint, fontSize: 13, fontStyle: "italic" }}>Энэ нийтлэлд сэтгэгдэл бичих боломжгүй.</p>
                   ) : (
-                    <form onSubmit={handleCommentSubmit} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                    <form onSubmit={handleMainCommentSubmit} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
                       <div>
                         <label htmlFor="comment-name" style={{ fontSize: 13, fontWeight: 800, color: "#fff", display: "block", marginBottom: 6 }}>
                           Нэр

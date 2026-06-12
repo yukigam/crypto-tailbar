@@ -475,7 +475,7 @@ const diffColor = (d) => {
  *   initialScreen?: string | null,
  * }} props
  */
-export default function CryptoTailbarClient({ initialPosts = [], initialUncategorized = [], initialCategories = [], initialGlossary = [], binanceLink, initialPostSlug = null, initialScreen = null }) {
+export default function CryptoTailbarClient({ initialPosts = [], initialUncategorized = [], initialCategories = [], initialGlossary = [], initialCommunityPosts = [], binanceLink, initialPostSlug = null, initialScreen = null }) {
   const [mounted, setMounted] = useState(false);
   const [screen, setScreen] = useState(initialScreen || "home"); // home, category, post, glossary, about, privacy, terms
   const [activeCat, setActiveCat] = useState("beginners");
@@ -574,12 +574,15 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const communityPosts = initialCommunityPosts || [];
+
   useEffect(() => {
     if (!mounted || !initialPostSlug) return;
-    const post = allPosts.find((p) => p.slug === initialPostSlug);
+    const post = allPosts.find((p) => p.slug === initialPostSlug) ||
+                 communityPosts.find((p) => p.slug === initialPostSlug);
     if (!post) return;
     openPost(post);
-  }, [mounted, initialPostSlug, initialPosts]);
+  }, [mounted, initialPostSlug, initialPosts, initialCommunityPosts]);
 
   const securityGuidePost = allPosts.find((p) => p.slug === SECURITY_GUIDE_SLUG);
 
@@ -883,6 +886,36 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
                     </div>
                   ))}
                 </div>
+
+                {/* Community posts widget */}
+                {communityPosts.length > 0 && (
+                  <div style={{ border: `2px solid ${C.border}`, borderRadius: 14, overflow: "hidden", background: C.bgDark }}>
+                    <div style={{ padding: "16px 18px", background: "#131d31", borderBottom: `2px solid ${C.border}`, fontSize: 13, fontWeight: 900, color: C.ink, letterSpacing: "0.08em" }}>💬 КОММЮНИТИГИЙН ПОСТУУД</div>
+                    {communityPosts.slice(0, 3).map((p) => (
+                      <div key={p.id} onClick={() => openPost(p)} style={{ padding: "16px 18px", borderBottom: `1px solid ${C.border}`, cursor: "pointer", display: "flex", gap: 14 }} className="sidebar-hover-item">
+                        <div style={{ fontSize: 14, fontWeight: 800, color: C.ink, lineHeight: 1.4 }}>{p.title}</div>
+                      </div>
+                    ))}
+                    <a
+                      href="/community"
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: 6,
+                        padding: "12px 18px",
+                        fontSize: 13,
+                        fontWeight: 800,
+                        color: C.accentBlue,
+                        textDecoration: "none",
+                        transition: "all 0.2s",
+                      }}
+                      className="sidebar-hover-item"
+                    >
+                      Бүгдийг үзэх →
+                    </a>
+                  </div>
+                )}
 
                 {/* Crypto Security Guide Box */}
                 <div style={{ border: `2px solid ${C.border}`, borderRadius: 14, padding: "24px", background: C.bgDark, position: "relative", overflow: "hidden", display: "flex", flexDirection: "column" }}>

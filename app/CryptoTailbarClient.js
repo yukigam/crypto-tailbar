@@ -497,6 +497,15 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
   // Active FAQ state for post page accordion
   const [openFaqIndex, setOpenFaqIndex] = useState(null);
 
+  // Comments state
+  const [comments, setComments] = useState([]);
+  const [commentsLoading, setCommentsLoading] = useState(false);
+  const [commentName, setCommentName] = useState('');
+  const [commentText, setCommentText] = useState('');
+  const [commentSubmitting, setCommentSubmitting] = useState(false);
+  const [commentError, setCommentError] = useState('');
+  const [commentSuccess, setCommentSuccess] = useState(false);
+
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -571,7 +580,46 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
     setActivePost(enrichedPost);
     setScreen("post");
     setOpenFaqIndex(null);
+    setCommentSuccess(false);
+    setCommentError('');
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleCommentSubmit = async (e) => {
+    e.preventDefault();
+    setCommentError('');
+    setCommentSubmitting(true);
+
+    try {
+      const res = await fetch('/api/comments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          postId: activePost.sanityId,
+          name: commentName.trim(),
+          comment: commentText.trim(),
+        }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        setCommentError(data.error || 'Алдаа гарлаа');
+        setCommentSubmitting(false);
+        return;
+      }
+
+      setCommentName('');
+      setCommentText('');
+      setCommentSuccess(true);
+      setCommentSubmitting(false);
+
+      const refreshRes = await fetch(`/api/comments?postId=${encodeURIComponent(activePost.sanityId)}`);
+      const refreshData = await refreshRes.json();
+      if (refreshData.comments) setComments(refreshData.comments);
+    } catch {
+      setCommentError('Сэтгэгдэл илгээхэд алдаа гарлаа');
+      setCommentSubmitting(false);
+    }
   };
 
   const communityPosts = initialCommunityPosts || [];
@@ -583,6 +631,21 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
     if (!post) return;
     openPost(post);
   }, [mounted, initialPostSlug, initialPosts, initialCommunityPosts]);
+
+  useEffect(() => {
+    if (!activePost || !activePost.sanityId) {
+      setComments([]);
+      return;
+    }
+    setCommentsLoading(true);
+    fetch(`/api/comments?postId=${encodeURIComponent(activePost.sanityId)}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setComments(data.comments || []);
+        setCommentsLoading(false);
+      })
+      .catch(() => setCommentsLoading(false));
+  }, [activePost]);
 
   const securityGuidePost = allPosts.find((p) => p.slug === SECURITY_GUIDE_SLUG);
 
@@ -1496,6 +1559,119 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
                   </div>
                 ))}
               </div>
+            </div>
+
+            {/* Comments section */}
+            <div style={{ borderTop: `2px solid ${C.border}`, paddingTop: 40, marginTop: 52 }}>
+              <h3 style={{ fontSize: 20, fontWeight: 900, color: "#fff", margin: "0 0 24px" }}>💬 Сэтгэгдлүүд</h3>
+
+              {/* Existing comments */}
+              {commentsLoading ? (
+                <p style={{ color: C.inkFaint, fontSize: 14 }}>Уншиж байна...</p>
+              ) : comments.length === 0 ? (
+                <p style={{ color: C.inkFaint, fontSize: 14, marginBottom: 28 }}>Сэтгэгдэл байхгүй. Та хамгийн түрүүнд сэтгэгдлээ үлдээгээрэй!</p>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", gap: 16, marginBottom: 32 }}>
+                  {comments.map((c) => (
+                    <div key={c._id} style={{ background: C.bgDark, border: `1.5px solid ${C.border}`, borderRadius: 12, padding: "18px 20px" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                        <span style={{ fontWeight: 800, fontSize: 14, color: "#fff" }}>{c.name}</span>
+                        <span style={{ fontSize: 11, color: C.inkFaint, fontWeight: 600 }}>
+                          {c.createdAt?.slice(0, 10)}
+                        </span>
+                      </div>
+                      <p style={{ margin: 0, fontSize: 14, color: C.inkLight, lineHeight: 1.7, fontWeight: 500 }}>{c.comment}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Comment form */}
+              {commentSuccess ? (
+                <div style={{ padding: "16px 20px", background: "rgba(34,197,94,0.1)", border: "1.5px solid rgba(34,197,94,0.3)", borderRadius: 12, color: "#86efac", fontSize: 14, fontWeight: 600 }}>
+                  Сэтгэгдэл амжилттай үлдээгдлээ!
+                </div>
+              ) : (
+                <form onSubmit={handleCommentSubmit} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                  <div>
+                    <label htmlFor="comment-name" style={{ fontSize: 13, fontWeight: 800, color: "#fff", display: "block", marginBottom: 6 }}>
+                      Нэр
+                    </label>
+                    <input
+                      id="comment-name"
+                      type="text"
+                      value={commentName}
+                      onChange={(e) => setCommentName(e.target.value)}
+                      placeholder="Таны нэр..."
+                      required
+                      style={{
+                        width: "100%",
+                        padding: "12px 16px",
+                        background: C.bgDark,
+                        border: `1.5px solid ${C.border}`,
+                        borderRadius: 10,
+                        color: "#fff",
+                        fontSize: 14,
+                        fontWeight: 600,
+                        outline: "none",
+                        boxSizing: "border-box",
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="comment-text" style={{ fontSize: 13, fontWeight: 800, color: "#fff", display: "block", marginBottom: 6 }}>
+                      Сэтгэгдэл
+                    </label>
+                    <textarea
+                      id="comment-text"
+                      value={commentText}
+                      onChange={(e) => setCommentText(e.target.value)}
+                      placeholder="Таны сэтгэгдэл..."
+                      required
+                      rows={4}
+                      style={{
+                        width: "100%",
+                        padding: "12px 16px",
+                        background: C.bgDark,
+                        border: `1.5px solid ${C.border}`,
+                        borderRadius: 10,
+                        color: "#fff",
+                        fontSize: 14,
+                        fontWeight: 500,
+                        outline: "none",
+                        resize: "vertical",
+                        boxSizing: "border-box",
+                        lineHeight: 1.6,
+                      }}
+                    />
+                  </div>
+
+                  {commentError && (
+                    <div style={{ padding: "12px 16px", background: "rgba(239,68,68,0.1)", border: "1.5px solid rgba(239,68,68,0.3)", borderRadius: 10, color: "#fca5a5", fontSize: 13, fontWeight: 600 }}>
+                      {commentError}
+                    </div>
+                  )}
+
+                  <button
+                    type="submit"
+                    disabled={commentSubmitting}
+                    style={{
+                      padding: "12px 28px",
+                      border: "none",
+                      borderRadius: 10,
+                      background: commentSubmitting ? C.border : C.accentGlow,
+                      color: "#fff",
+                      fontSize: 14,
+                      fontWeight: 800,
+                      cursor: commentSubmitting ? "not-allowed" : "pointer",
+                      transition: "all 0.2s",
+                      alignSelf: "flex-start",
+                    }}
+                  >
+                    {commentSubmitting ? 'Илгээж байна...' : 'Сэтгэгдэл үлдээх'}
+                  </button>
+                </form>
+              )}
             </div>
           </div>
         )}

@@ -506,6 +506,10 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
   const [commentError, setCommentError] = useState('');
   const [replyingTo, setReplyingTo] = useState(null);
 
+  const myCommentIds = (() => {
+    try { return JSON.parse(localStorage.getItem('my_comments') || '[]'); } catch { return []; }
+  })();
+
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -585,6 +589,22 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const saveMyCommentId = (id) => {
+    try {
+      const stored = JSON.parse(localStorage.getItem('my_comments') || '[]');
+      if (!stored.includes(id)) {
+        stored.push(id);
+        localStorage.setItem('my_comments', JSON.stringify(stored));
+      }
+    } catch {}
+  };
+
+  const getMyCommentIds = () => {
+    try {
+      return JSON.parse(localStorage.getItem('my_comments') || '[]');
+    } catch { return []; }
+  };
+
   const submitComment = async ({ name, comment, parentId }) => {
     const res = await fetch('/api/comments', {
       method: 'POST',
@@ -598,6 +618,13 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Алдаа гарлаа');
+    return data;
+  };
+
+  const addCommentOptimistically = (_id, name, comment, parent) => {
+    const newComment = { _id, name, comment, createdAt: new Date().toISOString(), parent };
+    setComments((prev) => [...prev, newComment]);
+    saveMyCommentId(_id);
   };
 
   const handleMainCommentSubmit = async (e) => {
@@ -607,15 +634,8 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
     const trimmedName = commentName.trim();
     const trimmedComment = commentText.trim();
     try {
-      await submitComment({ name: trimmedName, comment: trimmedComment, parentId: null });
-      const newComment = {
-        _id: `new-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
-        name: trimmedName,
-        comment: trimmedComment,
-        createdAt: new Date().toISOString(),
-        parent: null,
-      };
-      setComments((prev) => [...prev, newComment]);
+      const data = await submitComment({ name: trimmedName, comment: trimmedComment, parentId: null });
+      addCommentOptimistically(data._id, trimmedName, trimmedComment, null);
       setCommentName('');
       setCommentText('');
       setCommentSubmitting(false);
@@ -632,15 +652,8 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
     const trimmedName = commentName.trim();
     const trimmedComment = commentText.trim();
     try {
-      await submitComment({ name: trimmedName, comment: trimmedComment, parentId });
-      const newComment = {
-        _id: `new-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
-        name: trimmedName,
-        comment: trimmedComment,
-        createdAt: new Date().toISOString(),
-        parent: parentId,
-      };
-      setComments((prev) => [...prev, newComment]);
+      const data = await submitComment({ name: trimmedName, comment: trimmedComment, parentId });
+      addCommentOptimistically(data._id, trimmedName, trimmedComment, parentId);
       setCommentName('');
       setCommentText('');
       setReplyingTo(null);
@@ -649,6 +662,13 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
       setCommentError(err.message);
       setCommentSubmitting(false);
     }
+  };
+
+  const handleDeleteComment = async (commentId) => {
+    try {
+      await fetch(`/api/comments?commentId=${encodeURIComponent(commentId)}`, { method: 'DELETE' });
+      setComments((prev) => prev.filter((c) => c._id !== commentId && c.parent !== commentId));
+    } catch {}
   };
 
   const communityPosts = initialCommunityPosts || [];
@@ -1621,16 +1641,26 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
                                 </span>
                               </div>
                               <p style={{ margin: "0 0 8px", fontSize: 14, color: C.inkLight, lineHeight: 1.7, fontWeight: 500 }}>{c.comment}</p>
-                              <button
-                                onClick={() => {
-                                  const next = replyingTo === c._id ? null : c._id;
-                                  setReplyingTo(next);
-                                  if (next) { setCommentName(''); setCommentText(''); setCommentError(''); }
-                                }}
-                                style={{ background: "none", border: "none", color: C.accentBlue, fontSize: 12, fontWeight: 800, cursor: "pointer", padding: 0, fontFamily: "inherit" }}
-                              >
-                                {replyingTo === c._id ? 'Хариу цуцлах' : 'Хариу өгөх'}
-                              </button>
+                              <div style={{ display: "flex", gap: 14, alignItems: "center" }}>
+                                <button
+                                  onClick={() => {
+                                    const next = replyingTo === c._id ? null : c._id;
+                                    setReplyingTo(next);
+                                    if (next) { setCommentName(''); setCommentText(''); setCommentError(''); }
+                                  }}
+                                  style={{ background: "none", border: "none", color: C.accentBlue, fontSize: 12, fontWeight: 800, cursor: "pointer", padding: 0, fontFamily: "inherit" }}
+                                >
+                                  {replyingTo === c._id ? 'Хариу цуцлах' : 'Хариу өгөх'}
+                                </button>
+                                {myCommentIds.includes(c._id) && (
+                                  <button
+                                    onClick={() => handleDeleteComment(c._id)}
+                                    style={{ background: "none", border: "none", color: "#ef4444", fontSize: 12, fontWeight: 800, cursor: "pointer", padding: 0, fontFamily: "inherit" }}
+                                  >
+                                    🗑 Устгах
+                                  </button>
+                                )}
+                              </div>
                             </div>
                             {replies[c._id] && (
                               <div style={{ marginLeft: 24, marginTop: 8, display: "flex", flexDirection: "column", gap: 8 }}>
@@ -1642,7 +1672,17 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
                                         {r.createdAt?.slice(0, 10)}
                                       </span>
                                     </div>
-                                    <p style={{ margin: 0, fontSize: 13, color: C.inkLight, lineHeight: 1.6, fontWeight: 500 }}>{r.comment}</p>
+                                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                                      <p style={{ margin: 0, fontSize: 13, color: C.inkLight, lineHeight: 1.6, fontWeight: 500, flex: 1 }}>{r.comment}</p>
+                                      {myCommentIds.includes(r._id) && (
+                                        <button
+                                          onClick={() => handleDeleteComment(r._id)}
+                                          style={{ background: "none", border: "none", color: "#ef4444", fontSize: 11, fontWeight: 800, cursor: "pointer", padding: 0, fontFamily: "inherit", whiteSpace: "nowrap" }}
+                                        >
+                                          🗑
+                                        </button>
+                                      )}
+                                    </div>
                                   </div>
                                 ))}
                               </div>

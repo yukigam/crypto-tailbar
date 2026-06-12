@@ -96,13 +96,45 @@ export async function POST(request) {
       doc.parent = { _type: 'reference', _ref: parentId };
     }
 
-    await writeClient.create(doc);
+    const result = await writeClient.create(doc);
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, _id: result._id });
   } catch (error) {
     console.error('Comment create error:', error);
     return NextResponse.json(
       { error: 'Сэтгэгдэл илгээхэд алдаа гарлаа' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const commentId = searchParams.get('commentId');
+
+    if (!commentId) {
+      return NextResponse.json(
+        { error: 'Missing commentId parameter' },
+        { status: 400 }
+      );
+    }
+
+    const replyIds = await readClient.fetch(
+      `*[_type == "comment" && parent._ref == $commentId]._id`,
+      { commentId }
+    );
+
+    const idsToDelete = [commentId, ...replyIds];
+    const tx = writeClient.transaction();
+    idsToDelete.forEach((id) => tx.delete(id));
+    await tx.commit();
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Comment delete error:', error);
+    return NextResponse.json(
+      { error: 'Сэтгэгдэл устгахад алдаа гарлаа' },
       { status: 500 }
     );
   }

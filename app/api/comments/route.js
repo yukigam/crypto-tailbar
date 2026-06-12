@@ -42,7 +42,8 @@ export async function GET(request) {
         _id,
         name,
         comment,
-        createdAt
+        createdAt,
+        "parent": parent->_id
       }`,
       { postId }
     );
@@ -59,7 +60,7 @@ export async function GET(request) {
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { postId, name, comment } = body;
+    const { postId, name, comment, parent } = body;
 
     if (!postId || !name || !comment) {
       return NextResponse.json(
@@ -84,13 +85,18 @@ export async function POST(request) {
       );
     }
 
-    await writeClient.create({
+    const doc = {
       _type: 'comment',
       name: trimmedName,
       comment: trimmedComment,
       post: { _type: 'reference', _ref: postId },
       createdAt: new Date().toISOString(),
-    });
+    };
+    if (parent) {
+      doc.parent = { _type: 'reference', _ref: parent };
+    }
+
+    await writeClient.create(doc);
 
     return NextResponse.json({ success: true });
   } catch (error) {

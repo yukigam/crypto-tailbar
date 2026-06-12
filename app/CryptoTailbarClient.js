@@ -504,7 +504,7 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
   const [commentText, setCommentText] = useState('');
   const [commentSubmitting, setCommentSubmitting] = useState(false);
   const [commentError, setCommentError] = useState('');
-  const [commentSuccess, setCommentSuccess] = useState(false);
+  const [replyingTo, setReplyingTo] = useState(null);
 
   useEffect(() => {
     setMounted(true);
@@ -580,8 +580,8 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
     setActivePost(enrichedPost);
     setScreen("post");
     setOpenFaqIndex(null);
-    setCommentSuccess(false);
     setCommentError('');
+    setReplyingTo(null);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -590,14 +590,19 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
     setCommentError('');
     setCommentSubmitting(true);
 
+    const trimmedName = commentName.trim();
+    const trimmedComment = commentText.trim();
+    const replyingToId = replyingTo;
+
     try {
       const res = await fetch('/api/comments', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           postId: activePost.sanityId,
-          name: commentName.trim(),
-          comment: commentText.trim(),
+          name: trimmedName,
+          comment: trimmedComment,
+          parent: replyingToId || undefined,
         }),
       });
       const data = await res.json();
@@ -608,14 +613,18 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
         return;
       }
 
+      const newComment = {
+        _id: `new-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+        name: trimmedName,
+        comment: trimmedComment,
+        createdAt: new Date().toISOString(),
+        parent: replyingToId || null,
+      };
+      setComments((prev) => [...prev, newComment]);
       setCommentName('');
       setCommentText('');
-      setCommentSuccess(true);
+      setReplyingTo(null);
       setCommentSubmitting(false);
-
-      const refreshRes = await fetch(`/api/comments?postId=${encodeURIComponent(activePost.sanityId)}`);
-      const refreshData = await refreshRes.json();
-      if (refreshData.comments) setComments(refreshData.comments);
     } catch {
       setCommentError('Сэтгэгдэл илгээхэд алдаа гарлаа');
       setCommentSubmitting(false);
@@ -1565,112 +1574,219 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
             <div style={{ borderTop: `2px solid ${C.border}`, paddingTop: 40, marginTop: 52 }}>
               <h3 style={{ fontSize: 20, fontWeight: 900, color: "#fff", margin: "0 0 24px" }}>💬 Сэтгэгдлүүд</h3>
 
-              {/* Existing comments */}
               {commentsLoading ? (
                 <p style={{ color: C.inkFaint, fontSize: 14 }}>Уншиж байна...</p>
-              ) : comments.length === 0 ? (
-                <p style={{ color: C.inkFaint, fontSize: 14, marginBottom: 28 }}>Сэтгэгдэл байхгүй. Та хамгийн түрүүнд сэтгэгдлээ үлдээгээрэй!</p>
               ) : (
-                <div style={{ display: "flex", flexDirection: "column", gap: 16, marginBottom: 32 }}>
-                  {comments.map((c) => (
-                    <div key={c._id} style={{ background: C.bgDark, border: `1.5px solid ${C.border}`, borderRadius: 12, padding: "18px 20px" }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-                        <span style={{ fontWeight: 800, fontSize: 14, color: "#fff" }}>{c.name}</span>
-                        <span style={{ fontSize: 11, color: C.inkFaint, fontWeight: 600 }}>
-                          {c.createdAt?.slice(0, 10)}
-                        </span>
+                <>
+                  {(() => {
+                    const topLevel = comments.filter((c) => !c.parent);
+                    const replies = {};
+                    comments.forEach((c) => {
+                      if (c.parent) {
+                        if (!replies[c.parent]) replies[c.parent] = [];
+                        replies[c.parent].push(c);
+                      }
+                    });
+                    return topLevel.length === 0 ? (
+                      <p style={{ color: C.inkFaint, fontSize: 14, marginBottom: 28 }}>Сэтгэгдэл байхгүй. Та хамгийн түрүүнд сэтгэгдлээ үлдээгээрэй!</p>
+                    ) : (
+                      <div style={{ display: "flex", flexDirection: "column", gap: 16, marginBottom: 32 }}>
+                        {topLevel.map((c) => (
+                          <div key={c._id}>
+                            <div style={{ background: C.bgDark, border: `1.5px solid ${C.border}`, borderRadius: 12, padding: "18px 20px" }}>
+                              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                                <span style={{ fontWeight: 800, fontSize: 14, color: "#fff" }}>{c.name}</span>
+                                <span style={{ fontSize: 11, color: C.inkFaint, fontWeight: 600 }}>
+                                  {c.createdAt?.slice(0, 10)}
+                                </span>
+                              </div>
+                              <p style={{ margin: "0 0 8px", fontSize: 14, color: C.inkLight, lineHeight: 1.7, fontWeight: 500 }}>{c.comment}</p>
+                              <button
+                                onClick={() => {
+                                  const next = replyingTo === c._id ? null : c._id;
+                                  setReplyingTo(next);
+                                  if (next) { setCommentName(''); setCommentText(''); setCommentError(''); }
+                                }}
+                                style={{ background: "none", border: "none", color: C.accentBlue, fontSize: 12, fontWeight: 800, cursor: "pointer", padding: 0, fontFamily: "inherit" }}
+                              >
+                                {replyingTo === c._id ? 'Хариу цуцлах' : 'Хариу өгөх'}
+                              </button>
+                            </div>
+                            {replies[c._id] && (
+                              <div style={{ marginLeft: 24, marginTop: 8, display: "flex", flexDirection: "column", gap: 8 }}>
+                                {replies[c._id].map((r) => (
+                                  <div key={r._id} style={{ background: "rgba(30,41,59,0.5)", border: `1.5px solid ${C.border}`, borderRadius: 10, padding: "14px 18px" }}>
+                                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                                      <span style={{ fontWeight: 800, fontSize: 13, color: "#fff" }}>↳ {r.name}</span>
+                                      <span style={{ fontSize: 11, color: C.inkFaint, fontWeight: 600 }}>
+                                        {r.createdAt?.slice(0, 10)}
+                                      </span>
+                                    </div>
+                                    <p style={{ margin: 0, fontSize: 13, color: C.inkLight, lineHeight: 1.6, fontWeight: 500 }}>{r.comment}</p>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                            {replyingTo === c._id && (
+                              <div style={{ marginLeft: 24, marginTop: 12, marginBottom: 16 }}>
+                                <form onSubmit={handleCommentSubmit} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                                  <input
+                                    type="text"
+                                    value={commentName}
+                                    onChange={(e) => setCommentName(e.target.value)}
+                                    placeholder="Таны нэр..."
+                                    required
+                                    style={{
+                                      width: "100%",
+                                      padding: "10px 14px",
+                                      background: C.bgDark,
+                                      border: `1.5px solid ${C.border}`,
+                                      borderRadius: 8,
+                                      color: "#fff",
+                                      fontSize: 13,
+                                      fontWeight: 600,
+                                      outline: "none",
+                                      boxSizing: "border-box",
+                                    }}
+                                  />
+                                  <textarea
+                                    value={commentText}
+                                    onChange={(e) => setCommentText(e.target.value)}
+                                    placeholder="Хариу..."
+                                    required
+                                    rows={2}
+                                    style={{
+                                      width: "100%",
+                                      padding: "10px 14px",
+                                      background: C.bgDark,
+                                      border: `1.5px solid ${C.border}`,
+                                      borderRadius: 8,
+                                      color: "#fff",
+                                      fontSize: 13,
+                                      fontWeight: 500,
+                                      outline: "none",
+                                      resize: "vertical",
+                                      boxSizing: "border-box",
+                                      lineHeight: 1.5,
+                                    }}
+                                  />
+                                  <div style={{ display: "flex", gap: 8 }}>
+                                    <button
+                                      type="submit"
+                                      disabled={commentSubmitting}
+                                      style={{
+                                        padding: "8px 20px",
+                                        border: "none",
+                                        borderRadius: 8,
+                                        background: commentSubmitting ? C.border : C.accentGlow,
+                                        color: "#fff",
+                                        fontSize: 12,
+                                        fontWeight: 800,
+                                        cursor: commentSubmitting ? "not-allowed" : "pointer",
+                                        transition: "all 0.2s",
+                                      }}
+                                    >
+                                      {commentSubmitting ? 'Илгээж байна...' : 'Хариу илгээх'}
+                                    </button>
+                                  </div>
+                                </form>
+                              </div>
+                            )}
+                          </div>
+                        ))}
                       </div>
-                      <p style={{ margin: 0, fontSize: 14, color: C.inkLight, lineHeight: 1.7, fontWeight: 500 }}>{c.comment}</p>
-                    </div>
-                  ))}
-                </div>
+                    );
+                  })()}
+                </>
               )}
 
-              {/* Comment form */}
-              {commentSuccess ? (
-                <div style={{ padding: "16px 20px", background: "rgba(34,197,94,0.1)", border: "1.5px solid rgba(34,197,94,0.3)", borderRadius: 12, color: "#86efac", fontSize: 14, fontWeight: 600 }}>
-                  Сэтгэгдэл амжилттай үлдээгдлээ!
-                </div>
-              ) : (
-                <form onSubmit={handleCommentSubmit} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-                  <div>
-                    <label htmlFor="comment-name" style={{ fontSize: 13, fontWeight: 800, color: "#fff", display: "block", marginBottom: 6 }}>
-                      Нэр
-                    </label>
-                    <input
-                      id="comment-name"
-                      type="text"
-                      value={commentName}
-                      onChange={(e) => setCommentName(e.target.value)}
-                      placeholder="Таны нэр..."
-                      required
-                      style={{
-                        width: "100%",
-                        padding: "12px 16px",
-                        background: C.bgDark,
-                        border: `1.5px solid ${C.border}`,
-                        borderRadius: 10,
-                        color: "#fff",
-                        fontSize: 14,
-                        fontWeight: 600,
-                        outline: "none",
-                        boxSizing: "border-box",
-                      }}
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="comment-text" style={{ fontSize: 13, fontWeight: 800, color: "#fff", display: "block", marginBottom: 6 }}>
-                      Сэтгэгдэл
-                    </label>
-                    <textarea
-                      id="comment-text"
-                      value={commentText}
-                      onChange={(e) => setCommentText(e.target.value)}
-                      placeholder="Таны сэтгэгдэл..."
-                      required
-                      rows={4}
-                      style={{
-                        width: "100%",
-                        padding: "12px 16px",
-                        background: C.bgDark,
-                        border: `1.5px solid ${C.border}`,
-                        borderRadius: 10,
-                        color: "#fff",
-                        fontSize: 14,
-                        fontWeight: 500,
-                        outline: "none",
-                        resize: "vertical",
-                        boxSizing: "border-box",
-                        lineHeight: 1.6,
-                      }}
-                    />
-                  </div>
+              {/* Main comment form — only show when not replying */}
+              {!replyingTo && (
+                <>
+                  {!activePost.sanityId ? (
+                    <p style={{ color: C.inkFaint, fontSize: 13, fontStyle: "italic" }}>Энэ нийтлэлд сэтгэгдэл бичих боломжгүй.</p>
+                  ) : (
+                    <form onSubmit={handleCommentSubmit} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                      <div>
+                        <label htmlFor="comment-name" style={{ fontSize: 13, fontWeight: 800, color: "#fff", display: "block", marginBottom: 6 }}>
+                          Нэр
+                        </label>
+                        <input
+                          id="comment-name"
+                          type="text"
+                          value={commentName}
+                          onChange={(e) => setCommentName(e.target.value)}
+                          placeholder="Таны нэр..."
+                          required
+                          style={{
+                            width: "100%",
+                            padding: "12px 16px",
+                            background: C.bgDark,
+                            border: `1.5px solid ${C.border}`,
+                            borderRadius: 10,
+                            color: "#fff",
+                            fontSize: 14,
+                            fontWeight: 600,
+                            outline: "none",
+                            boxSizing: "border-box",
+                          }}
+                        />
+                      </div>
+                      <div>
+                        <label htmlFor="comment-text" style={{ fontSize: 13, fontWeight: 800, color: "#fff", display: "block", marginBottom: 6 }}>
+                          Сэтгэгдэл
+                        </label>
+                        <textarea
+                          id="comment-text"
+                          value={commentText}
+                          onChange={(e) => setCommentText(e.target.value)}
+                          placeholder="Таны сэтгэгдэл..."
+                          required
+                          rows={4}
+                          style={{
+                            width: "100%",
+                            padding: "12px 16px",
+                            background: C.bgDark,
+                            border: `1.5px solid ${C.border}`,
+                            borderRadius: 10,
+                            color: "#fff",
+                            fontSize: 14,
+                            fontWeight: 500,
+                            outline: "none",
+                            resize: "vertical",
+                            boxSizing: "border-box",
+                            lineHeight: 1.6,
+                          }}
+                        />
+                      </div>
 
-                  {commentError && (
-                    <div style={{ padding: "12px 16px", background: "rgba(239,68,68,0.1)", border: "1.5px solid rgba(239,68,68,0.3)", borderRadius: 10, color: "#fca5a5", fontSize: 13, fontWeight: 600 }}>
-                      {commentError}
-                    </div>
+                      {commentError && (
+                        <div style={{ padding: "12px 16px", background: "rgba(239,68,68,0.1)", border: "1.5px solid rgba(239,68,68,0.3)", borderRadius: 10, color: "#fca5a5", fontSize: 13, fontWeight: 600 }}>
+                          {commentError}
+                        </div>
+                      )}
+
+                      <button
+                        type="submit"
+                        disabled={commentSubmitting}
+                        style={{
+                          padding: "12px 28px",
+                          border: "none",
+                          borderRadius: 10,
+                          background: commentSubmitting ? C.border : C.accentGlow,
+                          color: "#fff",
+                          fontSize: 14,
+                          fontWeight: 800,
+                          cursor: commentSubmitting ? "not-allowed" : "pointer",
+                          transition: "all 0.2s",
+                          alignSelf: "flex-start",
+                        }}
+                      >
+                        {commentSubmitting ? 'Илгээж байна...' : 'Сэтгэгдэл үлдээх'}
+                      </button>
+                    </form>
                   )}
-
-                  <button
-                    type="submit"
-                    disabled={commentSubmitting}
-                    style={{
-                      padding: "12px 28px",
-                      border: "none",
-                      borderRadius: 10,
-                      background: commentSubmitting ? C.border : C.accentGlow,
-                      color: "#fff",
-                      fontSize: 14,
-                      fontWeight: 800,
-                      cursor: commentSubmitting ? "not-allowed" : "pointer",
-                      transition: "all 0.2s",
-                      alignSelf: "flex-start",
-                    }}
-                  >
-                    {commentSubmitting ? 'Илгээж байна...' : 'Сэтгэгдэл үлдээх'}
-                  </button>
-                </form>
+                </>
               )}
             </div>
           </div>

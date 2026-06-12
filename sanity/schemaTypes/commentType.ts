@@ -25,6 +25,12 @@ export const commentType = defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
+      name: 'parent',
+      type: 'reference',
+      to: [{type: 'comment'}],
+      title: 'Parent Comment',
+    }),
+    defineField({
       name: 'createdAt',
       type: 'datetime',
       title: 'Created At',

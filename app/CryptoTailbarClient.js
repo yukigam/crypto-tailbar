@@ -585,8 +585,10 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
     const matchedFallback = POSTS_FALLBACK.find(f => f.slug === p.slug);
     const enrichedPost = matchedFallback ? { ...p, faq: matchedFallback.faq } : p;
 
-    setPrevScreen(screen);
-    if (screen === 'category') setPrevCat(activeCat);
+    if (screen !== 'post') {
+      setPrevScreen(screen);
+      if (screen === 'category') setPrevCat(activeCat);
+    }
 
     setActivePost(enrichedPost);
     setScreen("post");
@@ -1497,12 +1499,20 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
                   if (!categoryPostsCache[prevCat] && !SPECIAL_CATEGORY_SCREENS[prevCat]) {
                     fetchCategoryPosts(prevCat);
                   }
-                } else if (prevScreen === 'home' || prevScreen === 'about' || prevScreen === 'glossary') {
+                  return;
+                }
+                if (prevScreen === 'about' || prevScreen === 'glossary') {
                   setScreen(prevScreen);
                   setActiveCat(null);
-                } else {
-                  router.back();
+                  return;
                 }
+                if (prevScreen === 'home') {
+                  if (initialPostSlug) { router.back(); return; }
+                  setScreen('home');
+                  setActiveCat(null);
+                  return;
+                }
+                router.back();
               }} style={{ background: "rgba(255,255,255,0.06)", border: `1px solid ${C.border}`, color: C.accentBlue, cursor: "pointer", fontSize: 13, fontWeight: "800", padding: "8px 16px", borderRadius: 8, marginBottom: 24, display: "inline-flex", alignItems: "center", transition: "all 0.2s" }} className="hover-glow">
                 ← Буцах
               </IconButton>

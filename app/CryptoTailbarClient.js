@@ -615,11 +615,13 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
   };
 
   const submitComment = async ({ name, comment, parentId }) => {
+    const postId = activePost.sanityId || activePost.id;
+    if (!postId) return;
     const res = await fetch('/api/comments', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        postId: activePost.sanityId,
+        postId,
         name,
         comment,
         parentId: parentId || undefined,
@@ -691,12 +693,17 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
   }, [mounted, initialPostSlug, initialPosts, initialCommunityPosts]);
 
   useEffect(() => {
-    if (!activePost || !activePost.sanityId) {
+    if (!activePost) {
+      setComments([]);
+      return;
+    }
+    const postId = activePost.sanityId || activePost.id;
+    if (!postId) {
       setComments([]);
       return;
     }
     setCommentsLoading(true);
-    fetch(`/api/comments?postId=${encodeURIComponent(activePost.sanityId)}`)
+    fetch(`/api/comments?postId=${encodeURIComponent(postId)}`)
       .then((res) => res.json())
       .then((data) => {
         setComments(data.comments || []);
@@ -1787,10 +1794,7 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
               {/* Main comment form — only show when not replying */}
               {!replyingTo && (
                 <>
-                  {!activePost.sanityId ? (
-                    <p style={{ color: C.inkFaint, fontSize: 13, fontStyle: "italic" }}>Энэ нийтлэлд сэтгэгдэл бичих боломжгүй.</p>
-                  ) : (
-                    <form onSubmit={handleMainCommentSubmit} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                  <form onSubmit={handleMainCommentSubmit} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
                       <div>
                         <label htmlFor="comment-name" style={{ fontSize: 13, fontWeight: 800, color: "#fff", display: "block", marginBottom: 6 }}>
                           Нэр

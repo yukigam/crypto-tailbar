@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import BackButton from '../components/BackButton';
 import { getCommunityPosts } from '../../lib/sanity';
 import { mapSanityPosts } from '../../lib/mapPost';
 
@@ -11,9 +11,9 @@ export default async function CommunityPage() {
   return (
     <div style={{ minHeight: '100vh', background: '#0f172a', color: '#e2e8f0' }}>
       <div style={{ maxWidth: 800, margin: '0 auto', padding: '60px 24px' }}>
-        <Link href="/" style={{ fontSize: 13, color: '#94a3b8', textDecoration: 'none', fontWeight: 600, display: 'inline-block', marginBottom: 24 }}>
-          ← Нүүр хуудас руу буцах
-        </Link>
+        <BackButton>
+          <span style={{ fontSize: 13, color: '#94a3b8', fontWeight: 600, display: 'inline-block', marginBottom: 24 }}>← Нүүр хуудас руу буцах</span>
+        </BackButton>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
           <h1 style={{ fontSize: 32, fontWeight: 900, color: '#fff', margin: 0 }}>Нийтлэлүүд</h1>
           <a

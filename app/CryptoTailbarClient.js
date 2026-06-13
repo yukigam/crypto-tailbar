@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from "react";
+import { useRouter } from "next/navigation";
 import IconButton from "../components/IconButton";
 import { CATEGORIES, normalizeCategoryId, LEGACY_TITLE_TO_CATEGORY, SPECIAL_CATEGORY_SCREENS, isNavItemActive } from "../lib/categories";
 
@@ -506,6 +507,8 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
   const [commentError, setCommentError] = useState('');
   const [replyingTo, setReplyingTo] = useState(null);
 
+  const router = useRouter();
+
   const myCommentIds = (() => {
     try { return JSON.parse(localStorage.getItem('my_comments') || '[]'); } catch { return []; }
   })();
@@ -853,7 +856,7 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
                             <div style={{ fontSize: 26 }}>{COVER_ICON[p.cover] || "📄"}</div>
                             <div style={{ flex: 1 }}>
                               <div style={{ fontSize: 15, fontWeight: 800, color: C.ink }}>{p.title}</div>
-                              <div style={{ fontSize: 12, color: C.inkFaint, marginTop: 4, fontWeight: "600" }}>{p.catLabel ? `${p.catLabel} · ` : ""}⏱ {p.readTime} мин</div>
+                              <div style={{ fontSize: 12, color: C.inkFaint, marginTop: 4, fontWeight: "600" }}>{p.catLabel || ""}</div>
                             </div>
                           </div>
                         ))}
@@ -988,12 +991,11 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
                 {/* Popular posts */}
                 <div style={{ border: `2px solid ${C.border}`, borderRadius: 14, overflow: "hidden", background: C.bgDark }}>
                   <div style={{ padding: "16px 18px", background: "#131d31", borderBottom: `2px solid ${C.border}`, fontSize: 13, fontWeight: 900, color: C.ink, letterSpacing: "0.08em" }}>🔥 ШИЛДЭГ НИЙТЛЭЛҮҮД</div>
-                  {[...allPosts].sort((a, b) => parseFloat(b.views) - parseFloat(a.views)).slice(0, 3).map((p, i) => (
+                  {allPosts.slice(0, 3).map((p, i) => (
                     <div key={p.id} onClick={() => openPost(p)} style={{ padding: "16px 18px", borderBottom: `1px solid ${C.border}`, cursor: "pointer", display: "flex", gap: 14 }} className="sidebar-hover-item">
                       <div style={{ fontSize: 18, fontWeight: 900, color: C.accentPurple }}>{i + 1}</div>
                       <div>
                         <div style={{ fontSize: 14, fontWeight: 800, color: C.ink, lineHeight: 1.4 }}>{p.title}</div>
-                        <div style={{ fontSize: 12, color: C.inkFaint, marginTop: 4, fontWeight: "600" }}>👁 {p.views} уншсан</div>
                       </div>
                     </div>
                   ))}
@@ -1121,9 +1123,6 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
                       <div key={p.id} onClick={() => openPost(p)} className="modern-card hover-glow" style={{ cursor: "pointer", background: C.bgDark, overflow: "hidden", borderRadius: 14, display: "flex", flexDirection: "column", height: "100%", border: `2px solid ${C.border}` }}>
                         <div style={{ height: 180, width: "100%", position: "relative", borderBottom: `2px solid ${C.border}` }}>
                           <img src={getImgSrc(p)} alt={p.title} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                          <span style={{ position: "absolute", right: 12, top: 12, background: "rgba(15, 23, 42, 0.85)", border: `1px solid ${C.border}`, color: C.ink, fontSize: 11, padding: "4px 10px", borderRadius: 8, fontWeight: 800 }}>
-                            ⏱ {p.readTime} мин
-                          </span>
                         </div>
                         <div style={{ padding: "20px", flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
                           <div>
@@ -1144,16 +1143,14 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
                 {/* Popular posts from other categories */}
                 <div style={{ border: `2px solid ${C.border}`, borderRadius: 14, overflow: "hidden", background: C.bgDark }}>
                   <div style={{ padding: "16px 18px", background: "#131d31", borderBottom: `2px solid ${C.border}`, fontSize: 13, fontWeight: 900, color: C.ink, letterSpacing: "0.08em" }}>🔥 ЭРЭЛТТЭЙ НИЙТЛЭЛҮҮД</div>
-                  {[...allPosts]
+                  {allPosts
                     .filter(p => p.cat !== activeCat)
-                    .sort((a, b) => parseFloat(b.views) - parseFloat(a.views))
                     .slice(0, 3)
                     .map((p, i) => (
                       <div key={p.id} onClick={() => openPost(p)} style={{ padding: "16px 18px", borderBottom: `1px solid ${C.border}`, cursor: "pointer", display: "flex", gap: 14 }} className="sidebar-hover-item">
                         <div style={{ fontSize: 18, fontWeight: 900, color: C.accentPurple }}>{i + 1}</div>
                         <div>
                           <div style={{ fontSize: 14, fontWeight: 800, color: C.ink, lineHeight: 1.4 }}>{p.title}</div>
-                          <div style={{ fontSize: 12, color: C.inkFaint, marginTop: 4, fontWeight: "600" }}>👁 {p.views} уншсан</div>
                         </div>
                       </div>
                     ))}
@@ -1489,7 +1486,7 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
 
             {/* Header section */}
             <div style={{ marginBottom: 28 }}>
-              <IconButton onClick={() => setScreen("home")} style={{ background: "rgba(255,255,255,0.06)", border: `1px solid ${C.border}`, color: C.accentBlue, cursor: "pointer", fontSize: 13, fontWeight: "800", padding: "8px 16px", borderRadius: 8, marginBottom: 24, display: "inline-flex", alignItems: "center", transition: "all 0.2s" }} className="hover-glow">
+              <IconButton onClick={() => router.back()} style={{ background: "rgba(255,255,255,0.06)", border: `1px solid ${C.border}`, color: C.accentBlue, cursor: "pointer", fontSize: 13, fontWeight: "800", padding: "8px 16px", borderRadius: 8, marginBottom: 24, display: "inline-flex", alignItems: "center", transition: "all 0.2s" }} className="hover-glow">
                 ← Буцах
               </IconButton>
 

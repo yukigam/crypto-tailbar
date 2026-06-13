@@ -506,6 +506,8 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
   const [commentSubmitting, setCommentSubmitting] = useState(false);
   const [commentError, setCommentError] = useState('');
   const [replyingTo, setReplyingTo] = useState(null);
+  const [prevScreen, setPrevScreen] = useState('home');
+  const [prevCat, setPrevCat] = useState(null);
 
   const router = useRouter();
 
@@ -580,9 +582,11 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
     : allGlossary;
 
   const openPost = (p) => {
-    // Inject local FAQ if matching the fallback posts
     const matchedFallback = POSTS_FALLBACK.find(f => f.slug === p.slug);
     const enrichedPost = matchedFallback ? { ...p, faq: matchedFallback.faq } : p;
+
+    setPrevScreen(screen);
+    if (screen === 'category') setPrevCat(activeCat);
 
     setActivePost(enrichedPost);
     setScreen("post");
@@ -1486,7 +1490,20 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
 
             {/* Header section */}
             <div style={{ marginBottom: 28 }}>
-              <IconButton onClick={() => router.back()} style={{ background: "rgba(255,255,255,0.06)", border: `1px solid ${C.border}`, color: C.accentBlue, cursor: "pointer", fontSize: 13, fontWeight: "800", padding: "8px 16px", borderRadius: 8, marginBottom: 24, display: "inline-flex", alignItems: "center", transition: "all 0.2s" }} className="hover-glow">
+              <IconButton onClick={() => {
+                if (prevScreen === 'category' && prevCat) {
+                  setActiveCat(prevCat);
+                  setScreen('category');
+                  if (!categoryPostsCache[prevCat] && !SPECIAL_CATEGORY_SCREENS[prevCat]) {
+                    fetchCategoryPosts(prevCat);
+                  }
+                } else if (prevScreen === 'home' || prevScreen === 'about' || prevScreen === 'glossary') {
+                  setScreen(prevScreen);
+                  setActiveCat(null);
+                } else {
+                  router.back();
+                }
+              }} style={{ background: "rgba(255,255,255,0.06)", border: `1px solid ${C.border}`, color: C.accentBlue, cursor: "pointer", fontSize: 13, fontWeight: "800", padding: "8px 16px", borderRadius: 8, marginBottom: 24, display: "inline-flex", alignItems: "center", transition: "all 0.2s" }} className="hover-glow">
                 ← Буцах
               </IconButton>
 

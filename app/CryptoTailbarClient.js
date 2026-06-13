@@ -665,6 +665,7 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
     const newComment = { _id, name, comment, createdAt: new Date().toISOString(), parent };
     setComments((prev) => [...prev, newComment]);
     saveMyCommentId(_id);
+    setMyCommentIds((prev) => [...prev, _id]);
   };
 
   const handleMainCommentSubmit = async (e) => {
@@ -715,6 +716,11 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
       removeLocalComment(storageId, commentId);
     }
     setComments((prev) => prev.filter((c) => c._id !== commentId && c.parent !== commentId));
+    setMyCommentIds((prev) => {
+      const next = prev.filter((id) => id !== commentId);
+      try { localStorage.setItem('my_comments', JSON.stringify(next)); } catch {}
+      return next;
+    });
   };
 
   const communityPosts = initialCommunityPosts || [];
@@ -1913,10 +1919,9 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
                         {commentSubmitting ? 'Илгээж байна...' : 'Сэтгэгдэл үлдээх'}
                       </button>
                     </form>
+                    </>
                   )}
-                </>
-              )}
-            </div>
+             </div>
           </div>
         )}
 

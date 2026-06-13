@@ -516,6 +516,10 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
   useEffect(() => {
     setMounted(true);
     try { setMyCommentIds(JSON.parse(localStorage.getItem('my_comments') || '[]')); } catch {}
+    try {
+      const saved = localStorage.getItem('comment_author_name');
+      if (saved) setCommentName(saved);
+    } catch {}
   }, []);
 
   // ── DYNAMIC ROBUST DATA MERGING ──
@@ -677,6 +681,7 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
     try {
       const data = await submitComment({ name: trimmedName, comment: trimmedComment, parentId: null });
       addCommentOptimistically(data._id, trimmedName, trimmedComment, null);
+      try { localStorage.setItem('comment_author_name', trimmedName); } catch {}
       setCommentName('');
       setCommentText('');
       setCommentSubmitting(false);
@@ -695,6 +700,7 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
     try {
       const data = await submitComment({ name: trimmedName, comment: trimmedComment, parentId });
       addCommentOptimistically(data._id, trimmedName, trimmedComment, parentId);
+      try { localStorage.setItem('comment_author_name', trimmedName); } catch {}
       setCommentName('');
       setCommentText('');
       setReplyingTo(null);

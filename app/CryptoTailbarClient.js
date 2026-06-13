@@ -511,12 +511,11 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
 
   const router = useRouter();
 
-  const myCommentIds = (() => {
-    try { return JSON.parse(localStorage.getItem('my_comments') || '[]'); } catch { return []; }
-  })();
+  const [myCommentIds, setMyCommentIds] = useState([]);
 
   useEffect(() => {
     setMounted(true);
+    try { setMyCommentIds(JSON.parse(localStorage.getItem('my_comments') || '[]')); } catch {}
   }, []);
 
   // ── DYNAMIC ROBUST DATA MERGING ──
@@ -1142,7 +1141,7 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
             ...(STATIC_CAT_MAP[activeCat] ? [STATIC_CAT_MAP[activeCat]] : []),
             ...(cachedSanity?.length
               ? [
-                  ...cachedSanity,
+                  ...cachedSanity.filter((p) => p.slug !== 'digital-asset-security-guide'),
                   ...allPosts.filter(
                     (p) =>
                       p.cat === activeCat &&
@@ -1150,7 +1149,7 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
                   ),
                 ]
               : allPosts.filter((p) => p.cat === activeCat)),
-          ];
+          ].filter((p) => p.slug !== 'digital-asset-security-guide');
 
           return (
             <div className="layout-grid" style={{ display: "grid", gridTemplateColumns: "2.4fr 1fr", gap: 32 }}>

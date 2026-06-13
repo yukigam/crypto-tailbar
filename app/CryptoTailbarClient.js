@@ -1092,7 +1092,7 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
           const cachedSanity = categoryPostsCache[activeCat];
           const catPosts = [
             ...(STATIC_CAT_MAP[activeCat] ? [STATIC_CAT_MAP[activeCat]] : []),
-            ...(cachedSanity
+            ...(cachedSanity?.length
               ? [
                   ...cachedSanity,
                   ...allPosts.filter(

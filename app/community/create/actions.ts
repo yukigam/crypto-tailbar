@@ -2,6 +2,7 @@
 
 import { createClient } from 'next-sanity';
 import { redirect } from 'next/navigation';
+import { revalidatePath } from 'next/cache';
 
 const writeClient = createClient({
   projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || '88ym68hf',
@@ -80,6 +81,9 @@ export async function createPost(formData: FormData) {
       isUserPost: true,
       publishedAt: new Date().toISOString(),
     });
+
+    revalidatePath('/');
+    revalidatePath('/community');
   } catch (err) {
     console.error('Sanity create error:', err);
     return { error: 'Пост илгээхэд алдаа гарлаа. Дахин оролдоно уу.' };

@@ -1,7 +1,7 @@
 import { getCommunityPosts } from '../../lib/sanity';
 import { mapSanityPosts } from '../../lib/mapPost';
 
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export default async function CommunityPage() {
   const posts = await getCommunityPosts();

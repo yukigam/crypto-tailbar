@@ -598,6 +598,27 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const getCommentStorageId = () => activePost?.sanityId || activePost?.id;
+
+  const getLocalComments = (storageId) => {
+    try { return JSON.parse(localStorage.getItem(`comments_${storageId}`) || '[]'); } catch { return []; }
+  };
+
+  const saveLocalComment = (storageId, comment) => {
+    try {
+      const all = getLocalComments(storageId);
+      all.push(comment);
+      localStorage.setItem(`comments_${storageId}`, JSON.stringify(all));
+    } catch {}
+  };
+
+  const removeLocalComment = (storageId, commentId) => {
+    try {
+      const all = getLocalComments(storageId);
+      localStorage.setItem(`comments_${storageId}`, JSON.stringify(all.filter((c) => c._id !== commentId && c.parent !== commentId)));
+    } catch {}
+  };
+
   const saveMyCommentId = (id) => {
     try {
       const stored = JSON.parse(localStorage.getItem('my_comments') || '[]');
@@ -608,28 +629,37 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
     } catch {}
   };
 
-  const getMyCommentIds = () => {
-    try {
-      return JSON.parse(localStorage.getItem('my_comments') || '[]');
-    } catch { return []; }
-  };
-
   const submitComment = async ({ name, comment, parentId }) => {
     const postId = activePost.sanityId || activePost.id;
-    if (!postId) return;
-    const res = await fetch('/api/comments', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        postId,
+    const storageId = getCommentStorageId();
+    if (!postId || !storageId) return;
+
+    if (activePost.sanityId) {
+      const res = await fetch('/api/comments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          postId,
+          name,
+          comment,
+          parentId: parentId || undefined,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Алдаа гарлаа');
+      return data;
+    } else {
+      const tempId = `local-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+      const newComment = {
+        _id: tempId,
         name,
         comment,
-        parentId: parentId || undefined,
-      }),
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Алдаа гарлаа');
-    return data;
+        createdAt: new Date().toISOString(),
+        parent: parentId || null,
+      };
+      saveLocalComment(storageId, newComment);
+      return { _id: tempId };
+    }
   };
 
   const addCommentOptimistically = (_id, name, comment, parent) => {
@@ -676,10 +706,16 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
   };
 
   const handleDeleteComment = async (commentId) => {
-    try {
-      await fetch(`/api/comments?commentId=${encodeURIComponent(commentId)}`, { method: 'DELETE' });
-      setComments((prev) => prev.filter((c) => c._id !== commentId && c.parent !== commentId));
-    } catch {}
+    const storageId = getCommentStorageId();
+    if (!storageId) return;
+    if (activePost.sanityId) {
+      try {
+        await fetch(`/api/comments?commentId=${encodeURIComponent(commentId)}`, { method: 'DELETE' });
+      } catch {}
+    } else {
+      removeLocalComment(storageId, commentId);
+    }
+    setComments((prev) => prev.filter((c) => c._id !== commentId && c.parent !== commentId));
   };
 
   const communityPosts = initialCommunityPosts || [];
@@ -698,18 +734,23 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
       return;
     }
     const postId = activePost.sanityId || activePost.id;
-    if (!postId) {
+    const storageId = getCommentStorageId();
+    if (!postId || !storageId) {
       setComments([]);
       return;
     }
-    setCommentsLoading(true);
-    fetch(`/api/comments?postId=${encodeURIComponent(postId)}`)
-      .then((res) => res.json())
-      .then((data) => {
-        setComments(data.comments || []);
-        setCommentsLoading(false);
-      })
-      .catch(() => setCommentsLoading(false));
+    if (activePost.sanityId) {
+      setCommentsLoading(true);
+      fetch(`/api/comments?postId=${encodeURIComponent(postId)}`)
+        .then((res) => res.json())
+        .then((data) => {
+          setComments(data.comments || []);
+          setCommentsLoading(false);
+        })
+        .catch(() => setCommentsLoading(false));
+    } else {
+      setComments(getLocalComments(storageId));
+    }
   }, [activePost]);
 
   const securityGuidePost = allPosts.find((p) => p.slug === SECURITY_GUIDE_SLUG);

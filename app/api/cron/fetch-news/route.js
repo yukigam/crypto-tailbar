@@ -1,6 +1,6 @@
 import { createClient } from '@sanity/client';
 import Parser from 'rss-parser';
-import OpenAI from 'openai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 export const maxDuration = 120;
 export const dynamic = 'force-dynamic';
@@ -56,10 +56,6 @@ function textToPortableText(text) {
   }));
 }
 
-function stripCodeFences(raw) {
-  return raw.replace(/```(?:json)?\n?/gi, '').trim();
-}
-
 export async function GET(request) {
   const auth = request.headers.get('authorization');
   const secret = process.env.CRON_SECRET;
@@ -67,7 +63,15 @@ export async function GET(request) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_API_KEY);
+  const model = genAI.getGenerativeModel({
+    model: 'gemini-2.0-flash',
+    generationConfig: {
+      temperature: 0.7,
+      maxOutputTokens: 2500,
+      responseMimeType: 'application/json',
+    },
+  });
 
   const sanityClient = createClient({
     projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || process.env.SANITY_PROJECT_ID,
@@ -119,7 +123,7 @@ export async function GET(request) {
 
 Translate the English crypto news below into natural, engaging Mongolian. Write it as a professional blog post for beginners.
 
-Output ONLY valid JSON (no markdown, no code fences):
+Output ONLY valid JSON with these exact fields:
 {
   "title": "Catchy Mongolian title (max 80 chars)",
   "slug": "english-kebab-slug-derived-from-title",
@@ -138,15 +142,9 @@ Title: ${article.title}
 Published: ${article.pubDate}
 Content: ${article.content}`;
 
-      const aiRes = await openai.chat.completions.create({
-        model: 'gpt-4o-mini',
-        messages: [{ role: 'user', content: prompt }],
-        temperature: 0.7,
-        max_tokens: 2500,
-      });
-
-      const raw = aiRes.choices[0]?.message?.content || '{}';
-      const translated = JSON.parse(stripCodeFences(raw));
+      const result = await model.generateContent(prompt);
+      const raw = result.response.text();
+      const translated = JSON.parse(raw);
 
       const slug = slugify(translated.slug || article.title).slice(0, 100);
 

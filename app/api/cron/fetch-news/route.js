@@ -174,6 +174,15 @@ Content: ${article.content}`;
 
       await sanityClient.create({
         _type: 'post',
+        _id: `drafts.${slug}`,
+        title: translated.title,
+        slug: { _type: 'slug', current: slug },
+        body: textToPortableText(translated.body),
+        category,
+        publishedAt: new Date().toISOString(),
+      });
+      await sanityClient.createOrReplace({
+        _type: 'post',
         _id: slug,
         title: translated.title,
         slug: { _type: 'slug', current: slug },

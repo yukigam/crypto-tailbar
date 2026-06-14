@@ -1,6 +1,5 @@
 import { createClient } from '@sanity/client';
 import Parser from 'rss-parser';
-import { GoogleGenerativeAI } from '@google/generative-ai';
 
 export const maxDuration = 120;
 export const dynamic = 'force-dynamic';
@@ -66,12 +65,6 @@ export async function GET(request) {
   if (secret && auth !== `Bearer ${secret}`) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 });
   }
-
-  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-  const gemini = genAI.getGenerativeModel({
-    model: 'gemini-2.0-flash',
-    generationConfig: { temperature: 0.7, maxOutputTokens: 2500, responseMimeType: 'application/json' },
-  });
 
   const sanityClient = createClient({
     projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || process.env.SANITY_PROJECT_ID,
@@ -146,8 +139,22 @@ Title: ${article.title}
 Published: ${article.pubDate}
 Content: ${article.content}`;
 
-      const result = await gemini.generateContent(prompt);
-      const raw = result.response.text();
+      const orRes = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+        },
+        body: JSON.stringify({
+          model: 'google/gemini-2.5-flash:free',
+          messages: [{ role: 'user', content: prompt }],
+          temperature: 0.7,
+          max_tokens: 2500,
+        }),
+      });
+      if (!orRes.ok) throw new Error(`OpenRouter ${orRes.status}: ${await orRes.text()}`);
+      const orData = await orRes.json();
+      const raw = orData.choices?.[0]?.message?.content || '{}';
       const translated = JSON.parse(raw);
 
       const slug = slugify(translated.slug || article.title).slice(0, 100);
@@ -165,6 +172,7 @@ Content: ${article.content}`;
 
       await sanityClient.create({
         _type: 'post',
+        _id: slug,
         title: translated.title,
         slug: { _type: 'slug', current: slug },
         body: textToPortableText(translated.body),

@@ -146,7 +146,7 @@ Content: ${article.content}`;
           Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
         },
         body: JSON.stringify({
-          model: 'google/gemini-2.5-flash:free',
+          model: 'meta-llama/llama-3.1-8b-instruct:free',
           messages: [{ role: 'user', content: prompt }],
           temperature: 0.7,
           max_tokens: 2500,

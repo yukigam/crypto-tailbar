@@ -56,6 +56,10 @@ function textToPortableText(text) {
   }));
 }
 
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+const MAX_ARTICLES_TOTAL = 6;
+
 export async function GET(request) {
   const auth = request.headers.get('authorization');
   const secret = process.env.CRON_SECRET;
@@ -88,7 +92,7 @@ export async function GET(request) {
   for (const url of RSS_FEEDS) {
     try {
       const feed = await parser.parseURL(url);
-      for (const item of feed.items.slice(0, 5)) {
+      for (const item of feed.items.slice(0, 3)) {
         const key = item.title?.slice(0, 80).toLowerCase().trim();
         if (!key || seen.has(key)) continue;
         seen.add(key);
@@ -98,15 +102,19 @@ export async function GET(request) {
           content: (item.contentSnippet || item.content || '').slice(0, 4000),
           pubDate: item.pubDate || new Date().toISOString(),
         });
+        if (articles.length >= MAX_ARTICLES_TOTAL) break;
       }
     } catch {
       // skip failed feed
     }
+    if (articles.length >= MAX_ARTICLES_TOTAL) break;
   }
 
   const results = [];
 
-  for (const article of articles) {
+  for (const [i, article] of articles.entries()) {
+    if (i > 0) await sleep(5000);
+
     const tempSlug = slugify(article.title).slice(0, 100);
 
     const dup = await sanityClient.fetch(

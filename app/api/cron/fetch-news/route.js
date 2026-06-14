@@ -57,6 +57,8 @@ function textToPortableText(text) {
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
+const stripCodeFences = (text) => text.replace(/```(?:json)?\n?/gi, '').trim();
+
 const MAX_ARTICLES_TOTAL = 6;
 
 export async function GET(request) {
@@ -146,7 +148,7 @@ Content: ${article.content}`;
           Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
         },
         body: JSON.stringify({
-          model: 'google/gemma-4-26b-a4b-it:free',
+          model: 'google/gemini-2.5-flash',
           messages: [{ role: 'user', content: prompt }],
           temperature: 0.7,
           max_tokens: 2500,
@@ -154,7 +156,7 @@ Content: ${article.content}`;
       });
       if (!orRes.ok) throw new Error(`OpenRouter ${orRes.status}: ${await orRes.text()}`);
       const orData = await orRes.json();
-      const raw = orData.choices?.[0]?.message?.content || '{}';
+      const raw = stripCodeFences(orData.choices?.[0]?.message?.content || '{}');
       const translated = JSON.parse(raw);
 
       const slug = slugify(translated.slug || article.title).slice(0, 100);

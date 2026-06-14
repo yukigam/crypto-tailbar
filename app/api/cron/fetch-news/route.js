@@ -72,7 +72,7 @@ export async function GET(request) {
     projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || process.env.SANITY_PROJECT_ID,
     dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || process.env.SANITY_DATASET,
     apiVersion: '2024-01-01',
-    token: process.env.SANITY_WRITE_TOKEN || process.env.SANITY_API_TOKEN,
+    token: process.env.SANITY_API_WRITE_TOKEN || process.env.SANITY_API_TOKEN,
     useCdn: false,
   });
 
@@ -172,20 +172,9 @@ Content: ${article.content}`;
 
       const category = pickCategory(article.title, article.content);
 
-      const draftId = `drafts.${slug}`;
-      const draft = await sanityClient.create({
-        _type: 'post',
-        _id: draftId,
-        title: translated.title,
-        slug: { _type: 'slug', current: slug },
-        body: textToPortableText(translated.body),
-        category,
-        publishedAt: new Date().toISOString(),
-      });
-      await sanityClient.createOrReplace({
+      await sanityClient.create({
         _type: 'post',
         _id: slug,
-        _rev: draft._rev,
         title: translated.title,
         slug: { _type: 'slug', current: slug },
         body: textToPortableText(translated.body),

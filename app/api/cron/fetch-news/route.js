@@ -146,7 +146,7 @@ Content: ${article.content}`;
           Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
         },
         body: JSON.stringify({
-          model: 'meta-llama/llama-3-8b-instruct:free',
+          model: 'google/gemma-4-26b-a4b-it:free',
           messages: [{ role: 'user', content: prompt }],
           temperature: 0.7,
           max_tokens: 2500,

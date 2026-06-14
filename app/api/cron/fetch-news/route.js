@@ -171,25 +171,18 @@ Content: ${article.content}`;
       }
 
       const category = pickCategory(article.title, article.content);
+      const docData = {
+        _type: 'post',
+        title: translated.title,
+        slug: { _type: 'slug', current: slug },
+        body: textToPortableText(translated.body),
+        category,
+        publishedAt: new Date().toISOString(),
+      };
 
-      await sanityClient.create({
-        _type: 'post',
-        _id: `drafts.${slug}`,
-        title: translated.title,
-        slug: { _type: 'slug', current: slug },
-        body: textToPortableText(translated.body),
-        category,
-        publishedAt: new Date().toISOString(),
-      });
-      await sanityClient.createOrReplace({
-        _type: 'post',
-        _id: slug,
-        title: translated.title,
-        slug: { _type: 'slug', current: slug },
-        body: textToPortableText(translated.body),
-        category,
-        publishedAt: new Date().toISOString(),
-      });
+      await sanityClient.mutate([
+        { createOrReplace: { _id: slug, ...docData } },
+      ]);
 
       results.push({ title: translated.title, slug, category, status: 'published' });
     } catch (err) {

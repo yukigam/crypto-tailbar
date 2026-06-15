@@ -58,6 +58,27 @@ function formatRelativeDate(dateStr, publishedAtStr) {
   return { text: `${months[target.getMonth()]} ${target.getDate()}`, isToday: false, relative: null };
 }
 
+function RelDate({ date, publishedAt, style }) {
+  const [fd, setFd] = useState(null);
+
+  useEffect(() => {
+    const update = () => setFd(formatRelativeDate(date, publishedAt));
+    update();
+    const id = setInterval(update, 60000);
+    return () => clearInterval(id);
+  }, [date, publishedAt]);
+
+  if (!fd || !fd.text) return null;
+  if (fd.isToday) {
+    return (
+      <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.05em", color: "#34d399", textShadow: "0 0 8px rgba(52,211,153,0.5)" }}>
+        {fd.text}{fd.relative ? ` · ${fd.relative}` : ''}
+      </span>
+    );
+  }
+  return <span style={{ fontSize: 10, fontWeight: 600, color: C.inkFaint, ...style }}>{fd.text}</span>;
+}
+
 // ── FALLBACK POSTS (Fully Enriched with Comprehensive Mongolian Guides & FAQ) ──
 const POSTS_FALLBACK = [
   {
@@ -1007,18 +1028,7 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
                   <div style={{ display: "flex", gap: 10, marginBottom: 16, alignItems: "center" }}>
                     <span style={{ background: C.accentGlow, color: "#fff", padding: "4px 12px", fontSize: 10, fontWeight: 900, borderRadius: 6, letterSpacing: "0.05em", boxShadow: "0 0 10px rgba(56, 189, 248, 0.4)" }}>ОНЦЛОХ</span>
                     {p.catLabel && <span style={{ background: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.2)", color: "#fff", padding: "4px 10px", fontSize: 10, fontWeight: 800, borderRadius: 6 }}>{p.catLabel.toUpperCase()}</span>}
-                    {(() => {
-                      const fd = formatRelativeDate(p.date, p.publishedAt);
-                      if (!fd.text) return null;
-                      if (fd.isToday) {
-                        return (
-                          <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.05em", color: "#34d399", textShadow: "0 0 8px rgba(52,211,153,0.5)" }}>
-                            {fd.text}{fd.relative ? ` · ${fd.relative}` : ''}
-                          </span>
-                        );
-                      }
-                      return <span style={{ fontSize: 10, color: "rgba(255,255,255,0.6)", fontWeight: 600 }}>{fd.text}</span>;
-                    })()}
+                    <RelDate date={p.date} publishedAt={p.publishedAt} style={{ color: "rgba(255,255,255,0.6)" }} />
                   </div>
                   <h1 style={{ margin: "0 0 14px", fontSize: "clamp(24px, 3.5vw, 38px)", fontWeight: 900, lineHeight: 1.25, color: "#fff", textShadow: "0 2px 10px rgba(0,0,0,0.5)" }}>{p.title}</h1>
                   <p style={{ margin: "0 0 24px", color: C.inkLight, fontSize: 16, lineHeight: 1.65, fontWeight: "500" }}>{p.intro}</p>
@@ -1058,18 +1068,7 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
                         <div style={{ flex: 1 }}>
                           <div style={{ display: "flex", gap: 10, marginBottom: 8, alignItems: "center" }}>
                             {p.catLabel && <span style={{ fontSize: 10, color: C.accentPurple, fontWeight: 800, letterSpacing: "0.05em" }}>{p.catLabel.toUpperCase()}</span>}
-                            {(() => {
-                              const fd = formatRelativeDate(p.date, p.publishedAt);
-                              if (!fd.text) return null;
-                              if (fd.isToday) {
-                                return (
-                                  <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.05em", color: "#34d399", textShadow: "0 0 8px rgba(52,211,153,0.5)" }}>
-                                    {fd.text}{fd.relative ? ` · ${fd.relative}` : ''}
-                                  </span>
-                                );
-                              }
-                              return <span style={{ fontSize: 10, color: C.inkFaint, fontWeight: 600 }}>{fd.text}</span>;
-                            })()}
+                            <RelDate date={p.date} publishedAt={p.publishedAt} />
                           </div>
                           <h3 style={{ margin: "0 0 8px", fontSize: 18, fontWeight: 850, color: C.ink, lineHeight: 1.35 }}>{p.title}</h3>
                           <p style={{ margin: 0, fontSize: 13, color: C.inkLight, lineHeight: 1.55, fontWeight: "500" }} className="line-clamp-2">{p.subtitle}</p>
@@ -1253,18 +1252,7 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
                           <div>
                             <div style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: 8 }}>
                               <span style={{ fontSize: 11, color: C.accentPurple, fontWeight: 850, textTransform: "uppercase", letterSpacing: "0.05em" }}>{p.catLabel}</span>
-                              {(() => {
-                                const fd = formatRelativeDate(p.date, p.publishedAt);
-                                if (!fd.text) return null;
-                                if (fd.isToday) {
-                                  return (
-                                    <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.05em", color: "#34d399", textShadow: "0 0 8px rgba(52,211,153,0.5)" }}>
-                                      {fd.text}{fd.relative ? ` · ${fd.relative}` : ''}
-                                    </span>
-                                  );
-                                }
-                                return <span style={{ fontSize: 10, color: C.inkFaint, fontWeight: 600 }}>{fd.text}</span>;
-                              })()}
+                              <RelDate date={p.date} publishedAt={p.publishedAt} />
                             </div>
                             <h3 style={{ margin: "0 0 10px", fontSize: 18, fontWeight: 850, color: C.ink, lineHeight: 1.35 }}>{p.title}</h3>
                             <p style={{ margin: "0 0 16px", fontSize: 13, color: C.inkLight, lineHeight: 1.55, fontWeight: "500" }} className="line-clamp-2">{p.intro}</p>
@@ -1291,13 +1279,7 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
                         <div>
                           <div style={{ fontSize: 14, fontWeight: 800, color: C.ink, lineHeight: 1.4 }}>{p.title}</div>
                           <div style={{ fontSize: 10, color: C.inkFaint, fontWeight: 600, marginTop: 4 }}>
-                            {(() => {
-                              const fd = formatRelativeDate(p.date, p.publishedAt);
-                              if (!fd.text) return null;
-                              return fd.isToday
-                                ? <span style={{ color: "#34d399", textShadow: "0 0 6px rgba(52,211,153,0.4)" }}>{fd.text}{fd.relative ? ` · ${fd.relative}` : ''}</span>
-                                : fd.text;
-                            })()}
+                            <RelDate date={p.date} publishedAt={p.publishedAt} />
                           </div>
                         </div>
                       </div>

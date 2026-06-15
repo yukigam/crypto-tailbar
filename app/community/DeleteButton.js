@@ -11,7 +11,8 @@ export default function DeleteButton({ sanityId }) {
     if (tokens[sanityId]) setShow(true);
   }, [sanityId]);
 
-  const handleDelete = async () => {
+  const handleDelete = async (e) => {
+    e.stopPropagation();
     if (!confirm('Нийтлэлээ устгахдаа итгэлтэй байна уу?')) return;
     setDeleting(true);
     const tokens = JSON.parse(localStorage.getItem('deleteTokens') || '{}');

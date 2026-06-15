@@ -58,29 +58,29 @@ function formatRelativeDate(dateStr, publishedAtStr, now) {
 }
 
 function RelDate({ date, publishedAt, style }) {
-  const [display, setDisplay] = useState("");
+  const [tick, setTick] = useState(0);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const calc = () => {
-      const fd = formatRelativeDate(date, publishedAt, new Date());
-      setDisplay(!fd || !fd.text ? "" : fd.isToday && fd.relative ? `${fd.text} · ${fd.relative}` : fd.text);
-    };
-    calc();
-    const id = setInterval(calc, 10000);
+    setMounted(true);
+    const id = setInterval(() => setTick(t => t + 1), 10000);
     return () => clearInterval(id);
   }, []);
 
-  if (!display) return null;
+  if (!mounted) return null;
 
-  const isToday = display.startsWith("Today");
+  const fd = formatRelativeDate(date, publishedAt, new Date());
+  if (!fd || !fd.text) return null;
+
+  const display = fd.isToday && fd.relative ? `${fd.text} · ${fd.relative}` : fd.text;
 
   return (
     <span style={{
       fontSize: 10,
-      fontWeight: isToday ? 800 : 600,
+      fontWeight: fd.isToday ? 800 : 600,
       letterSpacing: "0.05em",
-      color: isToday ? "#34d399" : C.inkFaint,
-      textShadow: isToday ? "0 0 8px rgba(52,211,153,0.5)" : "none",
+      color: fd.isToday ? "#34d399" : C.inkFaint,
+      textShadow: fd.isToday ? "0 0 8px rgba(52,211,153,0.5)" : "none",
       ...style,
     }}>
       {display}
@@ -1070,9 +1070,9 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
                   <h2 style={{ fontSize: 20, fontWeight: 850, borderBottom: `2px solid ${C.border}`, paddingBottom: 12, marginBottom: 24, color: C.ink }}>Зах зээлийн сүүлийн үеийн мэдээ</h2>
                   <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
                     {(uncategorizedPosts || []).map((p, i) => (
-                      <div key={p.id} onClick={() => openPost(p)} className={`modern-card hover-glow list-article-card${i === 0 ? ' animate-pulse shadow-[0_0_20px_rgba(34,197,94,0.4)] border-emerald-500/50' : ''}`} style={{
+                      <div key={p.id} onClick={() => openPost(p)} className={`modern-card hover-glow list-article-card${i === 0 ? ' first-glow' : ''}`} style={{
                         display: "flex", gap: 24, padding: "20px", cursor: "pointer", background: C.bgDark, alignItems: "center",
-                        border: i === 0 ? undefined : `1px solid ${C.border}`,
+                        border: `1px solid ${i === 0 ? 'rgba(52,211,153,0.35)' : C.border}`,
                       }}>
                         <div className="img-wrap" style={{ width: 160, height: 110, borderRadius: 12, overflow: "hidden", position: "relative", flexShrink: 0, border: `1px solid ${C.border}` }}>
                           <img src={getImgSrc(p)} alt={p.title} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
@@ -2262,6 +2262,13 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
             width: 100% !important;
             height: 150px !important;
           }
+        }
+        @keyframes first-pulse {
+          0%, 100% { box-shadow: 0 0 12px rgba(52,211,153,0.25); }
+          50% { box-shadow: 0 0 28px rgba(52,211,153,0.5); }
+        }
+        .first-glow {
+          animation: first-pulse 3s ease-in-out infinite;
         }
       `}</style>
     </div>

@@ -1072,7 +1072,7 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
                     {(uncategorizedPosts || []).map((p, i) => (
                       <div key={p.id} onClick={() => openPost(p)} className={`modern-card hover-glow list-article-card${i === 0 ? ' first-glow' : ''}`} style={{
                         display: "flex", gap: 24, padding: "20px", cursor: "pointer", background: C.bgDark, alignItems: "center",
-                        border: `1px solid ${i === 0 ? 'rgba(52,211,153,0.35)' : C.border}`,
+                        border: i === 0 ? '2px solid rgba(52,211,153,0.5)' : `1px solid ${C.border}`,
                       }}>
                         <div className="img-wrap" style={{ width: 160, height: 110, borderRadius: 12, overflow: "hidden", position: "relative", flexShrink: 0, border: `1px solid ${C.border}` }}>
                           <img src={getImgSrc(p)} alt={p.title} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
@@ -2264,11 +2264,11 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
           }
         }
         @keyframes first-pulse {
-          0%, 100% { box-shadow: 0 0 12px rgba(52,211,153,0.25); }
-          50% { box-shadow: 0 0 28px rgba(52,211,153,0.5); }
+          0%, 100% { box-shadow: 0 0 8px rgba(52,211,153,0.2), 0 0 20px rgba(52,211,153,0.15); }
+          50% { box-shadow: 0 0 20px rgba(52,211,153,0.5), 0 0 50px rgba(52,211,153,0.3), 0 0 80px rgba(52,211,153,0.1); }
         }
         .first-glow {
-          animation: first-pulse 3s ease-in-out infinite;
+          animation: first-pulse 2s ease-in-out infinite;
         }
       `}</style>
     </div>

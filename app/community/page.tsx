@@ -1,15 +1,22 @@
 import BackButton from '../components/BackButton';
 import { getCommunityPosts } from '../../lib/sanity';
 import { mapSanityPosts } from '../../lib/mapPost';
+import SaveToken from './SaveToken';
+import DeleteButton from './DeleteButton';
 
 export const dynamic = 'force-dynamic';
 
-export default async function CommunityPage() {
+export default async function CommunityPage({ searchParams }: { searchParams: any }) {
+  const sp = await searchParams;
+  const postId = sp?.postId || null;
+  const token = sp?.token || null;
+
   const posts = await getCommunityPosts();
   const mapped = mapSanityPosts(posts || []);
 
   return (
     <div style={{ minHeight: '100vh', background: '#0f172a', color: '#e2e8f0' }}>
+      <SaveToken postId={postId} token={token} />
       <div style={{ maxWidth: 800, margin: '0 auto', padding: '60px 24px' }}>
         <BackButton>
           <span style={{ fontSize: 13, color: '#94a3b8', fontWeight: 600, display: 'inline-block', marginBottom: 24 }}>← Нүүр хуудас руу буцах</span>
@@ -91,6 +98,7 @@ export default async function CommunityPage() {
                   <span>{post.date}</span>
                   <span>{post.author}</span>
                 </div>
+                <DeleteButton sanityId={post.sanityId} />
               </a>
             ))}
           </div>

@@ -70,16 +70,19 @@ export async function createPost(formData: FormData) {
   }
 
   const slug = slugify(trimmedTitle);
+  const editToken = crypto.randomUUID();
+  const postId = `community-${Date.now()}`;
 
   try {
     await writeClient.create({
-      _id: `community-${Date.now()}`,
+      _id: postId,
       _type: 'post',
       title: trimmedTitle,
       slug: { _type: 'slug', current: slug },
       body: buildBlockContent(trimmedContent),
       isUserPost: true,
       publishedAt: new Date().toISOString(),
+      editToken,
     });
 
     revalidatePath('/');
@@ -89,5 +92,5 @@ export async function createPost(formData: FormData) {
     return { error: 'Пост илгээхэд алдаа гарлаа. Дахин оролдоно уу.' };
   }
 
-  redirect('/community');
+  redirect(`/community?postId=${postId}&token=${editToken}`);
 }

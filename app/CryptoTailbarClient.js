@@ -25,8 +25,7 @@ const C = {
 // ── FALLBACK CATEGORIES (used when Sanity counts are unavailable) ──
 const FALLBACK_CATEGORIES = CATEGORIES.map((c) => ({ ...c, count: 1 }));
 
-function formatRelativeDate(dateStr, publishedAtStr) {
-  const now = new Date();
+function formatRelativeDate(dateStr, publishedAtStr, now) {
   const target = publishedAtStr ? new Date(publishedAtStr) : dateStr ? new Date(dateStr + 'T00:00:00Z') : null;
   if (!target) return { text: '', isToday: false, relative: null };
 
@@ -59,16 +58,19 @@ function formatRelativeDate(dateStr, publishedAtStr) {
 }
 
 function RelDate({ date, publishedAt, style }) {
-  const [fd, setFd] = useState(null);
+  const [now, setNow] = useState(null);
 
   useEffect(() => {
-    const update = () => setFd(formatRelativeDate(date, publishedAt));
-    update();
-    const id = setInterval(update, 60000);
+    setNow(Date.now());
+    const id = setInterval(() => setNow(Date.now()), 15000);
     return () => clearInterval(id);
-  }, [date, publishedAt]);
+  }, []);
 
+  if (!now) return null;
+
+  const fd = formatRelativeDate(date, publishedAt, now);
   if (!fd || !fd.text) return null;
+
   if (fd.isToday) {
     return (
       <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.05em", color: "#34d399", textShadow: "0 0 8px rgba(52,211,153,0.5)" }}>
@@ -1060,8 +1062,12 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
                 <div>
                   <h2 style={{ fontSize: 20, fontWeight: 850, borderBottom: `2px solid ${C.border}`, paddingBottom: 12, marginBottom: 24, color: C.ink }}>Зах зээлийн сүүлийн үеийн мэдээ</h2>
                   <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-                    {uncategorizedPosts.map(p => (
-                      <div key={p.id} onClick={() => openPost(p)} className="modern-card hover-glow list-article-card" style={{ display: "flex", gap: 24, padding: "20px", cursor: "pointer", background: C.bgDark, alignItems: "center", border: `1px solid ${C.border}` }}>
+                    {uncategorizedPosts.map((p, i) => (
+                      <div key={p.id} onClick={() => openPost(p)} className={`modern-card hover-glow list-article-card${i === 0 ? ' first-article-glow' : ''}`} style={{
+                        display: "flex", gap: 24, padding: "20px", cursor: "pointer", background: C.bgDark, alignItems: "center",
+                        border: i === 0 ? '1.5px solid rgba(52,211,153,0.35)' : `1px solid ${C.border}`,
+                        boxShadow: i === 0 ? '0 0 20px rgba(52,211,153,0.15)' : 'none',
+                      }}>
                         <div className="img-wrap" style={{ width: 160, height: 110, borderRadius: 12, overflow: "hidden", position: "relative", flexShrink: 0, border: `1px solid ${C.border}` }}>
                           <img src={getImgSrc(p)} alt={p.title} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                         </div>
@@ -2250,6 +2256,13 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
             width: 100% !important;
             height: 150px !important;
           }
+        }
+        @keyframes glow-pulse {
+          0%, 100% { box-shadow: 0 0 12px rgba(52,211,153,0.2); }
+          50% { box-shadow: 0 0 25px rgba(52,211,153,0.45); }
+        }
+        .first-article-glow {
+          animation: glow-pulse 3s ease-in-out infinite;
         }
       `}</style>
     </div>

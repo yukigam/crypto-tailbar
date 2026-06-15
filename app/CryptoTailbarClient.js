@@ -58,15 +58,17 @@ function formatRelativeDate(dateStr, publishedAtStr, now) {
 }
 
 function RelDate({ date, publishedAt, style }) {
+  const [mounted, setMounted] = useState(false);
   const [now, setNow] = useState(null);
 
   useEffect(() => {
+    setMounted(true);
     setNow(Date.now());
     const id = setInterval(() => setNow(Date.now()), 15000);
     return () => clearInterval(id);
   }, []);
 
-  if (!now) return null;
+  if (!mounted || !now) return null;
 
   const fd = formatRelativeDate(date, publishedAt, now);
   if (!fd || !fd.text) return null;
@@ -1021,7 +1023,7 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
         {screen === "home" && (
           <div>
             {/* Featured Hero Article */}
-            {uncategorizedPosts.slice(0, 1).map(p => (
+            {(uncategorizedPosts || []).slice(0, 1).map(p => (
               <div key={p.id} onClick={() => openPost(p)} className="hero-card modern-card hover-glow" style={{ cursor: "pointer", position: "relative", overflow: "hidden", minHeight: 420, borderRadius: 16, display: "flex", flexDirection: "column", justifyContent: "flex-end", padding: "48px 40px", marginBottom: 40, border: `2px solid ${C.border}` }}>
                 <img src={getImgSrc(p)} alt={p.title} loading="eager" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", zIndex: 0, transition: "transform 0.5s ease" }} className="hero-img" />
                 <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(15, 23, 42, 0.98) 20%, rgba(15, 23, 42, 0.6) 60%, rgba(15, 23, 42, 0.15) 100%)", zIndex: 1 }} />
@@ -1062,7 +1064,7 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
                 <div>
                   <h2 style={{ fontSize: 20, fontWeight: 850, borderBottom: `2px solid ${C.border}`, paddingBottom: 12, marginBottom: 24, color: C.ink }}>Зах зээлийн сүүлийн үеийн мэдээ</h2>
                   <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-                    {uncategorizedPosts.map((p, i) => (
+                    {(uncategorizedPosts || []).map((p, i) => (
                       <div key={p.id} onClick={() => openPost(p)} className={`modern-card hover-glow list-article-card${i === 0 ? ' first-article-glow' : ''}`} style={{
                         display: "flex", gap: 24, padding: "20px", cursor: "pointer", background: C.bgDark, alignItems: "center",
                         border: i === 0 ? '1.5px solid rgba(52,211,153,0.35)' : `1px solid ${C.border}`,

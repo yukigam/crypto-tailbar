@@ -65,7 +65,7 @@ function RelDate({ date, publishedAt, style }) {
   useEffect(() => {
     setIsMounted(true);
     const calculateTime = () => {
-      const now = Date.now();
+      const now = new Date();
       const fd = formatRelativeDate(date, publishedAt, now);
       if (!fd || !fd.text) { setTimeAgo(""); return; }
       setIsToday(fd.isToday);

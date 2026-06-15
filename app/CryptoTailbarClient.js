@@ -64,26 +64,18 @@ function RelDate({ date, publishedAt, style }) {
 
   useEffect(() => {
     setIsMounted(true);
-    const calculateTime = () => {
-      const now = new Date();
-      const fd = formatRelativeDate(date, publishedAt, now);
+    const updateTime = () => {
+      const fd = formatRelativeDate(date, publishedAt, new Date());
       if (!fd || !fd.text) { setTimeAgo(""); return; }
       setIsToday(fd.isToday);
-      if (fd.isToday) {
-        setTimeAgo(fd.text + (fd.relative ? ` · ${fd.relative}` : ''));
-      } else {
-        setTimeAgo(fd.text);
-      }
+      setTimeAgo(fd.isToday && fd.relative ? `${fd.text} · ${fd.relative}` : fd.text);
     };
-    calculateTime();
-    const interval = setInterval(calculateTime, 60000);
+    updateTime();
+    const interval = setInterval(updateTime, 60000);
     return () => clearInterval(interval);
-  }, [date, publishedAt]);
+  }, [publishedAt]);
 
-  if (!isMounted) {
-    return <span className="text-gray-500 text-xs">Loading...</span>;
-  }
-
+  if (!isMounted) return <span className="text-gray-500 text-xs">Today</span>;
   if (!timeAgo) return null;
 
   return (
@@ -1082,10 +1074,9 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
                   <h2 style={{ fontSize: 20, fontWeight: 850, borderBottom: `2px solid ${C.border}`, paddingBottom: 12, marginBottom: 24, color: C.ink }}>Зах зээлийн сүүлийн үеийн мэдээ</h2>
                   <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
                     {(uncategorizedPosts || []).map((p, i) => (
-                      <div key={p.id} onClick={() => openPost(p)} className={`modern-card hover-glow list-article-card${i === 0 ? ' first-article-glow' : ''}`} style={{
+                      <div key={p.id} onClick={() => openPost(p)} className={`modern-card hover-glow list-article-card${i === 0 ? ' animate-pulse shadow-[0_0_20px_rgba(34,197,94,0.4)] border-emerald-500/50' : ''}`} style={{
                         display: "flex", gap: 24, padding: "20px", cursor: "pointer", background: C.bgDark, alignItems: "center",
                         border: i === 0 ? '1.5px solid rgba(52,211,153,0.35)' : `1px solid ${C.border}`,
-                        boxShadow: i === 0 ? '0 0 20px rgba(52,211,153,0.15)' : 'none',
                       }}>
                         <div className="img-wrap" style={{ width: 160, height: 110, borderRadius: 12, overflow: "hidden", position: "relative", flexShrink: 0, border: `1px solid ${C.border}` }}>
                           <img src={getImgSrc(p)} alt={p.title} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
@@ -2275,13 +2266,6 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
             width: 100% !important;
             height: 150px !important;
           }
-        }
-        @keyframes glow-pulse {
-          0%, 100% { box-shadow: 0 0 12px rgba(52,211,153,0.2); }
-          50% { box-shadow: 0 0 25px rgba(52,211,153,0.45); }
-        }
-        .first-article-glow {
-          animation: glow-pulse 3s ease-in-out infinite;
         }
       `}</style>
     </div>

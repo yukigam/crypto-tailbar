@@ -58,28 +58,47 @@ function formatRelativeDate(dateStr, publishedAtStr, now) {
 }
 
 function RelDate({ date, publishedAt, style }) {
-  const [now, setNow] = useState(null);
+  const [display, setDisplay] = useState(null);
+  const [isToday, setIsToday] = useState(false);
 
   useEffect(() => {
-    setNow(new Date());
-    const id = setInterval(() => setNow(new Date()), 10000);
+    function update() {
+      const now = new Date();
+      const target = publishedAt ? new Date(publishedAt) : date ? new Date(date + 'T00:00:00Z') : null;
+      if (!target) { setDisplay(null); return; }
+      const msDiff = now - target;
+      const secDiff = Math.floor(msDiff / 1000);
+      const minDiff = Math.floor(secDiff / 60);
+      const hourDiff = Math.floor(minDiff / 60);
+      const today = target.toDateString() === now.toDateString();
+      const yesterday = new Date(now);
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yest = target.toDateString() === yesterday.toDateString();
+      setIsToday(today);
+      if (today && publishedAt) {
+        let rel = null;
+        if (hourDiff < 1) rel = minDiff <= 1 ? '1m ago' : `${minDiff}m ago`;
+        else if (hourDiff < 24) rel = hourDiff <= 1 ? '1h ago' : `${hourDiff}h ago`;
+        setDisplay(rel ? `Today · ${rel}` : 'Today');
+      } else if (yest) {
+        setDisplay('1 day ago');
+      } else {
+        const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        setDisplay(`${months[target.getMonth()]} ${target.getDate()}`);
+      }
+    }
+    update();
+    const id = setInterval(update, 5000);
     return () => clearInterval(id);
-  }, []);
-
-  if (!now) return null;
-
-  const fd = formatRelativeDate(date, publishedAt, now);
-  if (!fd || !fd.text) return null;
-
-  const display = fd.isToday && fd.relative ? `${fd.text} · ${fd.relative}` : fd.text;
+  }, [date, publishedAt]);
 
   return (
     <span style={{
       fontSize: 10,
-      fontWeight: fd.isToday ? 800 : 600,
+      fontWeight: isToday ? 800 : 600,
       letterSpacing: "0.05em",
-      color: fd.isToday ? "#34d399" : C.inkFaint,
-      textShadow: fd.isToday ? "0 0 8px rgba(52,211,153,0.5)" : "none",
+      color: isToday ? "#34d399" : C.inkFaint,
+      textShadow: isToday ? "0 0 8px rgba(52,211,153,0.5)" : "none",
       ...style,
     }}>
       {display}

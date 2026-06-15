@@ -25,6 +25,39 @@ const C = {
 // ── FALLBACK CATEGORIES (used when Sanity counts are unavailable) ──
 const FALLBACK_CATEGORIES = CATEGORIES.map((c) => ({ ...c, count: 1 }));
 
+function formatRelativeDate(dateStr, publishedAtStr) {
+  const now = new Date();
+  const target = publishedAtStr ? new Date(publishedAtStr) : dateStr ? new Date(dateStr + 'T00:00:00Z') : null;
+  if (!target) return { text: '', isToday: false, relative: null };
+
+  const msDiff = now - target;
+  const secDiff = Math.floor(msDiff / 1000);
+  const minDiff = Math.floor(secDiff / 60);
+  const hourDiff = Math.floor(minDiff / 60);
+
+  const isToday = target.toDateString() === now.toDateString();
+  const yesterday = new Date(now);
+  yesterday.setDate(yesterday.getDate() - 1);
+  const isYesterday = target.toDateString() === yesterday.toDateString();
+
+  if (isToday && publishedAtStr) {
+    let relative = null;
+    if (hourDiff < 1) {
+      relative = minDiff <= 1 ? '1m ago' : `${minDiff}m ago`;
+    } else if (hourDiff < 24) {
+      relative = hourDiff <= 1 ? '1h ago' : `${hourDiff}h ago`;
+    }
+    return { text: 'Today', isToday: true, relative };
+  }
+
+  if (isYesterday) {
+    return { text: '1 day ago', isToday: false, relative: null };
+  }
+
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  return { text: `${months[target.getMonth()]} ${target.getDate()}`, isToday: false, relative: null };
+}
+
 // ── FALLBACK POSTS (Fully Enriched with Comprehensive Mongolian Guides & FAQ) ──
 const POSTS_FALLBACK = [
   {
@@ -36,6 +69,7 @@ const POSTS_FALLBACK = [
     subtitle: "Биткойны технология, Сатоши Накамото, олборлолт, хавнинг болон аюулгүй хадгалах арга замыг монгол хэлээр маш энгийнээр тайлбарлалаа.",
     author: "Б.Мөнхбаяр",
     authorTitle: "Крипто судлаач",
+    publishedAt: "2026-06-15T08:30:00Z",
     date: "2026-05-18",
     readTime: "18",
     views: "64.8K",
@@ -94,6 +128,7 @@ const POSTS_FALLBACK = [
     subtitle: "Виталик Бутерины бүтээсэн дэлхийн хамгийн том ухаалаг гэрээний сүлжээ, Proof of Stake механизм болон Gas fee-ийг монгол хэлээр маш энгийнээр тайлбарлалаа.",
     author: "Э.Төгөлдөр",
     authorTitle: "Блокчейн архитектор",
+    publishedAt: "2026-06-14T10:00:00Z",
     date: "2026-05-17",
     readTime: "14",
     views: "41.6K",
@@ -140,6 +175,7 @@ const POSTS_FALLBACK = [
     subtitle: "Төвлөрсөн бус зээл, Staking, Yield Farming болон Liquidity Pool-ийн тухай монгол хэлээр маш энгийнээр тайлбарлалаа.",
     author: "Ж.Тэргэл",
     authorTitle: "DeFi шинжээч",
+    publishedAt: "2026-06-10T10:00:00Z",
     date: "2026-05-16",
     readTime: "15",
     views: "32.1K",
@@ -971,6 +1007,18 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
                   <div style={{ display: "flex", gap: 10, marginBottom: 16, alignItems: "center" }}>
                     <span style={{ background: C.accentGlow, color: "#fff", padding: "4px 12px", fontSize: 10, fontWeight: 900, borderRadius: 6, letterSpacing: "0.05em", boxShadow: "0 0 10px rgba(56, 189, 248, 0.4)" }}>ОНЦЛОХ</span>
                     {p.catLabel && <span style={{ background: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.2)", color: "#fff", padding: "4px 10px", fontSize: 10, fontWeight: 800, borderRadius: 6 }}>{p.catLabel.toUpperCase()}</span>}
+                    {(() => {
+                      const fd = formatRelativeDate(p.date, p.publishedAt);
+                      if (!fd.text) return null;
+                      if (fd.isToday) {
+                        return (
+                          <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.05em", color: "#34d399", textShadow: "0 0 8px rgba(52,211,153,0.5)" }}>
+                            {fd.text}{fd.relative ? ` · ${fd.relative}` : ''}
+                          </span>
+                        );
+                      }
+                      return <span style={{ fontSize: 10, color: "rgba(255,255,255,0.6)", fontWeight: 600 }}>{fd.text}</span>;
+                    })()}
                   </div>
                   <h1 style={{ margin: "0 0 14px", fontSize: "clamp(24px, 3.5vw, 38px)", fontWeight: 900, lineHeight: 1.25, color: "#fff", textShadow: "0 2px 10px rgba(0,0,0,0.5)" }}>{p.title}</h1>
                   <p style={{ margin: "0 0 24px", color: C.inkLight, fontSize: 16, lineHeight: 1.65, fontWeight: "500" }}>{p.intro}</p>
@@ -1010,6 +1058,18 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
                         <div style={{ flex: 1 }}>
                           <div style={{ display: "flex", gap: 10, marginBottom: 8, alignItems: "center" }}>
                             {p.catLabel && <span style={{ fontSize: 10, color: C.accentPurple, fontWeight: 800, letterSpacing: "0.05em" }}>{p.catLabel.toUpperCase()}</span>}
+                            {(() => {
+                              const fd = formatRelativeDate(p.date, p.publishedAt);
+                              if (!fd.text) return null;
+                              if (fd.isToday) {
+                                return (
+                                  <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.05em", color: "#34d399", textShadow: "0 0 8px rgba(52,211,153,0.5)" }}>
+                                    {fd.text}{fd.relative ? ` · ${fd.relative}` : ''}
+                                  </span>
+                                );
+                              }
+                              return <span style={{ fontSize: 10, color: C.inkFaint, fontWeight: 600 }}>{fd.text}</span>;
+                            })()}
                           </div>
                           <h3 style={{ margin: "0 0 8px", fontSize: 18, fontWeight: 850, color: C.ink, lineHeight: 1.35 }}>{p.title}</h3>
                           <p style={{ margin: 0, fontSize: 13, color: C.inkLight, lineHeight: 1.55, fontWeight: "500" }} className="line-clamp-2">{p.subtitle}</p>
@@ -1191,7 +1251,21 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
                         </div>
                         <div style={{ padding: "20px", flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
                           <div>
-                            <div style={{ fontSize: 11, color: C.accentPurple, fontWeight: 850, marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.05em" }}>{p.catLabel}</div>
+                            <div style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: 8 }}>
+                              <span style={{ fontSize: 11, color: C.accentPurple, fontWeight: 850, textTransform: "uppercase", letterSpacing: "0.05em" }}>{p.catLabel}</span>
+                              {(() => {
+                                const fd = formatRelativeDate(p.date, p.publishedAt);
+                                if (!fd.text) return null;
+                                if (fd.isToday) {
+                                  return (
+                                    <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.05em", color: "#34d399", textShadow: "0 0 8px rgba(52,211,153,0.5)" }}>
+                                      {fd.text}{fd.relative ? ` · ${fd.relative}` : ''}
+                                    </span>
+                                  );
+                                }
+                                return <span style={{ fontSize: 10, color: C.inkFaint, fontWeight: 600 }}>{fd.text}</span>;
+                              })()}
+                            </div>
                             <h3 style={{ margin: "0 0 10px", fontSize: 18, fontWeight: 850, color: C.ink, lineHeight: 1.35 }}>{p.title}</h3>
                             <p style={{ margin: "0 0 16px", fontSize: 13, color: C.inkLight, lineHeight: 1.55, fontWeight: "500" }} className="line-clamp-2">{p.intro}</p>
                           </div>
@@ -1216,6 +1290,15 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
                         <div style={{ fontSize: 18, fontWeight: 900, color: C.accentPurple }}>{i + 1}</div>
                         <div>
                           <div style={{ fontSize: 14, fontWeight: 800, color: C.ink, lineHeight: 1.4 }}>{p.title}</div>
+                          <div style={{ fontSize: 10, color: C.inkFaint, fontWeight: 600, marginTop: 4 }}>
+                            {(() => {
+                              const fd = formatRelativeDate(p.date, p.publishedAt);
+                              if (!fd.text) return null;
+                              return fd.isToday
+                                ? <span style={{ color: "#34d399", textShadow: "0 0 6px rgba(52,211,153,0.4)" }}>{fd.text}{fd.relative ? ` · ${fd.relative}` : ''}</span>
+                                : fd.text;
+                            })()}
+                          </div>
                         </div>
                       </div>
                     ))}

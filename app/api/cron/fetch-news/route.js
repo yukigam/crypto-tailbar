@@ -1,5 +1,6 @@
 import { createClient } from '@sanity/client';
 import Parser from 'rss-parser';
+import { CATEGORY_IDS } from '../../../../lib/categories';
 
 export const maxDuration = 120;
 export const dynamic = 'force-dynamic';
@@ -127,7 +128,8 @@ Output ONLY valid JSON with these exact fields:
   "title": "Catchy Mongolian title (max 80 chars)",
   "slug": "english-kebab-slug-derived-from-title",
   "body": "Full Mongolian article with 3-5 paragraphs separated by \\\\n\\\\n",
-  "excerpt": "1-2 sentence Mongolian summary"
+  "excerpt": "1-2 sentence Mongolian summary",
+  "category": "one of: beginners, bitcoin, ethereum, defi, trading, wallet, nft-web3, mining"
 }
 
 Rules:
@@ -135,6 +137,7 @@ Rules:
 - Slug: kebab-case English from the Mongolian title meaning
 - Body: detailed, friendly, beginner-oriented, at least 3 paragraphs
 - Keep all original facts intact
+- Category: Be VERY precise. Only pure Bitcoin-specific news (halving, price, tech) → "bitcoin". General educational content, advice, guides, overviews → "beginners". Do NOT use "beginners" as a fallback for everything — only when the article is truly a general explainer or guide.
 
 Original article:
 Title: ${article.title}
@@ -170,14 +173,18 @@ Content: ${article.content}`;
         continue;
       }
 
-      const category = pickCategory(article.title, article.content);
+      const category = CATEGORY_IDS.includes(translated.category)
+        ? translated.category
+        : pickCategory(article.title, article.content);
       const docData = {
         _type: 'post',
         title: translated.title,
         slug: { _type: 'slug', current: slug },
         body: textToPortableText(translated.body),
+        excerpt: translated.excerpt || '',
         category,
         publishedAt: new Date().toISOString(),
+        ...(i < 2 && { market: true }),
       };
 
       await sanityClient.mutate([

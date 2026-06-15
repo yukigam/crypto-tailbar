@@ -58,29 +58,46 @@ function formatRelativeDate(dateStr, publishedAtStr, now) {
 }
 
 function RelDate({ date, publishedAt, style }) {
-  const [mounted, setMounted] = useState(false);
-  const [now, setNow] = useState(null);
+  const [timeAgo, setTimeAgo] = useState("");
+  const [isMounted, setIsMounted] = useState(false);
+  const [isToday, setIsToday] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
-    setNow(Date.now());
-    const id = setInterval(() => setNow(Date.now()), 15000);
-    return () => clearInterval(id);
-  }, []);
+    setIsMounted(true);
+    const calculateTime = () => {
+      const now = Date.now();
+      const fd = formatRelativeDate(date, publishedAt, now);
+      if (!fd || !fd.text) { setTimeAgo(""); return; }
+      setIsToday(fd.isToday);
+      if (fd.isToday) {
+        setTimeAgo(fd.text + (fd.relative ? ` · ${fd.relative}` : ''));
+      } else {
+        setTimeAgo(fd.text);
+      }
+    };
+    calculateTime();
+    const interval = setInterval(calculateTime, 60000);
+    return () => clearInterval(interval);
+  }, [date, publishedAt]);
 
-  if (!mounted || !now) return null;
-
-  const fd = formatRelativeDate(date, publishedAt, now);
-  if (!fd || !fd.text) return null;
-
-  if (fd.isToday) {
-    return (
-      <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.05em", color: "#34d399", textShadow: "0 0 8px rgba(52,211,153,0.5)" }}>
-        {fd.text}{fd.relative ? ` · ${fd.relative}` : ''}
-      </span>
-    );
+  if (!isMounted) {
+    return <span className="text-gray-500 text-xs">Loading...</span>;
   }
-  return <span style={{ fontSize: 10, fontWeight: 600, color: C.inkFaint, ...style }}>{fd.text}</span>;
+
+  if (!timeAgo) return null;
+
+  return (
+    <span style={{
+      fontSize: 10,
+      fontWeight: isToday ? 800 : 600,
+      letterSpacing: "0.05em",
+      color: isToday ? "#34d399" : C.inkFaint,
+      textShadow: isToday ? "0 0 8px rgba(52,211,153,0.5)" : "none",
+      ...style,
+    }}>
+      {timeAgo}
+    </span>
+  );
 }
 
 // ── FALLBACK POSTS (Fully Enriched with Comprehensive Mongolian Guides & FAQ) ──

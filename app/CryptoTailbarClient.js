@@ -58,18 +58,17 @@ function formatRelativeDate(dateStr, publishedAtStr, now) {
 }
 
 function RelDate({ date, publishedAt, style }) {
-  const [tick, setTick] = useState(0);
-  const [mounted, setMounted] = useState(false);
+  const [now, setNow] = useState(null);
 
   useEffect(() => {
-    setMounted(true);
-    const id = setInterval(() => setTick(t => t + 1), 10000);
+    setNow(new Date());
+    const id = setInterval(() => setNow(new Date()), 10000);
     return () => clearInterval(id);
   }, []);
 
-  if (!mounted) return null;
+  if (!now) return null;
 
-  const fd = formatRelativeDate(date, publishedAt, new Date());
+  const fd = formatRelativeDate(date, publishedAt, now);
   if (!fd || !fd.text) return null;
 
   const display = fd.isToday && fd.relative ? `${fd.text} · ${fd.relative}` : fd.text;

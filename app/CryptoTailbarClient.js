@@ -58,25 +58,21 @@ function formatRelativeDate(dateStr, publishedAtStr, now) {
 }
 
 function RelDate({ date, publishedAt, style }) {
-  const [timeAgo, setTimeAgo] = useState("");
-  const [isMounted, setIsMounted] = useState(false);
-  const [isToday, setIsToday] = useState(false);
+  const [display, setDisplay] = useState("");
 
   useEffect(() => {
-    setIsMounted(true);
-    const updateTime = () => {
+    const calc = () => {
       const fd = formatRelativeDate(date, publishedAt, new Date());
-      if (!fd || !fd.text) { setTimeAgo(""); return; }
-      setIsToday(fd.isToday);
-      setTimeAgo(fd.isToday && fd.relative ? `${fd.text} · ${fd.relative}` : fd.text);
+      setDisplay(!fd || !fd.text ? "" : fd.isToday && fd.relative ? `${fd.text} · ${fd.relative}` : fd.text);
     };
-    updateTime();
-    const interval = setInterval(updateTime, 60000);
-    return () => clearInterval(interval);
-  }, [publishedAt]);
+    calc();
+    const id = setInterval(calc, 10000);
+    return () => clearInterval(id);
+  }, []);
 
-  if (!isMounted) return <span className="text-gray-500 text-xs">Today</span>;
-  if (!timeAgo) return null;
+  if (!display) return null;
+
+  const isToday = display.startsWith("Today");
 
   return (
     <span style={{
@@ -87,7 +83,7 @@ function RelDate({ date, publishedAt, style }) {
       textShadow: isToday ? "0 0 8px rgba(52,211,153,0.5)" : "none",
       ...style,
     }}>
-      {timeAgo}
+      {display}
     </span>
   );
 }
@@ -1076,7 +1072,7 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
                     {(uncategorizedPosts || []).map((p, i) => (
                       <div key={p.id} onClick={() => openPost(p)} className={`modern-card hover-glow list-article-card${i === 0 ? ' animate-pulse shadow-[0_0_20px_rgba(34,197,94,0.4)] border-emerald-500/50' : ''}`} style={{
                         display: "flex", gap: 24, padding: "20px", cursor: "pointer", background: C.bgDark, alignItems: "center",
-                        border: i === 0 ? '1.5px solid rgba(52,211,153,0.35)' : `1px solid ${C.border}`,
+                        border: i === 0 ? undefined : `1px solid ${C.border}`,
                       }}>
                         <div className="img-wrap" style={{ width: 160, height: 110, borderRadius: 12, overflow: "hidden", position: "relative", flexShrink: 0, border: `1px solid ${C.border}` }}>
                           <img src={getImgSrc(p)} alt={p.title} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover" }} />

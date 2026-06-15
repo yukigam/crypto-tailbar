@@ -73,33 +73,32 @@ export default async function CommunityPage({ searchParams }: { searchParams: an
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             {mapped.map((post) => (
-              <a
-                key={post.id}
-                href={`/post/${post.slug}`}
-                style={{
-                  display: 'block',
-                  padding: '20px 24px',
-                  background: '#1e293b',
-                  borderRadius: 12,
-                  border: '1.5px solid #334155',
-                  textDecoration: 'none',
-                  transition: 'all 0.2s',
-                  color: 'inherit',
-                }}
-                className="hover-card"
-              >
-                <h2 style={{ fontSize: 18, fontWeight: 800, color: '#fff', margin: '0 0 8px' }}>
-                  {post.title}
-                </h2>
-                <p style={{ fontSize: 14, color: '#94a3b8', lineHeight: 1.6, margin: 0 }}>
-                  {post.subtitle?.slice(0, 200)}
-                </p>
-                <div style={{ display: 'flex', gap: 16, marginTop: 12, fontSize: 12, color: '#64748b' }}>
-                  <span>{post.date}</span>
-                  <span>{post.author}</span>
+              <div key={post.id} style={{ background: '#1e293b', borderRadius: 12, border: '1.5px solid #334155' }}>
+                <a
+                  href={`/post/${post.slug}`}
+                  style={{
+                    display: 'block',
+                    padding: '20px 24px',
+                    textDecoration: 'none',
+                    color: 'inherit',
+                  }}
+                  className="hover-card"
+                >
+                  <h2 style={{ fontSize: 18, fontWeight: 800, color: '#fff', margin: '0 0 8px' }}>
+                    {post.title}
+                  </h2>
+                  <p style={{ fontSize: 14, color: '#94a3b8', lineHeight: 1.6, margin: 0 }}>
+                    {post.subtitle?.slice(0, 200)}
+                  </p>
+                  <div style={{ display: 'flex', gap: 16, marginTop: 12, fontSize: 12, color: '#64748b' }}>
+                    <span>{post.date}</span>
+                    <span>{post.author}</span>
+                  </div>
+                </a>
+                <div style={{ padding: '0 24px 16px' }}>
+                  <DeleteButton sanityId={post.sanityId} />
                 </div>
-                <DeleteButton sanityId={post.sanityId} />
-              </a>
+              </div>
             ))}
           </div>
         )}

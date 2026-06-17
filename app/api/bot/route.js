@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { waitUntil } from '@vercel/functions';
 import { sendMessage, setWebhook, getWebhookInfo, handleCommand, getCommand, buildPostMessage } from '../../../lib/bot/telegram';
 import { postToFacebook, setCoverPhoto, setProfilePhoto } from '../../../lib/bot/facebook';
 import { getPosts, getCommunityPosts } from '../../../lib/sanity';
@@ -60,10 +61,6 @@ async function handleTelegramUpdate(update) {
   const text = msg.text || msg.caption || '';
 
   const command = getCommand(text);
-  if (command) {
-    const handled = await handleCommand(command, chatId);
-    if (handled) return NextResponse.json({ ok: true });
-  }
 
   // /posts — send latest 5 posts
   if (command === '/posts') {
@@ -105,27 +102,35 @@ async function handleTelegramUpdate(update) {
     return NextResponse.json({ ok: true });
   }
 
+  // Commands from COMMANDS map (start, help, about) — fast, no background work
+  if (command && ['/start', '/help', '/about'].includes(command)) {
+    const handled = await handleCommand(command, chatId);
+    if (handled) return NextResponse.json({ ok: true });
+  }
+
   // /generate_cover — generate AI image and set as Facebook cover
   if (command === '/generate_cover') {
     const prompt = text.slice('/generate_cover'.length).trim();
     if (!prompt) {
-      await sendMessage(chatId, 'Зураг үүсгэх текстээ оруулна уу.\n\nЖишээ: <code>/generate_cover Bitcoin mining in the Mongolian steppe with modern rigs under aurora sky</code>');
+      await sendMessage(chatId, '🎨 <b>AI нүүр зураг үүсгэх</b>\n\n/generate_cover [текст] — Тайлбарын дагуу AI зураг үүсгэж, Facebook хуудасны Cover болгоно.\n\nЖишээ: <code>/generate_cover Bitcoin mining in the Mongolian steppe with modern rigs under aurora sky</code>');
       return NextResponse.json({ ok: true });
     }
     await sendMessage(chatId, '⏳ Зураг үүсгэж байна... Энэ хэдэн секунд үргэлжилж болно.');
-    try {
-      const imageUrl = await generateImage(prompt);
-      if (!imageUrl) throw new Error('No image URL returned');
-      await sendMessage(chatId, '📤 Facebook cover болгон хуулж байна...');
-      const fbResult = await setCoverPhoto(imageUrl);
-      if (fbResult.id || fbResult.success) {
-        await sendMessage(chatId, `✅ Нүүр зураг амжилттай солигдлоо!\n\n🎨 <b>Prompt:</b> ${prompt}\n🖼 <a href="${imageUrl}">Зураг харах</a>`);
-      } else {
-        await sendMessage(chatId, `❌ Facebook дээр cover солиход алдаа гарлаа: ${JSON.stringify(fbResult)}`);
+    waitUntil((async () => {
+      try {
+        const imageUrl = await generateImage(prompt);
+        if (!imageUrl) throw new Error('No image URL returned');
+        await sendMessage(chatId, '📤 Facebook cover болгон хуулж байна...');
+        const fbResult = await setCoverPhoto(imageUrl);
+        if (fbResult.id || fbResult.success) {
+          await sendMessage(chatId, `✅ Нүүр зураг амжилттай солигдлоо!\n\n🎨 <b>Prompt:</b> ${prompt}\n🖼 <a href="${imageUrl}">Зураг харах</a>`);
+        } else {
+          await sendMessage(chatId, `❌ Facebook дээр cover солиход алдаа гарлаа: ${JSON.stringify(fbResult)}`);
+        }
+      } catch (err) {
+        await sendMessage(chatId, `❌ Алдаа гарлаа: ${err.message}`);
       }
-    } catch (err) {
-      await sendMessage(chatId, `❌ Алдаа гарлаа: ${err.message}`);
-    }
+    })());
     return NextResponse.json({ ok: true });
   }
 
@@ -133,43 +138,45 @@ async function handleTelegramUpdate(update) {
   if (command === '/generate_all_photos') {
     const prompt = text.slice('/generate_all_photos'.length).trim();
     if (!prompt) {
-      await sendMessage(chatId, 'Зураг үүсгэх текстээ оруулна уу.\n\nЖишээ: <code>/generate_all_photos Crypto blockchain theme with gold and blue gradient, modern tech style</code>');
+      await sendMessage(chatId, '🎨 <b>Бүх зураг үүсгэх</b>\n\n/generate_all_photos [текст] — Тайлбарын дагуу 2 AI зураг (1:1 профайл зураг + хэвтээ cover зураг) үүсгэж, Facebook хуудасны профайл болон cover-ыг шинэчилнэ.\n\nЖишээ: <code>/generate_all_photos Crypto blockchain theme with gold and blue gradient, modern tech style</code>');
       return NextResponse.json({ ok: true });
     }
     await sendMessage(chatId, '⏳ 2 зураг (профайл + cover) үүсгэж байна... Энэ хэдэн секунд үргэлжилж болно.');
-    try {
-      const [profileUrl, coverUrl] = await Promise.all([
-        generateImage(prompt, {
-          size: '1024x1024',
-          suffix: 'Facebook profile picture, square 1:1 aspect ratio, close-up centered subject, professional, high quality, no text, no watermark.',
-        }),
-        generateImage(prompt, {
-          size: '1024x512',
-          suffix: 'Facebook page cover photo, landscape orientation, wide banner, high quality, professional look, no text, no watermark.',
-        }),
-      ]);
-      if (!profileUrl && !coverUrl) throw new Error('Both image generations failed');
-      await sendMessage(chatId, '📤 Facebook профайл болон cover хуудас руу хуулж байна...');
-      const results = await Promise.allSettled([
-        profileUrl ? setProfilePhoto(profileUrl) : Promise.resolve(null),
-        coverUrl ? setCoverPhoto(coverUrl) : Promise.resolve(null),
-      ]);
-      let reply = '';
-      if (results[0].status === 'fulfilled' && results[0].value?.id) {
-        reply += '✅ Профайл зураг амжилттай солигдлоо!\n';
-      } else {
-        reply += '❌ Профайл зураг солиход алдаа гарлаа.\n';
+    waitUntil((async () => {
+      try {
+        const [profileUrl, coverUrl] = await Promise.all([
+          generateImage(prompt, {
+            size: '1024x1024',
+            suffix: 'Facebook profile picture, square 1:1 aspect ratio, close-up centered subject, professional, high quality, no text, no watermark.',
+          }),
+          generateImage(prompt, {
+            size: '1024x512',
+            suffix: 'Facebook page cover photo, landscape orientation, wide banner, high quality, professional look, no text, no watermark.',
+          }),
+        ]);
+        if (!profileUrl && !coverUrl) throw new Error('Both image generations failed');
+        await sendMessage(chatId, '📤 Facebook профайл болон cover хуудас руу хуулж байна...');
+        const results = await Promise.allSettled([
+          profileUrl ? setProfilePhoto(profileUrl) : Promise.resolve(null),
+          coverUrl ? setCoverPhoto(coverUrl) : Promise.resolve(null),
+        ]);
+        let reply = '';
+        if (results[0].status === 'fulfilled' && results[0].value?.id) {
+          reply += '✅ Профайл зураг амжилттай солигдлоо!\n';
+        } else {
+          reply += '❌ Профайл зураг солиход алдаа гарлаа.\n';
+        }
+        if (results[1].status === 'fulfilled' && (results[1].value?.id || results[1].value?.success)) {
+          reply += '✅ Cover зураг амжилттай солигдлоо!\n';
+        } else {
+          reply += '❌ Cover зураг солиход алдаа гарлаа.\n';
+        }
+        reply += `\n🎨 <b>Prompt:</b> ${prompt}`;
+        await sendMessage(chatId, reply);
+      } catch (err) {
+        await sendMessage(chatId, `❌ Алдаа гарлаа: ${err.message}`);
       }
-      if (results[1].status === 'fulfilled' && (results[1].value?.id || results[1].value?.success)) {
-        reply += '✅ Cover зураг амжилттай солигдлоо!\n';
-      } else {
-        reply += '❌ Cover зураг солиход алдаа гарлаа.\n';
-      }
-      reply += `\n🎨 <b>Prompt:</b> ${prompt}`;
-      await sendMessage(chatId, reply);
-    } catch (err) {
-      await sendMessage(chatId, `❌ Алдаа гарлаа: ${err.message}`);
-    }
+    })());
     return NextResponse.json({ ok: true });
   }
 

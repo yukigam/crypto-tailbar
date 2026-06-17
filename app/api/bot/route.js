@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { sendMessage, setWebhook, getWebhookInfo, handleCommand, getCommand, buildPostMessage } from '../../../lib/bot/telegram';
-import { postToFacebook } from '../../../lib/bot/facebook';
+import { postToFacebook, setCoverPhoto } from '../../../lib/bot/facebook';
 import { getPosts, getCommunityPosts } from '../../../lib/sanity';
 import { mapSanityPosts } from '../../../lib/mapPost';
 
@@ -105,6 +105,30 @@ async function handleTelegramUpdate(update) {
     return NextResponse.json({ ok: true });
   }
 
+  // /generate_cover — generate AI image and set as Facebook cover
+  if (command === '/generate_cover') {
+    const prompt = text.slice('/generate_cover'.length).trim();
+    if (!prompt) {
+      await sendMessage(chatId, 'Зураг үүсгэх текстээ оруулна уу.\n\nЖишээ: <code>/generate_cover Bitcoin mining in the Mongolian steppe with modern rigs under aurora sky</code>');
+      return NextResponse.json({ ok: true });
+    }
+    await sendMessage(chatId, '⏳ Зураг үүсгэж байна... Энэ хэдэн секунд үргэлжилж болно.');
+    try {
+      const imageUrl = await generateImage(prompt);
+      if (!imageUrl) throw new Error('No image URL returned');
+      await sendMessage(chatId, '📤 Facebook cover болгон хуулж байна...');
+      const fbResult = await setCoverPhoto(imageUrl);
+      if (fbResult.id || fbResult.success) {
+        await sendMessage(chatId, `✅ Нүүр зураг амжилттай солигдлоо!\n\n🎨 <b>Prompt:</b> ${prompt}\n🖼 <a href="${imageUrl}">Зураг харах</a>`);
+      } else {
+        await sendMessage(chatId, `❌ Facebook дээр cover солиход алдаа гарлаа: ${JSON.stringify(fbResult)}`);
+      }
+    } catch (err) {
+      await sendMessage(chatId, `❌ Алдаа гарлаа: ${err.message}`);
+    }
+    return NextResponse.json({ ok: true });
+  }
+
   // Unknown command or plain text — show help
   if (command) {
     await handleCommand('help', chatId);
@@ -121,4 +145,32 @@ async function handleFacebookPost(body) {
   const fbMessage = message || `📰 ${title}\n\nДэлгэрэнгүй: ${link}`;
   const result = await postToFacebook(fbMessage, link, title);
   return NextResponse.json({ success: true, result });
+}
+
+async function generateImage(prompt) {
+  const fullPrompt = `${prompt}. Facebook page cover photo, landscape orientation, high quality, professional look, 1600x600 resolution, no text, no watermark.`;
+
+  const res = await fetch('https://openrouter.ai/api/v1/images/generations', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+      'HTTP-Referer': 'https://crypto-tailbar.vercel.app',
+      'X-Title': 'Crypto Tailbar',
+    },
+    body: JSON.stringify({
+      model: 'black-forest-labs/flux-schnell',
+      prompt: fullPrompt,
+      n: 1,
+      size: '1024x1024',
+    }),
+  });
+
+  if (!res.ok) {
+    const errText = await res.text();
+    throw new Error(`OpenRouter ${res.status}: ${errText}`);
+  }
+
+  const data = await res.json();
+  return data.data?.[0]?.url || null;
 }

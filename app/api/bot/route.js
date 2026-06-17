@@ -112,7 +112,10 @@ async function handleTelegramUpdate(update) {
     }
     await sendMessage(chatId, '⏳ Зураг үүсгэж байна... Энэ хэдэн секунд үргэлжилж болно.');
     try {
-      const imageUrl = await generateImage(prompt);
+      const imageUrl = await generateImage(prompt, {
+        size: '1024x512',
+        suffix: 'Facebook page cover photo, landscape orientation, wide banner, high quality, professional look, no text, no watermark.',
+      });
       if (!imageUrl) throw new Error('OpenRouter зураг үүсгэх API хариулт хоосон байна. Токен эсвэл моделийн хязгаарлалт шалгана уу.');
       await sendMessage(chatId, '📤 Facebook cover болгон хуулж байна...');
       const fbResult = await setCoverPhoto(imageUrl);
@@ -129,47 +132,29 @@ async function handleTelegramUpdate(update) {
     return NextResponse.json({ ok: true });
   }
 
-  if (command === '/generate_all_photos') {
-    const prompt = text.slice('/generate_all_photos'.length).trim();
+  if (command === '/generate_profile') {
+    const prompt = text.slice('/generate_profile'.length).trim();
     if (!prompt) {
-      await sendMessage(chatId, '🎨 <b>Бүх зураг үүсгэх</b>\n\n/generate_all_photos [текст] — Тайлбарын дагуу 2 AI зураг (1:1 профайл зураг + хэвтээ cover зураг) үүсгэж, Facebook хуудасны профайл болон cover-ыг шинэчилнэ.\n\nЖишээ: <code>/generate_all_photos Crypto blockchain theme with gold and blue gradient, modern tech style</code>');
+      await sendMessage(chatId, '🎨 <b>AI профайл зураг үүсгэх</b>\n\n/generate_profile [текст] — Тайлбарын дагуу AI зураг үүсгэж, Facebook хуудасны Профайл зураг болгоно.\n\nЖишээ: <code>/generate_profile Crypto blockchain logo with gold and blue gradient, modern tech style</code>');
       return NextResponse.json({ ok: true });
     }
-    await sendMessage(chatId, '⏳ 2 зураг (профайл + cover) үүсгэж байна... Энэ хэдэн секунд үргэлжилж болно.');
+    await sendMessage(chatId, '⏳ Зураг үүсгэж байна... Энэ хэдэн секунд үргэлжилж болно.');
     try {
-      const [profileUrl, coverUrl] = await Promise.all([
-        generateImage(prompt, {
-          size: '1024x1024',
-          suffix: 'Facebook profile picture, square 1:1 aspect ratio, close-up centered subject, professional, high quality, no text, no watermark.',
-        }),
-        generateImage(prompt, {
-          size: '1024x512',
-          suffix: 'Facebook page cover photo, landscape orientation, wide banner, high quality, professional look, no text, no watermark.',
-        }),
-      ]);
-      if (!profileUrl && !coverUrl) throw new Error('OpenRouter зураг үүсгэх API хоёр хариултыг хоосон буцаасан. Токен эсвэл моделийн хязгаарлалт шалгана уу.');
-      await sendMessage(chatId, '📤 Facebook профайл болон cover хуудас руу хуулж байна...');
-      const results = await Promise.allSettled([
-        profileUrl ? setProfilePhoto(profileUrl) : Promise.resolve(null),
-        coverUrl ? setCoverPhoto(coverUrl) : Promise.resolve(null),
-      ]);
-      let reply = '';
-      if (results[0].status === 'fulfilled' && results[0].value?.id) {
-        reply += '✅ Профайл зураг амжилттай солигдлоо!\n';
+      const imageUrl = await generateImage(prompt, {
+        size: '1024x1024',
+        suffix: 'Facebook profile picture, square 1:1 aspect ratio, close-up centered subject, professional, high quality, no text, no watermark.',
+      });
+      if (!imageUrl) throw new Error('OpenRouter зураг үүсгэх API хариулт хоосон байна. Токен эсвэл моделийн хязгаарлалт шалгана уу.');
+      await sendMessage(chatId, '📤 Facebook профайл болгон хуулж байна...');
+      const fbResult = await setProfilePhoto(imageUrl);
+      if (fbResult.id || fbResult.success) {
+        await sendMessage(chatId, `✅ Профайл зураг амжилттай солигдлоо!\n\n🎨 <b>Prompt:</b> ${prompt}\n🖼 <a href="${imageUrl}">Зураг харах</a>`);
       } else {
-        const pfErr = results[0].status === 'rejected' ? results[0].reason?.message : (results[0].value?.error?.message || 'тодорхойгүй');
-        reply += `❌ Профайл зураг солиход алдаа гарлаа: ${pfErr}\n`;
+        const fbError = fbResult?.error?.message ? `Facebook алдаа: ${fbResult.error.message}` : `Facebook хариулт: ${JSON.stringify(fbResult)}`;
+        await sendMessage(chatId, `❌ Facebook дээр профайл зураг солиход алдаа гарлаа.\n\n${fbError}`);
       }
-      if (results[1].status === 'fulfilled' && (results[1].value?.id || results[1].value?.success)) {
-        reply += '✅ Cover зураг амжилттай солигдлоо!\n';
-      } else {
-        const cvErr = results[1].status === 'rejected' ? results[1].reason?.message : (results[1].value?.error?.message || 'тодорхойгүй');
-        reply += `❌ Cover зураг солиход алдаа гарлаа: ${cvErr}\n`;
-      }
-      reply += `\n🎨 <b>Prompt:</b> ${prompt}`;
-      await sendMessage(chatId, reply);
     } catch (err) {
-      console.error('generate_all_photos error:', err);
+      console.error('generate_profile error:', err);
       await sendMessage(chatId, `❌ Алдаа гарлаа: ${err.message}`);
     }
     return NextResponse.json({ ok: true });

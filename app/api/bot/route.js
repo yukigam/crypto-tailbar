@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { sendMessage, setWebhook, getWebhookInfo, handleCommand, getCommand, buildPostMessage } from '../../../lib/bot/telegram';
-import { postToFacebook, setCoverPhoto } from '../../../lib/bot/facebook';
+import { postToFacebook, setCoverPhoto, setProfilePhoto } from '../../../lib/bot/facebook';
 import { getPosts, getCommunityPosts } from '../../../lib/sanity';
 import { mapSanityPosts } from '../../../lib/mapPost';
 
@@ -129,6 +129,50 @@ async function handleTelegramUpdate(update) {
     return NextResponse.json({ ok: true });
   }
 
+  // /generate_all_photos — generate profile + cover images and update Facebook
+  if (command === '/generate_all_photos') {
+    const prompt = text.slice('/generate_all_photos'.length).trim();
+    if (!prompt) {
+      await sendMessage(chatId, 'Зураг үүсгэх текстээ оруулна уу.\n\nЖишээ: <code>/generate_all_photos Crypto blockchain theme with gold and blue gradient, modern tech style</code>');
+      return NextResponse.json({ ok: true });
+    }
+    await sendMessage(chatId, '⏳ 2 зураг (профайл + cover) үүсгэж байна... Энэ хэдэн секунд үргэлжилж болно.');
+    try {
+      const [profileUrl, coverUrl] = await Promise.all([
+        generateImage(prompt, {
+          size: '1024x1024',
+          suffix: 'Facebook profile picture, square 1:1 aspect ratio, close-up centered subject, professional, high quality, no text, no watermark.',
+        }),
+        generateImage(prompt, {
+          size: '1024x512',
+          suffix: 'Facebook page cover photo, landscape orientation, wide banner, high quality, professional look, no text, no watermark.',
+        }),
+      ]);
+      if (!profileUrl && !coverUrl) throw new Error('Both image generations failed');
+      await sendMessage(chatId, '📤 Facebook профайл болон cover хуудас руу хуулж байна...');
+      const results = await Promise.allSettled([
+        profileUrl ? setProfilePhoto(profileUrl) : Promise.resolve(null),
+        coverUrl ? setCoverPhoto(coverUrl) : Promise.resolve(null),
+      ]);
+      let reply = '';
+      if (results[0].status === 'fulfilled' && results[0].value?.id) {
+        reply += '✅ Профайл зураг амжилттай солигдлоо!\n';
+      } else {
+        reply += '❌ Профайл зураг солиход алдаа гарлаа.\n';
+      }
+      if (results[1].status === 'fulfilled' && (results[1].value?.id || results[1].value?.success)) {
+        reply += '✅ Cover зураг амжилттай солигдлоо!\n';
+      } else {
+        reply += '❌ Cover зураг солиход алдаа гарлаа.\n';
+      }
+      reply += `\n🎨 <b>Prompt:</b> ${prompt}`;
+      await sendMessage(chatId, reply);
+    } catch (err) {
+      await sendMessage(chatId, `❌ Алдаа гарлаа: ${err.message}`);
+    }
+    return NextResponse.json({ ok: true });
+  }
+
   // Unknown command or plain text — show help
   if (command) {
     await handleCommand('help', chatId);
@@ -147,8 +191,8 @@ async function handleFacebookPost(body) {
   return NextResponse.json({ success: true, result });
 }
 
-async function generateImage(prompt) {
-  const fullPrompt = `${prompt}. Facebook page cover photo, landscape orientation, high quality, professional look, 1600x600 resolution, no text, no watermark.`;
+async function generateImage(prompt, { size = '1024x1024', suffix = 'Facebook page cover photo, landscape orientation, high quality, professional look, no text, no watermark.' } = {}) {
+  const fullPrompt = `${prompt}. ${suffix}`;
 
   const res = await fetch('https://openrouter.ai/api/v1/images/generations', {
     method: 'POST',
@@ -162,7 +206,7 @@ async function generateImage(prompt) {
       model: 'black-forest-labs/flux-schnell',
       prompt: fullPrompt,
       n: 1,
-      size: '1024x1024',
+      size,
     }),
   });
 

@@ -1,9 +1,15 @@
 import { NextResponse } from 'next/server';
-import { waitUntil } from '@vercel/functions';
+import { waitUntil as vercelWaitUntil } from '@vercel/functions';
 import { sendMessage, setWebhook, getWebhookInfo, handleCommand, getCommand, buildPostMessage } from '../../../lib/bot/telegram';
 import { postToFacebook, setCoverPhoto, setProfilePhoto } from '../../../lib/bot/facebook';
 import { getPosts, getCommunityPosts } from '../../../lib/sanity';
 import { mapSanityPosts } from '../../../lib/mapPost';
+
+function getScheduler(request) {
+  if (typeof request?.waitUntil === 'function') return request.waitUntil;
+  if (typeof globalThis.waitUntil === 'function') return globalThis.waitUntil;
+  return vercelWaitUntil;
+}
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
@@ -36,12 +42,10 @@ export async function POST(request) {
   try {
     const body = await request.json();
 
-    // Handle Telegram webhook update
     if (body.update_id) {
-      return handleTelegramUpdate(body);
+      return handleTelegramUpdate(request, body);
     }
 
-    // Handle internal action (e.g. from cron job)
     if (body.action === 'post-to-facebook') {
       return handleFacebookPost(body);
     }
@@ -53,7 +57,7 @@ export async function POST(request) {
   }
 }
 
-async function handleTelegramUpdate(update) {
+async function handleTelegramUpdate(request, update) {
   const msg = update.message || update.channel_post;
   if (!msg) return NextResponse.json({ ok: true });
 
@@ -61,8 +65,8 @@ async function handleTelegramUpdate(update) {
   const text = msg.text || msg.caption || '';
 
   const command = getCommand(text);
+  const schedule = getScheduler(request);
 
-  // /posts — send latest 5 posts
   if (command === '/posts') {
     try {
       const data = await getPosts();
@@ -79,7 +83,6 @@ async function handleTelegramUpdate(update) {
     return NextResponse.json({ ok: true });
   }
 
-  // /recent — send market news
   if (command === '/recent') {
     try {
       const data = await getPosts();
@@ -102,13 +105,11 @@ async function handleTelegramUpdate(update) {
     return NextResponse.json({ ok: true });
   }
 
-  // Commands from COMMANDS map (start, help, about) — fast, no background work
   if (command && ['/start', '/help', '/about'].includes(command)) {
     const handled = await handleCommand(command, chatId);
     if (handled) return NextResponse.json({ ok: true });
   }
 
-  // /generate_cover — generate AI image and set as Facebook cover
   if (command === '/generate_cover') {
     const prompt = text.slice('/generate_cover'.length).trim();
     if (!prompt) {
@@ -116,25 +117,10 @@ async function handleTelegramUpdate(update) {
       return NextResponse.json({ ok: true });
     }
     await sendMessage(chatId, '⏳ Зураг үүсгэж байна... Энэ хэдэн секунд үргэлжилж болно.');
-    waitUntil((async () => {
-      try {
-        const imageUrl = await generateImage(prompt);
-        if (!imageUrl) throw new Error('No image URL returned');
-        await sendMessage(chatId, '📤 Facebook cover болгон хуулж байна...');
-        const fbResult = await setCoverPhoto(imageUrl);
-        if (fbResult.id || fbResult.success) {
-          await sendMessage(chatId, `✅ Нүүр зураг амжилттай солигдлоо!\n\n🎨 <b>Prompt:</b> ${prompt}\n🖼 <a href="${imageUrl}">Зураг харах</a>`);
-        } else {
-          await sendMessage(chatId, `❌ Facebook дээр cover солиход алдаа гарлаа: ${JSON.stringify(fbResult)}`);
-        }
-      } catch (err) {
-        await sendMessage(chatId, `❌ Алдаа гарлаа: ${err.message}`);
-      }
-    })());
+    schedule(runGenerateCover(chatId, prompt));
     return NextResponse.json({ ok: true });
   }
 
-  // /generate_all_photos — generate profile + cover images and update Facebook
   if (command === '/generate_all_photos') {
     const prompt = text.slice('/generate_all_photos'.length).trim();
     if (!prompt) {
@@ -142,64 +128,91 @@ async function handleTelegramUpdate(update) {
       return NextResponse.json({ ok: true });
     }
     await sendMessage(chatId, '⏳ 2 зураг (профайл + cover) үүсгэж байна... Энэ хэдэн секунд үргэлжилж болно.');
-    waitUntil((async () => {
-      try {
-        const [profileUrl, coverUrl] = await Promise.all([
-          generateImage(prompt, {
-            size: '1024x1024',
-            suffix: 'Facebook profile picture, square 1:1 aspect ratio, close-up centered subject, professional, high quality, no text, no watermark.',
-          }),
-          generateImage(prompt, {
-            size: '1024x512',
-            suffix: 'Facebook page cover photo, landscape orientation, wide banner, high quality, professional look, no text, no watermark.',
-          }),
-        ]);
-        if (!profileUrl && !coverUrl) throw new Error('Both image generations failed');
-        await sendMessage(chatId, '📤 Facebook профайл болон cover хуудас руу хуулж байна...');
-        const results = await Promise.allSettled([
-          profileUrl ? setProfilePhoto(profileUrl) : Promise.resolve(null),
-          coverUrl ? setCoverPhoto(coverUrl) : Promise.resolve(null),
-        ]);
-        let reply = '';
-        if (results[0].status === 'fulfilled' && results[0].value?.id) {
-          reply += '✅ Профайл зураг амжилттай солигдлоо!\n';
-        } else {
-          reply += '❌ Профайл зураг солиход алдаа гарлаа.\n';
-        }
-        if (results[1].status === 'fulfilled' && (results[1].value?.id || results[1].value?.success)) {
-          reply += '✅ Cover зураг амжилттай солигдлоо!\n';
-        } else {
-          reply += '❌ Cover зураг солиход алдаа гарлаа.\n';
-        }
-        reply += `\n🎨 <b>Prompt:</b> ${prompt}`;
-        await sendMessage(chatId, reply);
-      } catch (err) {
-        await sendMessage(chatId, `❌ Алдаа гарлаа: ${err.message}`);
-      }
-    })());
+    schedule(runGenerateAllPhotos(chatId, prompt));
     return NextResponse.json({ ok: true });
   }
 
-  // Plain text — answer using AI (Gemini via OpenRouter)
   if (!command && text.trim()) {
     await sendMessage(chatId, '💬 Бодож байна...');
-    waitUntil((async () => {
-      try {
-        const answer = await generateChatResponse(text);
-        await sendMessage(chatId, answer);
-      } catch (err) {
-        await sendMessage(chatId, `❌ Алдаа гарлаа: ${err.message}`);
-      }
-    })());
+    schedule(runChatResponse(chatId, text));
     return NextResponse.json({ ok: true });
   }
 
-  // Unknown command — show help
   if (command) {
     await handleCommand('help', chatId);
   }
 
   return NextResponse.json({ ok: true });
+}
+
+async function runGenerateCover(chatId, prompt) {
+  try {
+    const imageUrl = await generateImage(prompt);
+    if (!imageUrl) throw new Error('OpenRouter зураг үүсгэх API хариулт хоосон байна. Токен эсвэл моделийн хязгаарлалт шалгана уу.');
+    await sendMessage(chatId, '📤 Facebook cover болгон хуулж байна...');
+    const fbResult = await setCoverPhoto(imageUrl);
+    if (fbResult.id || fbResult.success) {
+      await sendMessage(chatId, `✅ Нүүр зураг амжилттай солигдлоо!\n\n🎨 <b>Prompt:</b> ${prompt}\n🖼 <a href="${imageUrl}">Зураг харах</a>`);
+    } else {
+      const fbError = fbResult?.error?.message ? `Facebook алдаа: ${fbResult.error.message}` : `Facebook хариулт: ${JSON.stringify(fbResult)}`;
+      await sendMessage(chatId, `❌ Facebook дээр cover солиход алдаа гарлаа.\n\n${fbError}`);
+    }
+  } catch (err) {
+    const errorText = `❌ Алдаа гарлаа: ${err.message}`;
+    console.error('runGenerateCover error:', err);
+    await sendMessage(chatId, errorText);
+  }
+}
+
+async function runGenerateAllPhotos(chatId, prompt) {
+  try {
+    const [profileUrl, coverUrl] = await Promise.all([
+      generateImage(prompt, {
+        size: '1024x1024',
+        suffix: 'Facebook profile picture, square 1:1 aspect ratio, close-up centered subject, professional, high quality, no text, no watermark.',
+      }),
+      generateImage(prompt, {
+        size: '1024x512',
+        suffix: 'Facebook page cover photo, landscape orientation, wide banner, high quality, professional look, no text, no watermark.',
+      }),
+    ]);
+    if (!profileUrl && !coverUrl) throw new Error('OpenRouter зураг үүсгэх API хоёр хариултыг хоосон буцаасан. Токен эсвэл моделийн хязгаарлалт шалгана уу.');
+    await sendMessage(chatId, '📤 Facebook профайл болон cover хуудас руу хуулж байна...');
+    const results = await Promise.allSettled([
+      profileUrl ? setProfilePhoto(profileUrl) : Promise.resolve(null),
+      coverUrl ? setCoverPhoto(coverUrl) : Promise.resolve(null),
+    ]);
+    let reply = '';
+    if (results[0].status === 'fulfilled' && results[0].value?.id) {
+      reply += '✅ Профайл зураг амжилттай солигдлоо!\n';
+    } else {
+      const pfErr = results[0].status === 'rejected' ? results[0].reason?.message : (results[0].value?.error?.message || 'тодорхойгүй');
+      reply += `❌ Профайл зураг солиход алдаа гарлаа: ${pfErr}\n`;
+    }
+    if (results[1].status === 'fulfilled' && (results[1].value?.id || results[1].value?.success)) {
+      reply += '✅ Cover зураг амжилттай солигдлоо!\n';
+    } else {
+      const cvErr = results[1].status === 'rejected' ? results[1].reason?.message : (results[1].value?.error?.message || 'тодорхойгүй');
+      reply += `❌ Cover зураг солиход алдаа гарлаа: ${cvErr}\n`;
+    }
+    reply += `\n🎨 <b>Prompt:</b> ${prompt}`;
+    await sendMessage(chatId, reply);
+  } catch (err) {
+    const errorText = `❌ Алдаа гарлаа: ${err.message}`;
+    console.error('runGenerateAllPhotos error:', err);
+    await sendMessage(chatId, errorText);
+  }
+}
+
+async function runChatResponse(chatId, text) {
+  try {
+    const answer = await generateChatResponse(text);
+    await sendMessage(chatId, answer);
+  } catch (err) {
+    const errorText = `❌ Алдаа гарлаа: ${err.message}`;
+    console.error('runChatResponse error:', err);
+    await sendMessage(chatId, errorText);
+  }
 }
 
 async function handleFacebookPost(body) {
@@ -235,7 +248,7 @@ async function generateChatResponse(prompt) {
 
   if (!res.ok) {
     const errText = await res.text();
-    throw new Error(`OpenRouter ${res.status}: ${errText}`);
+    throw new Error(`OpenRouter API ${res.status}: ${errText.slice(0, 200)}`);
   }
 
   const data = await res.json();
@@ -263,7 +276,7 @@ async function generateImage(prompt, { size = '1024x1024', suffix = 'Facebook pa
 
   if (!res.ok) {
     const errText = await res.text();
-    throw new Error(`OpenRouter ${res.status}: ${errText}`);
+    throw new Error(`OpenRouter Image API ${res.status}: ${errText.slice(0, 200)}`);
   }
 
   const data = await res.json();

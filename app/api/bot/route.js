@@ -180,7 +180,21 @@ async function handleTelegramUpdate(update) {
     return NextResponse.json({ ok: true });
   }
 
-  // Unknown command or plain text — show help
+  // Plain text — answer using AI (Gemini via OpenRouter)
+  if (!command && text.trim()) {
+    await sendMessage(chatId, '💬 Бодож байна...');
+    waitUntil((async () => {
+      try {
+        const answer = await generateChatResponse(text);
+        await sendMessage(chatId, answer);
+      } catch (err) {
+        await sendMessage(chatId, `❌ Алдаа гарлаа: ${err.message}`);
+      }
+    })());
+    return NextResponse.json({ ok: true });
+  }
+
+  // Unknown command — show help
   if (command) {
     await handleCommand('help', chatId);
   }
@@ -196,6 +210,36 @@ async function handleFacebookPost(body) {
   const fbMessage = message || `📰 ${title}\n\nДэлгэрэнгүй: ${link}`;
   const result = await postToFacebook(fbMessage, link, title);
   return NextResponse.json({ success: true, result });
+}
+
+async function generateChatResponse(prompt) {
+  const systemPrompt = 'Та Crypto Tailbar-ын туслах бот юм. Монгол хэлээр крипто валют, блокчейн технологийн тухай асуултад хариулна. Товч, ойлгомжтой, хэрэгцээтэй мэдээлэл өгнө. Хариултаа 3-4 өгүүлбэрээр хязгаарла.';
+
+  const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+      'HTTP-Referer': 'https://crypto-tailbar.vercel.app',
+      'X-Title': 'Crypto Tailbar',
+    },
+    body: JSON.stringify({
+      model: 'google/gemini-2.5-flash',
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: prompt },
+      ],
+      max_tokens: 500,
+    }),
+  });
+
+  if (!res.ok) {
+    const errText = await res.text();
+    throw new Error(`OpenRouter ${res.status}: ${errText}`);
+  }
+
+  const data = await res.json();
+  return data.choices?.[0]?.message?.content || 'Уучлаарай, хариулт үүсгэж чадсангүй.';
 }
 
 async function generateImage(prompt, { size = '1024x1024', suffix = 'Facebook page cover photo, landscape orientation, high quality, professional look, no text, no watermark.' } = {}) {

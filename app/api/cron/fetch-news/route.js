@@ -62,8 +62,6 @@ const stripCodeFences = (text) => text.replace(/```(?:json)?\n?/gi, '').trim();
 
 const MAX_ARTICLES_TOTAL = 6;
 
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
-
 export async function GET(request) {
   const auth = request.headers.get('authorization');
   const secret = process.env.CRON_SECRET;
@@ -121,6 +119,9 @@ export async function GET(request) {
     }
 
     try {
+      const apiKey = process.env.OPENROUTER_API_KEY || '';
+      if (!apiKey) console.error('[cron] OPENROUTER_API_KEY is empty on Vercel runtime');
+      else console.error(`[cron] OPENROUTER_API_KEY length: ${apiKey.length}`);
       const prompt = `You are a professional crypto news translator for "КриптоТайлбарлагч", a Mongolian crypto education blog.
 
 Translate the English crypto news below into natural, engaging Mongolian. Write it as a professional blog post for beginners.
@@ -146,14 +147,14 @@ Title: ${article.title}
 Published: ${article.pubDate}
 Content: ${article.content}`;
 
-      const headers = new Headers();
-      headers.set('Content-Type', 'application/json');
-      headers.set('Authorization', `Bearer ${OPENROUTER_API_KEY}`);
-      headers.set('HTTP-Referer', 'https://crypto-tailbar.vercel.app');
-      headers.set('X-Title', 'Crypto Tailbar');
       const orRes = await fetch('https://openrouter.ai/api/v1/chat/completions', {
         method: 'POST',
-        headers,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${apiKey}`,
+          'HTTP-Referer': 'https://crypto-tailbar.vercel.app',
+          'X-Title': 'Crypto Tailbar',
+        },
         body: JSON.stringify({
           model: 'google/gemini-2.5-flash',
           messages: [{ role: 'user', content: prompt }],

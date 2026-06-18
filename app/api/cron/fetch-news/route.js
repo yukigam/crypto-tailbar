@@ -3,6 +3,7 @@ import Parser from 'rss-parser';
 import { CATEGORY_IDS } from '../../../../lib/categories';
 
 export const maxDuration = 120;
+export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const RSS_FEEDS = [
@@ -119,9 +120,8 @@ export async function GET(request) {
     }
 
     try {
-      const apiKey = process.env.OPENROUTER_API_KEY || '';
-      if (!apiKey) console.error('[cron] OPENROUTER_API_KEY is empty on Vercel runtime');
-      else console.error(`[cron] OPENROUTER_API_KEY length: ${apiKey.length}`);
+      const apiKey = process.env.OPENROUTER_API_KEY;
+      if (!apiKey) throw new Error(`OPENROUTER_API_KEY env var not found (runtime: nodejs, defined: ${typeof apiKey})`);
       const prompt = `You are a professional crypto news translator for "КриптоТайлбарлагч", a Mongolian crypto education blog.
 
 Translate the English crypto news below into natural, engaging Mongolian. Write it as a professional blog post for beginners.

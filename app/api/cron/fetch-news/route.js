@@ -119,6 +119,9 @@ export async function GET(request) {
     }
 
     try {
+      const key = process.env.OPENROUTER_API_KEY;
+      if (!key) throw new Error('OPENROUTER_API_KEY env var is NOT SET');
+      if (key.length < 10) throw new Error(`OPENROUTER_API_KEY too short (${key.length} chars): "${key}"`);
       const prompt = `You are a professional crypto news translator for "КриптоТайлбарлагч", a Mongolian crypto education blog.
 
 Translate the English crypto news below into natural, engaging Mongolian. Write it as a professional blog post for beginners.
@@ -149,6 +152,8 @@ Content: ${article.content}`;
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+          'HTTP-Referer': 'https://crypto-tailbar.vercel.app',
+          'X-Title': 'Crypto Tailbar',
         },
         body: JSON.stringify({
           model: 'google/gemini-2.5-flash',

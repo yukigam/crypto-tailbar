@@ -2,6 +2,7 @@ import { createClient } from '@sanity/client';
 import Parser from 'rss-parser';
 import { CATEGORY_IDS } from '../../../../lib/categories';
 
+export const runtime = 'nodejs';
 export const maxDuration = 120;
 export const dynamic = 'force-dynamic';
 

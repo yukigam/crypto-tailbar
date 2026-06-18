@@ -63,7 +63,6 @@ const stripCodeFences = (text) => text.replace(/```(?:json)?\n?/gi, '').trim();
 const MAX_ARTICLES_TOTAL = 6;
 
 export async function GET(request) {
-  try {
   const auth = request.headers.get('authorization');
   const secret = process.env.CRON_SECRET;
   if (secret && auth !== `Bearer ${secret}`) {
@@ -71,8 +70,8 @@ export async function GET(request) {
   }
 
   const sanityClient = createClient({
-    projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || process.env.SANITY_PROJECT_ID,
-    dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || process.env.SANITY_DATASET,
+    projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || process.env.SANITY_PROJECT_ID || '88ym68hf',
+    dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || process.env.SANITY_DATASET || 'production',
     apiVersion: '2024-01-01',
     token: process.env.SANITY_API_WRITE_TOKEN || process.env.SANITY_API_TOKEN,
     useCdn: false,
@@ -199,8 +198,4 @@ Content: ${article.content}`;
   }
 
   return Response.json({ success: true, results });
-  } catch (err) {
-    console.error('Cron fatal error:', err);
-    return Response.json({ success: false, error: err.message, stack: err.stack?.split('\n').slice(0, 5).join('\n') }, { status: 500 });
-  }
 }

@@ -63,7 +63,6 @@ const stripCodeFences = (text) => text.replace(/```(?:json)?\n?/gi, '').trim();
 const MAX_ARTICLES_TOTAL = 6;
 
 export async function GET(request) {
-  const apiKey = process.env.OPENROUTER_API_KEY;
   const auth = request.headers.get('authorization');
   const secret = process.env.CRON_SECRET;
   if (secret && auth !== `Bearer ${secret}`) {
@@ -120,7 +119,6 @@ export async function GET(request) {
     }
 
     try {
-      if (!apiKey) throw new Error('OPENROUTER_API_KEY env var is NOT SET');
       const prompt = `You are a professional crypto news translator for "КриптоТайлбарлагч", a Mongolian crypto education blog.
 
 Translate the English crypto news below into natural, engaging Mongolian. Write it as a professional blog post for beginners.
@@ -150,9 +148,7 @@ Content: ${article.content}`;
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${apiKey}`,
-          'HTTP-Referer': 'https://crypto-tailbar.vercel.app',
-          'X-Title': 'Crypto Tailbar',
+          Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
         },
         body: JSON.stringify({
           model: 'google/gemini-2.5-flash',

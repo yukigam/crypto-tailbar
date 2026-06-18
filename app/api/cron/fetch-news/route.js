@@ -63,6 +63,7 @@ const stripCodeFences = (text) => text.replace(/```(?:json)?\n?/gi, '').trim();
 const MAX_ARTICLES_TOTAL = 6;
 
 export async function GET(request) {
+  try {
   const auth = request.headers.get('authorization');
   const secret = process.env.CRON_SECRET;
   if (secret && auth !== `Bearer ${secret}`) {
@@ -198,4 +199,8 @@ Content: ${article.content}`;
   }
 
   return Response.json({ success: true, results });
+  } catch (err) {
+    console.error('Cron fatal error:', err);
+    return Response.json({ success: false, error: err.message, stack: err.stack?.split('\n').slice(0, 5).join('\n') }, { status: 500 });
+  }
 }

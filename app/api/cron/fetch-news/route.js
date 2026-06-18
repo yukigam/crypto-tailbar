@@ -159,7 +159,7 @@ Content: ${article.content}`;
           model: 'google/gemini-2.5-flash',
           messages: [{ role: 'user', content: prompt }],
           temperature: 0.7,
-          max_tokens: 2500,
+          max_tokens: 1600,
         }),
       });
       if (!orRes.ok) throw new Error(`OpenRouter ${orRes.status}: ${await orRes.text()}`);

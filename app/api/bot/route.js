@@ -1,10 +1,8 @@
 import { NextResponse } from 'next/server';
 import { sendMessage, setWebhook, getWebhookInfo, handleCommand, getCommand, buildPostMessage } from '../../../lib/bot/telegram';
-import { postToFacebook, setCoverPhoto, setProfilePhoto } from '../../../lib/bot/facebook';
+import { postToFacebook } from '../../../lib/bot/facebook';
 import { getPosts, getCommunityPosts } from '../../../lib/sanity';
 import { mapSanityPosts } from '../../../lib/mapPost';
-
-export const maxDuration = 60;
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
@@ -37,10 +35,12 @@ export async function POST(request) {
   try {
     const body = await request.json();
 
+    // Handle Telegram webhook update
     if (body.update_id) {
-      return await handleTelegramUpdate(body);
+      return handleTelegramUpdate(body);
     }
 
+    // Handle internal action (e.g. from cron job)
     if (body.action === 'post-to-facebook') {
       return handleFacebookPost(body);
     }
@@ -60,7 +60,12 @@ async function handleTelegramUpdate(update) {
   const text = msg.text || msg.caption || '';
 
   const command = getCommand(text);
+  if (command) {
+    const handled = await handleCommand(command, chatId);
+    if (handled) return NextResponse.json({ ok: true });
+  }
 
+  // /posts — send latest 5 posts
   if (command === '/posts') {
     try {
       const data = await getPosts();
@@ -77,6 +82,7 @@ async function handleTelegramUpdate(update) {
     return NextResponse.json({ ok: true });
   }
 
+  // /recent — send market news
   if (command === '/recent') {
     try {
       const data = await getPosts();
@@ -99,79 +105,7 @@ async function handleTelegramUpdate(update) {
     return NextResponse.json({ ok: true });
   }
 
-  if (command && ['/start', '/help', '/about'].includes(command)) {
-    const handled = await handleCommand(command, chatId);
-    if (handled) return NextResponse.json({ ok: true });
-  }
-
-  if (command === '/generate_cover') {
-    const prompt = text.slice('/generate_cover'.length).trim();
-    if (!prompt) {
-      await sendMessage(chatId, '🎨 <b>AI нүүр зураг үүсгэх</b>\n\n/generate_cover [текст] — Тайлбарын дагуу AI зураг үүсгэж, Facebook хуудасны Cover болгоно.\n\nЖишээ: <code>/generate_cover Bitcoin mining in the Mongolian steppe with modern rigs under aurora sky</code>');
-      return NextResponse.json({ ok: true });
-    }
-    await sendMessage(chatId, '⏳ Зураг үүсгэж байна... Энэ хэдэн секунд үргэлжилж болно.');
-    try {
-      const imageUrl = await generateImage(prompt, {
-        size: '1024x512',
-        suffix: 'Facebook page cover photo, landscape orientation, wide banner, high quality, professional look, no text, no watermark.',
-      });
-      if (!imageUrl) throw new Error('OpenRouter зураг үүсгэх API хариулт хоосон байна. Токен эсвэл моделийн хязгаарлалт шалгана уу.');
-      await sendMessage(chatId, '📤 Facebook cover болгон хуулж байна...');
-      const fbResult = await setCoverPhoto(imageUrl);
-      if (fbResult.id || fbResult.success) {
-        await sendMessage(chatId, `✅ Нүүр зураг амжилттай солигдлоо!\n\n🎨 <b>Prompt:</b> ${prompt}\n🖼 <a href="${imageUrl}">Зураг харах</a>`);
-      } else {
-        const fbError = fbResult?.error?.message ? `Facebook алдаа: ${fbResult.error.message}` : `Facebook хариулт: ${JSON.stringify(fbResult)}`;
-        await sendMessage(chatId, `❌ Facebook дээр cover солиход алдаа гарлаа.\n\n${fbError}`);
-      }
-    } catch (err) {
-      console.error('generate_cover error:', err);
-      await sendMessage(chatId, `❌ Алдаа гарлаа: ${err.message}`);
-    }
-    return NextResponse.json({ ok: true });
-  }
-
-  if (command === '/generate_profile') {
-    const prompt = text.slice('/generate_profile'.length).trim();
-    if (!prompt) {
-      await sendMessage(chatId, '🎨 <b>AI профайл зураг үүсгэх</b>\n\n/generate_profile [текст] — Тайлбарын дагуу AI зураг үүсгэж, Facebook хуудасны Профайл зураг болгоно.\n\nЖишээ: <code>/generate_profile Crypto blockchain logo with gold and blue gradient, modern tech style</code>');
-      return NextResponse.json({ ok: true });
-    }
-    await sendMessage(chatId, '⏳ Зураг үүсгэж байна... Энэ хэдэн секунд үргэлжилж болно.');
-    try {
-      const imageUrl = await generateImage(prompt, {
-        size: '1024x1024',
-        suffix: 'Facebook profile picture, square 1:1 aspect ratio, close-up centered subject, professional, high quality, no text, no watermark.',
-      });
-      if (!imageUrl) throw new Error('OpenRouter зураг үүсгэх API хариулт хоосон байна. Токен эсвэл моделийн хязгаарлалт шалгана уу.');
-      await sendMessage(chatId, '📤 Facebook профайл болгон хуулж байна...');
-      const fbResult = await setProfilePhoto(imageUrl);
-      if (fbResult.id || fbResult.success) {
-        await sendMessage(chatId, `✅ Профайл зураг амжилттай солигдлоо!\n\n🎨 <b>Prompt:</b> ${prompt}\n🖼 <a href="${imageUrl}">Зураг харах</a>`);
-      } else {
-        const fbError = fbResult?.error?.message ? `Facebook алдаа: ${fbResult.error.message}` : `Facebook хариулт: ${JSON.stringify(fbResult)}`;
-        await sendMessage(chatId, `❌ Facebook дээр профайл зураг солиход алдаа гарлаа.\n\n${fbError}`);
-      }
-    } catch (err) {
-      console.error('generate_profile error:', err);
-      await sendMessage(chatId, `❌ Алдаа гарлаа: ${err.message}`);
-    }
-    return NextResponse.json({ ok: true });
-  }
-
-  if (!command && text.trim()) {
-    await sendMessage(chatId, '💬 Бодож байна...');
-    try {
-      const answer = await generateChatResponse(text);
-      await sendMessage(chatId, answer);
-    } catch (err) {
-      console.error('chat error:', err);
-      await sendMessage(chatId, `❌ Алдаа гарлаа: ${err.message}`);
-    }
-    return NextResponse.json({ ok: true });
-  }
-
+  // Unknown command or plain text — show help
   if (command) {
     await handleCommand('help', chatId);
   }
@@ -187,62 +121,4 @@ async function handleFacebookPost(body) {
   const fbMessage = message || `📰 ${title}\n\nДэлгэрэнгүй: ${link}`;
   const result = await postToFacebook(fbMessage, link, title);
   return NextResponse.json({ success: true, result });
-}
-
-async function generateChatResponse(prompt) {
-  const systemPrompt = 'Та Crypto Tailbar-ын туслах бот юм. Монгол хэлээр крипто валют, блокчейн технологийн тухай асуултад хариулна. Товч, ойлгомжтой, хэрэгцээтэй мэдээлэл өгнө. Хариултаа 3-4 өгүүлбэрээр хязгаарла.';
-
-  const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
-      'HTTP-Referer': 'https://crypto-tailbar.vercel.app',
-      'X-Title': 'Crypto Tailbar',
-    },
-    body: JSON.stringify({
-      model: 'google/gemini-2.5-flash',
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: prompt },
-      ],
-      max_tokens: 500,
-    }),
-  });
-
-  if (!res.ok) {
-    const errText = await res.text();
-    throw new Error(`OpenRouter API ${res.status}: ${errText.slice(0, 200)}`);
-  }
-
-  const data = await res.json();
-  return data.choices?.[0]?.message?.content || 'Уучлаарай, хариулт үүсгэж чадсангүй.';
-}
-
-async function generateImage(prompt, { size = '1024x1024', suffix = 'Facebook page cover photo, landscape orientation, high quality, professional look, no text, no watermark.' } = {}) {
-  const fullPrompt = `${prompt}. ${suffix}`;
-
-  const res = await fetch('https://openrouter.ai/api/v1/images/generations', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
-      'HTTP-Referer': 'https://crypto-tailbar.vercel.app',
-      'X-Title': 'Crypto Tailbar',
-    },
-    body: JSON.stringify({
-      model: 'black-forest-labs/flux-schnell',
-      prompt: fullPrompt,
-      n: 1,
-      size,
-    }),
-  });
-
-  if (!res.ok) {
-    const errText = await res.text();
-    throw new Error(`OpenRouter Image API ${res.status}: ${errText.slice(0, 200)}`);
-  }
-
-  const data = await res.json();
-  return data.data?.[0]?.url || null;
 }

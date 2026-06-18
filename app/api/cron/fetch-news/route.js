@@ -121,6 +121,8 @@ export async function GET(request) {
     }
 
     try {
+      if (!OPENROUTER_API_KEY) throw new Error('OPENROUTER_API_KEY is empty/undefined on Vercel runtime');
+      if (OPENROUTER_API_KEY.length < 10) throw new Error(`OPENROUTER_API_KEY too short (${OPENROUTER_API_KEY.length} chars)`);
       const prompt = `You are a professional crypto news translator for "КриптоТайлбарлагч", a Mongolian crypto education blog.
 
 Translate the English crypto news below into natural, engaging Mongolian. Write it as a professional blog post for beginners.

@@ -121,8 +121,6 @@ export async function GET(request) {
     }
 
     try {
-      if (!OPENROUTER_API_KEY) throw new Error('OPENROUTER_API_KEY is empty/undefined on Vercel runtime');
-      if (OPENROUTER_API_KEY.length < 10) throw new Error(`OPENROUTER_API_KEY too short (${OPENROUTER_API_KEY.length} chars)`);
       const prompt = `You are a professional crypto news translator for "КриптоТайлбарлагч", a Mongolian crypto education blog.
 
 Translate the English crypto news below into natural, engaging Mongolian. Write it as a professional blog post for beginners.
@@ -148,14 +146,14 @@ Title: ${article.title}
 Published: ${article.pubDate}
 Content: ${article.content}`;
 
+      const headers = new Headers();
+      headers.set('Content-Type', 'application/json');
+      headers.set('Authorization', `Bearer ${OPENROUTER_API_KEY}`);
+      headers.set('HTTP-Referer', 'https://crypto-tailbar.vercel.app');
+      headers.set('X-Title', 'Crypto Tailbar');
       const orRes = await fetch('https://openrouter.ai/api/v1/chat/completions', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${OPENROUTER_API_KEY}`,
-          'HTTP-Referer': 'https://crypto-tailbar.vercel.app',
-          'X-Title': 'Crypto Tailbar',
-        },
+        headers,
         body: JSON.stringify({
           model: 'google/gemini-2.5-flash',
           messages: [{ role: 'user', content: prompt }],

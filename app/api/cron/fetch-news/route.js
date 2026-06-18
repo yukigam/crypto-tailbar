@@ -1,5 +1,6 @@
 import { createClient } from '@sanity/client';
 import Parser from 'rss-parser';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import { CATEGORY_IDS } from '../../../../lib/categories';
 
 export const runtime = 'nodejs';
@@ -64,7 +65,7 @@ const stripCodeFences = (text) => text.replace(/```(?:json)?\n?/gi, '').trim();
 const MAX_ARTICLES_TOTAL = 6;
 
 export async function GET(request) {
-  const apiKey = process.env.OPENROUTER_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY;
   const auth = request.headers.get('authorization');
   const secret = process.env.CRON_SECRET;
   if (secret && auth !== `Bearer ${secret}`) {
@@ -78,6 +79,10 @@ export async function GET(request) {
     token: process.env.SANITY_API_WRITE_TOKEN || process.env.SANITY_API_TOKEN,
     useCdn: false,
   });
+
+  if (!apiKey) throw new Error('GEMINI_API_KEY env var is NOT SET');
+  const genAI = new GoogleGenerativeAI(apiKey);
+  const gemini = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
   const parser = new Parser();
   const seen = new Set();
@@ -121,7 +126,6 @@ export async function GET(request) {
     }
 
     try {
-      if (!apiKey) throw new Error('OPENROUTER_API_KEY env var is NOT SET');
       const prompt = `You are a professional crypto news translator for "КриптоТайлбарлагч", a Mongolian crypto education blog.
 
 Translate the English crypto news below into natural, engaging Mongolian. Write it as a professional blog post for beginners.
@@ -130,7 +134,7 @@ Output ONLY valid JSON with these exact fields:
 {
   "title": "Catchy Mongolian title (max 80 chars)",
   "slug": "english-kebab-slug-derived-from-title",
-  "body": "Full Mongolian article with 3-5 paragraphs separated by \\\\n\\\\n",
+  "body": "Full Mongolian article with 3-5 paragraphs separated by \\n\\n",
   "excerpt": "1-2 sentence Mongolian summary",
   "category": "one of: beginners, bitcoin, ethereum, defi, trading, wallet, nft-web3, mining"
 }
@@ -147,24 +151,8 @@ Title: ${article.title}
 Published: ${article.pubDate}
 Content: ${article.content}`;
 
-      const orRes = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${apiKey}`,
-          'HTTP-Referer': 'https://crypto-tailbar.vercel.app',
-          'X-Title': 'Crypto Tailbar',
-        },
-        body: JSON.stringify({
-          model: 'google/gemini-2.5-flash',
-          messages: [{ role: 'user', content: prompt }],
-          temperature: 0.7,
-          max_tokens: 1600,
-        }),
-      });
-      if (!orRes.ok) throw new Error(`OpenRouter ${orRes.status}: ${await orRes.text()}`);
-      const orData = await orRes.json();
-      const raw = stripCodeFences(orData.choices?.[0]?.message?.content || '{}');
+      const result = await gemini.generateContent(prompt);
+      const raw = stripCodeFences(result.response.text());
       const translated = JSON.parse(raw);
 
       const slug = slugify(translated.slug || article.title).slice(0, 100);

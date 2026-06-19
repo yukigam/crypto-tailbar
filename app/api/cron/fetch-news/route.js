@@ -62,7 +62,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 const stripCodeFences = (text) => text.replace(/```(?:json)?\n?/gi, '').trim();
 
-const MAX_ARTICLES_TOTAL = 6;
+const MAX_ARTICLES_TOTAL = 1;
 
 export async function GET(request) {
   const apiKey = process.env.GEMINI_API_KEY;

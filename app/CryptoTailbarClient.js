@@ -1087,7 +1087,7 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
                 <div>
                   <h2 style={{ fontSize: 20, fontWeight: 850, borderBottom: `2px solid ${C.border}`, paddingBottom: 12, marginBottom: 24, color: C.ink }}>Зах зээлийн сүүлийн үеийн мэдээ</h2>
                   <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-                    {(uncategorizedPosts || []).map((p, i) => (
+                    {(uncategorizedPosts || []).slice(0, 6).map((p, i) => (
                       <div key={p.id} onClick={() => openPost(p)} className={`modern-card hover-glow list-article-card${i === 0 ? ' first-glow' : ''}`} style={{
                         display: "flex", gap: 24, padding: "20px", cursor: "pointer", background: C.bgDark, alignItems: "center",
                         border: i === 0 ? '2px solid rgba(52,211,153,0.5)' : `1px solid ${C.border}`,
@@ -1106,6 +1106,25 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
                       </div>
                     ))}
                   </div>
+                  <a
+                    href="/news"
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: 6,
+                      marginTop: 20,
+                      padding: "12px 18px",
+                      fontSize: 13,
+                      fontWeight: 800,
+                      color: C.accentBlue,
+                      textDecoration: "none",
+                      transition: "all 0.2s",
+                    }}
+                    className="sidebar-hover-item"
+                  >
+                    Бүгдийг үзэх →
+                  </a>
                 </div>
               </div>
 

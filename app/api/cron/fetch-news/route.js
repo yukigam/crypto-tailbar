@@ -1,7 +1,6 @@
 import { createClient } from '@sanity/client';
 import Parser from 'rss-parser';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { CATEGORY_IDS } from '../../../../lib/categories';
 
 export const runtime = 'nodejs';
 export const maxDuration = 120;
@@ -13,24 +12,6 @@ const RSS_FEEDS = [
   'https://cryptopotato.com/feed/',
   'https://news.bitcoin.com/feed/',
 ];
-
-const CATEGORY_RULES = [
-  { pattern: /bitcoin|btc|satoshi|halving/i, cat: 'bitcoin' },
-  { pattern: /ethereum|eth|vitalik|buterin|layer\s*2|arbitrum|optimism|base|polygon|zk-?sync/i, cat: 'ethereum' },
-  { pattern: /defi|decentralized finance|liquidity|yield|staking|lending|borrow|aave|compound|uni?swap|curve/i, cat: 'defi' },
-  { pattern: /nft|web3|metaverse|token\s*gate|digital.?collectible/i, cat: 'nft-web3' },
-  { pattern: /trading|exchange|market|price|analysis|bullish|bearish|altcoin|alt\s*season/i, cat: 'trading' },
-  { pattern: /wallet|custody|self.?custody|hardware.?wallet|ledger|trezor|seed.?phrase/i, cat: 'wallet' },
-  { pattern: /mining|miner|hashrate|proof.?of.?work|asic|pool/i, cat: 'mining' },
-];
-
-function pickCategory(title, content) {
-  const text = `${title} ${content}`;
-  for (const rule of CATEGORY_RULES) {
-    if (rule.pattern.test(text)) return rule.cat;
-  }
-  return 'beginners';
-}
 
 function slugify(text) {
   return text
@@ -135,8 +116,7 @@ Output ONLY valid JSON with these exact fields:
   "title": "Catchy Mongolian title (max 80 chars)",
   "slug": "english-kebab-slug-derived-from-title",
   "body": "Full Mongolian article with 3-5 paragraphs separated by \\n\\n",
-  "excerpt": "1-2 sentence Mongolian summary",
-  "category": "one of: beginners, bitcoin, ethereum, defi, trading, wallet, nft-web3, mining"
+  "excerpt": "1-2 sentence Mongolian summary"
 }
 
 Rules:
@@ -144,7 +124,6 @@ Rules:
 - Slug: kebab-case English from the Mongolian title meaning
 - Body: detailed, friendly, beginner-oriented, at least 3 paragraphs
 - Keep all original facts intact
-- Category: Be VERY precise. Only pure Bitcoin-specific news (halving, price, tech) → "bitcoin". General educational content, advice, guides, overviews → "beginners". Do NOT use "beginners" as a fallback for everything — only when the article is truly a general explainer or guide.
 
 Original article:
 Title: ${article.title}
@@ -166,25 +145,21 @@ Content: ${article.content}`;
         continue;
       }
 
-      const category = CATEGORY_IDS.includes(translated.category)
-        ? translated.category
-        : pickCategory(article.title, article.content);
       const docData = {
         _type: 'post',
         title: translated.title,
         slug: { _type: 'slug', current: slug },
         body: textToPortableText(translated.body),
         excerpt: translated.excerpt || '',
-        category,
         publishedAt: new Date().toISOString(),
-        ...(i < 2 && { market: true }),
+        market: true,
       };
 
       await sanityClient.mutate([
         { createOrReplace: { _id: slug, ...docData } },
       ]);
 
-      results.push({ title: translated.title, slug, category, status: 'published' });
+      results.push({ title: translated.title, slug, status: 'published' });
     } catch (err) {
       results.push({ title: article.title, status: 'error', error: err.message });
     }

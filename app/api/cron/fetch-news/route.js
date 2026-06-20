@@ -61,7 +61,7 @@ export async function GET(request) {
   });
 
   if (!apiKey) throw new Error('GEMINI_API_KEY env var is NOT SET');
-  const GEMINI_MODEL = 'gemini-2.0-flash';
+  const GEMINI_MODEL = 'gemini-1.5-flash';
 
   const parser = new Parser();
   const seen = new Set();

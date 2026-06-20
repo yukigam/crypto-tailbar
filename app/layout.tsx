@@ -12,9 +12,9 @@ export const metadata: Metadata = {
     template: "%s | Крипто Тайлбар Толь",
   },
   description:
-    "Крипто ертөнцийн бүх нарийн нэр томьёо, блокчэйн технологи, биткойн болон альткойны тухай ойлголтуудыг хамгийн энгийнээр тайлбарласан Монголын анхны крипто толь бичиг.",
+    "Крипто тайлбар толь бичиг. Блокчэйн, Биткойн, Койн гэж юу вэ? Crypto нэр томьёоны хамгийн энгийн тайлбарууд Монгол хэлээр (Cyrillic & Latin search friendly).",
   keywords:
-    "крипто тайлбар, крипто гэж юу вэ, блокчэйн тайлбар, биткойн гэж юу вэ, койн гэж юу вэ, крипто толь бичиг, crypto tailbar, blockchain mongolia, крипто сургалт, крипто арилжаа хийх заавар",
+    "крипто тайлбар, крипто гэж юу вэ, блокчэйн тайлбар, биткойн гэж юу вэ, койн гэж юу вэ, крипто толь бичиг, крипто сургалт, крипто арилжаа хийх заавар, цахим мөнгө, crypto tailbar, crypto gej yu ve, bitcoin gej yu ve, blockchain tailbar, coin gej yu ve, crypto toli bichig, crypto mgl, coin haanaas avah ve, coin ariljaa, crypto surgalt, blockchain mongolia",
   verification: {
     google: "ANxdo5-GCya_--dWhCSLTk9pSh3emfgEw_Y75MCgooU",
   },
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Крипто Тайлбар Толь — Блокчэйн, Криптог Энгийнээр",
     description:
-      "Крипто нэр томьёоноос эхлээд блокчэйн хэрхэн ажилладаг тухай бүх тайлбарыг нэг дороос Монгол хэлээр уншаарай.",
+      "Крипто нэр томьёо, блокчэйн технологи, биткойн болон альткойны тухай ойлголтуудыг хамгийн энгийнээр тайлбарласан толь бичиг. Bitcoin, Coin, Crypto gej yu ve?",
     locale: "mn_MN",
     siteName: "Crypto Tailbar",
     type: "website",

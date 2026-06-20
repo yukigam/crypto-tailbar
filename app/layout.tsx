@@ -8,16 +8,29 @@ const inter = Inter({ subsets: ["latin", "cyrillic"], display: "swap" });
 
 export const metadata: Metadata = {
   title: {
-    default: "КриптоТайлбарлагч | Монгол дахь крипто мэдлэгийн сан",
-    template: "%s | КриптоТайлбарлагч",
+    default: "Крипто Тайлбар Толь | Блокчэйн, Биткойн, Крипто Юу Вэ?",
+    template: "%s | Крипто Тайлбар Толь",
   },
   description:
-    "Монголчуудад крипто болон блокчейн технологийг энгийн, ойлгомжтой хэлбэрээр үнэ төлбөргүй хүргэх мэдлэгийн сан.",
+    "Крипто ертөнцийн бүх нарийн нэр томьёо, блокчэйн технологи, биткойн болон альткойны тухай ойлголтуудыг хамгийн энгийнээр тайлбарласан Монголын анхны крипто толь бичиг.",
+  keywords:
+    "крипто тайлбар, крипто гэж юу вэ, блокчэйн тайлбар, биткойн гэж юу вэ, койн гэж юу вэ, крипто толь бичиг, crypto tailbar, blockchain mongolia, крипто сургалт, крипто арилжаа хийх заавар",
   verification: {
     google: "ANxdo5-GCya_--dWhCSLTk9pSh3emfgEw_Y75MCgooU",
   },
   icons: {
     icon: "/favicon.ico",
+  },
+  openGraph: {
+    title: "Крипто Тайлбар Толь — Блокчэйн, Криптог Энгийнээр",
+    description:
+      "Крипто нэр томьёоноос эхлээд блокчэйн хэрхэн ажилладаг тухай бүх тайлбарыг нэг дороос Монгол хэлээр уншаарай.",
+    locale: "mn_MN",
+    siteName: "Crypto Tailbar",
+    type: "website",
+  },
+  alternates: {
+    canonical: "https://crypto-tailbar-gyrr.vercel.app/",
   },
 };
 

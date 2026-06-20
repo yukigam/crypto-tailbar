@@ -63,7 +63,7 @@ export async function GET(request) {
 
   if (!apiKey) throw new Error('GEMINI_API_KEY env var is NOT SET');
   const genAI = new GoogleGenerativeAI(apiKey);
-  const gemini = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+  const gemini = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-002' });
 
   const parser = new Parser();
   const seen = new Set();

@@ -1,5 +1,6 @@
 import { createClient } from '@sanity/client';
 import Parser from 'rss-parser';
+import Groq from 'groq-sdk';
 
 export const runtime = 'nodejs';
 export const maxDuration = 120;
@@ -45,7 +46,7 @@ const stripCodeFences = (text) => text.replace(/```(?:json)?\n?/gi, '').trim();
 const MAX_ARTICLES_TOTAL = 1;
 
 export async function GET(request) {
-  const apiKey = process.env.GEMINI_API_KEY;
+  const apiKey = process.env.GROQ_API_KEY;
   const auth = request.headers.get('authorization');
   const secret = process.env.CRON_SECRET;
   if (secret && auth !== `Bearer ${secret}`) {
@@ -60,8 +61,8 @@ export async function GET(request) {
     useCdn: false,
   });
 
-  if (!apiKey) throw new Error('GEMINI_API_KEY env var is NOT SET');
-  const GEMINI_MODEL = 'gemini-1.5-flash';
+  if (!apiKey) throw new Error('GROQ_API_KEY env var is NOT SET');
+  const groq = new Groq({ apiKey });
 
   const parser = new Parser();
   const seen = new Set();
@@ -128,17 +129,13 @@ Title: ${article.title}
 Published: ${article.pubDate}
 Content: ${article.content}`;
 
-      const gRes = await fetch(`https://generativelanguage.googleapis.com/v1/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.7, maxOutputTokens: 1600 },
-        }),
+      const completion = await groq.chat.completions.create({
+        messages: [{ role: 'user', content: prompt }],
+        model: 'llama-3.3-70b-versatile',
+        temperature: 0.7,
+        max_tokens: 1600,
       });
-      if (!gRes.ok) throw new Error(`Gemini ${gRes.status}: ${await gRes.text()}`);
-      const gData = await gRes.json();
-      const raw = stripCodeFences(gData.candidates?.[0]?.content?.parts?.[0]?.text || '{}');
+      const raw = stripCodeFences(completion.choices?.[0]?.message?.content || '{}');
       const translated = JSON.parse(raw);
 
       const slug = slugify(translated.slug || article.title).slice(0, 100);

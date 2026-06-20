@@ -1,6 +1,5 @@
 import { createClient } from '@sanity/client';
 import Parser from 'rss-parser';
-import { GoogleGenerativeAI } from '@google/generative-ai';
 
 export const runtime = 'nodejs';
 export const maxDuration = 120;
@@ -62,8 +61,7 @@ export async function GET(request) {
   });
 
   if (!apiKey) throw new Error('GEMINI_API_KEY env var is NOT SET');
-  const genAI = new GoogleGenerativeAI(apiKey);
-  const gemini = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-002' });
+  const GEMINI_MODEL = 'gemini-2.0-flash';
 
   const parser = new Parser();
   const seen = new Set();
@@ -130,8 +128,17 @@ Title: ${article.title}
 Published: ${article.pubDate}
 Content: ${article.content}`;
 
-      const result = await gemini.generateContent(prompt);
-      const raw = stripCodeFences(result.response.text());
+      const gRes = await fetch(`https://generativelanguage.googleapis.com/v1/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: { temperature: 0.7, maxOutputTokens: 1600 },
+        }),
+      });
+      if (!gRes.ok) throw new Error(`Gemini ${gRes.status}: ${await gRes.text()}`);
+      const gData = await gRes.json();
+      const raw = stripCodeFences(gData.candidates?.[0]?.content?.parts?.[0]?.text || '{}');
       const translated = JSON.parse(raw);
 
       const slug = slugify(translated.slug || article.title).slice(0, 100);

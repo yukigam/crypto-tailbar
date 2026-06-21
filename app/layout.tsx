@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
+import Script from "next/script";
 import GoogleAnalytics from "../components/GoogleAnalytics";
 import "../globals.css";
 
@@ -47,6 +48,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="mn">
       <body className={inter.className}>
+        <Script src="https://quge5.com/88/tag.min.js" data-zone="252181" strategy="beforeInteractive" data-cfasync="false" />
         <GoogleAnalytics />
         {children}
       </body>

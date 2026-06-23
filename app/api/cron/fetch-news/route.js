@@ -111,19 +111,27 @@ export async function GET(request) {
 
 Translate the English crypto news below into natural, engaging Mongolian. Write it as a professional blog post for beginners.
 
+CRITICAL: All Mongolian text MUST be spelled 100% correctly. Double-check every word for proper Cyrillic Mongolian spelling (жишээ нь: "зээллийг" биш "зээлийг", "компанийн" биш "компаны").
+
+For specialized crypto/finance/tech terms (like "liquidity", "tokenization", "collateral", etc.), write the Mongolian translation followed by a brief explanation in parentheses. Example: "ходоолго (барьцаа болгон тавьсан хөрөнгө)" or "ликвид байдал (хөрвөх чадвар)".
+
+Use pure Mongolian words as much as possible. Avoid Russian loanwords. If you must use a foreign term, explain it in parentheses.
+
 Output ONLY valid JSON with these exact fields:
 {
-  "title": "Catchy Mongolian title (max 80 chars)",
+  "title": "Catchy Mongolian title with correct spelling (max 80 chars)",
   "slug": "english-kebab-slug-derived-from-title",
-  "body": "Full Mongolian article with 3-5 paragraphs separated by \\n\\n",
-  "excerpt": "1-2 sentence Mongolian summary"
+  "body": "Full Mongolian article with 3-5 paragraphs separated by \\n\\n. Each specialized term must have (тайлбар) in parentheses.",
+  "excerpt": "1-2 sentence Mongolian summary with correct spelling"
 }
 
 Rules:
-- Title: informative, catchy, max 80 chars
+- Title: informative, catchy, max 80 chars, NO spelling mistakes
 - Slug: kebab-case English from the Mongolian title meaning
-- Body: detailed, friendly, beginner-oriented, at least 3 paragraphs
+- Body: detailed, friendly, beginner-oriented, at least 3 paragraphs, spell-checked
+- Every technical term gets a brief (тайлбар) in parentheses
 - Keep all original facts intact
+- Read your output once and fix any spelling errors before finalizing
 
 Original article:
 Title: ${article.title}

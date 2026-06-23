@@ -105,6 +105,7 @@ export async function GET(request) {
       continue;
     }
 
+    let rawContent = '';
     try {
       const prompt = `You are a professional crypto news translator for "КриптоТайлбарлагч", a Mongolian crypto education blog.
 
@@ -135,7 +136,8 @@ Content: ${article.content}`;
         temperature: 0.7,
         max_tokens: 1600,
       });
-      const raw = stripCodeFences(completion.choices?.[0]?.message?.content || '{}');
+      rawContent = completion.choices?.[0]?.message?.content || '{}';
+      const raw = stripCodeFences(rawContent);
       const translated = JSON.parse(raw);
 
       const slug = slugify(translated.slug || article.title).slice(0, 100);
@@ -163,9 +165,9 @@ Content: ${article.content}`;
         { createOrReplace: { _id: slug, ...docData } },
       ]);
 
-      results.push({ title: translated.title, slug, status: 'published' });
+      results.push({ title: translated.title, slug, rawTitle: rawContent.slice(0, 100), status: 'published' });
     } catch (err) {
-      results.push({ title: article.title, status: 'error', error: err.message });
+      results.push({ title: article.title, status: 'error', error: err.message, raw: rawContent?.slice(0, 200) });
     }
   }
 

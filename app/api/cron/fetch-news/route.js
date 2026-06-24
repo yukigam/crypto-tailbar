@@ -45,7 +45,7 @@ const stripCodeFences = (text) => text.replace(/```(?:json)?\n?/gi, '').trim();
 const MAX_ARTICLES_TOTAL = 1;
 
 export async function GET(request) {
-  const apiKey = process.env.GROQ_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY;
   const auth = request.headers.get('authorization');
   const secret = process.env.CRON_SECRET;
   if (secret && auth !== `Bearer ${secret}`) {
@@ -60,7 +60,7 @@ export async function GET(request) {
     useCdn: false,
   });
 
-  if (!apiKey) throw new Error('GROQ_API_KEY env var is NOT SET');
+  if (!apiKey) throw new Error('GEMINI_API_KEY env var is NOT SET');
 
   const parser = new Parser();
   const seen = new Set();
@@ -139,24 +139,17 @@ Title: ${article.title}
 Published: ${article.pubDate}
 Content: ${article.content}`;
 
-      const gRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      const gRes = await fetch('https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=' + apiKey, {
         method: 'POST',
-        headers: {
-          'Authorization': 'Bearer ' + apiKey,
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'llama-3.3-70b-versatile',
-          messages: [{ role: 'user', content: prompt }],
-          temperature: 0.7,
-          max_tokens: 1600,
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: { temperature: 0.7, maxOutputTokens: 1600 },
         }),
       });
-      if (!gRes.ok) { const text = await gRes.text(); throw new Error(`Groq ${gRes.status}: ${text}`); }
-      const rawApiText = await gRes.text();
-      const gData = JSON.parse(rawApiText);
-      let msgContent = gData.choices?.[0]?.message?.content || '{}';
-      msgContent = msgContent.replace(/<think>[\s\S]*?<\/think>/g, '');
+      if (!gRes.ok) { const text = await gRes.text(); throw new Error(`Gemini ${gRes.status}: ${text}`); }
+      const gData = await gRes.json();
+      let msgContent = gData.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
       rawContent = msgContent;
       const raw = stripCodeFences(rawContent);
       const translated = JSON.parse(raw);

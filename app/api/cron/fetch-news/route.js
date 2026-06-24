@@ -160,8 +160,10 @@ Content: ${article.content}`;
         }),
       });
       if (!gRes.ok) { const text = await gRes.text(); throw new Error(`Groq ${gRes.status}: ${text}`); }
-      const gData = await gRes.json();
-      rawContent = gData.choices?.[0]?.message?.content || '{}';
+      const rawApiText = await gRes.text();
+      const gData = JSON.parse(rawApiText);
+      const msgContent = gData.choices?.[0]?.message?.content || '{}';
+      rawContent = msgContent;
       const raw = stripCodeFences(rawContent);
       const translated = JSON.parse(raw);
 
@@ -190,9 +192,9 @@ Content: ${article.content}`;
         { createOrReplace: { _id: slug, ...docData } },
       ]);
 
-      results.push({ title: translated.title, slug, status: 'published' });
+      results.push({ title: translated.title, slug, status: 'published', _debug: rawApiText.slice(0, 300) });
     } catch (err) {
-      results.push({ title: article.title, status: 'error', error: err.message, raw: rawContent?.slice(0, 200) });
+      results.push({ title: article.title, status: 'error', error: err.message, raw: rawContent?.slice(0, 300) });
     }
   }
 

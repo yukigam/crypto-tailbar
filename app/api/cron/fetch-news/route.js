@@ -125,7 +125,7 @@ For specialized crypto/finance/tech terms, write the Mongolian word followed by 
 
 Use pure Mongolian. Avoid Russian words like "сеть" (use "сүлжээ"), "компани" (keep as is), "систем" (keep as is).
 
-Output ONLY valid JSON:
+CRITICAL: DO NOT use any thinking tags like <think> or reasoning blocks. Output ONLY valid JSON:
 {
   "title": "Catchy Mongolian title, perfect spelling, max 80 chars",
   "slug": "english-kebab-slug-derived-from-title",
@@ -139,6 +139,7 @@ Rules:
 - Body: 3+ paragraphs, friendly tone, spell-checked
 - Explain technical terms in parentheses
 - Keep facts intact
+- No <think> tags or reasoning blocks - output JSON directly
 - Read aloud mentally to catch errors before output
 
 Original article:
@@ -153,7 +154,7 @@ Content: ${article.content}`;
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'llama-3.3-70b-versatile',
+          model: 'qwen/qwen3-32b',
           messages: [{ role: 'user', content: prompt }],
           temperature: 0.7,
           max_tokens: 1600,

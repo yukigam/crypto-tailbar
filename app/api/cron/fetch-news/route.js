@@ -1,7 +1,6 @@
 import { createClient } from '@sanity/client';
 import Parser from 'rss-parser';
 
-
 export const runtime = 'nodejs';
 export const maxDuration = 120;
 export const dynamic = 'force-dynamic';
@@ -111,21 +110,15 @@ export async function GET(request) {
 Translate the English crypto news below into natural, engaging Mongolian. Write it as a professional blog post for beginners.
 
 MONGOLIAN SPELLING RULES - FOLLOW EXACTLY:
-- "зээл" + "-ийн" = "зээлийн" (нэг "л"), NOT "зээллийн"
-- "зээл" + "-ийг" = "зээлийг" (нэг "л"), NOT "зээллийг"
-- "компани" + "-ийн" = "компанийн" NOT "компаны"
-- "хэрэглэгч" NOT "хэрэглэгч"
-- "төлөвлөгөө" NOT "төлөвлөгөө"
-- "боломж" NOT "боломж"
-- "гэж" NOT "гэж"
-- "үйл ажиллагаа" NOT "үйлажиллагаа"
+- Double-check every word. Common mistakes to AVOID: write full correct forms like "зээллийг" (хоёр "л"), "зээллийн", "компанийн" (not "компаны")
+- Use proper Cyrillic Mongolian spelling throughout
 Double-check every single word before outputting.
 
 For specialized crypto/finance/tech terms, write the Mongolian word followed by a short (тайлбар) in parentheses. Example: "барьцаа (коллатерал)".
 
 Use pure Mongolian. Avoid Russian words like "сеть" (use "сүлжээ"), "компани" (keep as is), "систем" (keep as is).
 
-CRITICAL: DO NOT use any thinking tags like <think> or reasoning blocks. Output ONLY valid JSON:
+Output ONLY valid JSON:
 {
   "title": "Catchy Mongolian title, perfect spelling, max 80 chars",
   "slug": "english-kebab-slug-derived-from-title",
@@ -139,7 +132,6 @@ Rules:
 - Body: 3+ paragraphs, friendly tone, spell-checked
 - Explain technical terms in parentheses
 - Keep facts intact
-- No <think> tags or reasoning blocks - output JSON directly
 - Read aloud mentally to catch errors before output
 
 Original article:
@@ -154,7 +146,7 @@ Content: ${article.content}`;
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'qwen/qwen3-32b',
+          model: 'llama-3.3-70b-versatile',
           messages: [{ role: 'user', content: prompt }],
           temperature: 0.7,
           max_tokens: 1600,
@@ -163,7 +155,8 @@ Content: ${article.content}`;
       if (!gRes.ok) { const text = await gRes.text(); throw new Error(`Groq ${gRes.status}: ${text}`); }
       const rawApiText = await gRes.text();
       const gData = JSON.parse(rawApiText);
-      const msgContent = gData.choices?.[0]?.message?.content || '{}';
+      let msgContent = gData.choices?.[0]?.message?.content || '{}';
+      msgContent = msgContent.replace(/<think>[\s\S]*?<\/think>/g, '');
       rawContent = msgContent;
       const raw = stripCodeFences(rawContent);
       const translated = JSON.parse(raw);
@@ -193,7 +186,7 @@ Content: ${article.content}`;
         { createOrReplace: { _id: slug, ...docData } },
       ]);
 
-      results.push({ title: translated.title, slug, status: 'published', _debug: rawApiText.slice(0, 300) });
+      results.push({ title: translated.title, slug, status: 'published' });
     } catch (err) {
       results.push({ title: article.title, status: 'error', error: err.message, raw: rawContent?.slice(0, 300) });
     }

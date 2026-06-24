@@ -1,5 +1,6 @@
 import { createClient } from '@sanity/client';
 import Parser from 'rss-parser';
+import Groq from 'groq-sdk';
 
 export const runtime = 'nodejs';
 export const maxDuration = 120;
@@ -45,7 +46,7 @@ const stripCodeFences = (text) => text.replace(/```(?:json)?\n?/gi, '').trim();
 const MAX_ARTICLES_TOTAL = 1;
 
 export async function GET(request) {
-  const apiKey = process.env.GEMINI_API_KEY;
+  const apiKey = process.env.GROQ_API_KEY;
   const auth = request.headers.get('authorization');
   const secret = process.env.CRON_SECRET;
   if (secret && auth !== `Bearer ${secret}`) {
@@ -60,7 +61,8 @@ export async function GET(request) {
     useCdn: false,
   });
 
-  if (!apiKey) throw new Error('GEMINI_API_KEY env var is NOT SET');
+  if (!apiKey) throw new Error('GROQ_API_KEY env var is NOT SET');
+  const groq = new Groq({ apiKey });
 
   const parser = new Parser();
   const seen = new Set();
@@ -109,44 +111,49 @@ export async function GET(request) {
 
 Translate the English crypto news below into natural, engaging Mongolian. Write it as a professional blog post for beginners.
 
-CRITICAL: All Mongolian text MUST be spelled 100% correctly. Double-check every word for proper Cyrillic Mongolian spelling (жишээ нь: "зээллийг" биш "зээлийг", "компанийн" биш "компаны").
+MONGOLIAN SPELLING RULES - FOLLOW EXACTLY:
+- "зээл" + "-ийн" = "зээлийн" (нэг "л"), NOT "зээллийн"
+- "зээл" + "-ийг" = "зээлийг" (нэг "л"), NOT "зээллийг"
+- "компани" + "-ийн" = "компанийн" NOT "компаны"
+- "хэрэглэгч" NOT "хэрэглэгч"
+- "төлөвлөгөө" NOT "төлөвлөгөө"
+- "боломж" NOT "боломж"
+- "гэж" NOT "гэж"
+- "үйл ажиллагаа" NOT "үйлажиллагаа"
+Double-check every single word before outputting.
 
-For specialized crypto/finance/tech terms (like "liquidity", "tokenization", "collateral", etc.), write the Mongolian translation followed by a brief explanation in parentheses. Example: "ходоолго (барьцаа болгон тавьсан хөрөнгө)" or "ликвид байдал (хөрвөх чадвар)".
+For specialized crypto/finance/tech terms, write the Mongolian word followed by a short (тайлбар) in parentheses. Example: "барьцаа (коллатерал)".
 
-Use pure Mongolian words as much as possible. Avoid Russian loanwords. If you must use a foreign term, explain it in parentheses.
+Use pure Mongolian. Avoid Russian words like "сеть" (use "сүлжээ"), "компани" (keep as is), "систем" (keep as is).
 
-Output ONLY valid JSON with these exact fields:
+Output ONLY valid JSON:
 {
-  "title": "Catchy Mongolian title with correct spelling (max 80 chars)",
+  "title": "Catchy Mongolian title, perfect spelling, max 80 chars",
   "slug": "english-kebab-slug-derived-from-title",
-  "body": "Full Mongolian article with 3-5 paragraphs separated by \\n\\n. Each specialized term must have (тайлбар) in parentheses.",
-  "excerpt": "1-2 sentence Mongolian summary with correct spelling"
+  "body": "Full article in Mongolian, 3-5 paragraphs separated by \\n\\n. Explain terms in ().",
+  "excerpt": "1-2 sentence Mongolian summary, no spelling mistakes"
 }
 
 Rules:
-- Title: informative, catchy, max 80 chars, NO spelling mistakes
-- Slug: kebab-case English from the Mongolian title meaning
-- Body: detailed, friendly, beginner-oriented, at least 3 paragraphs, spell-checked
-- Every technical term gets a brief (тайлбар) in parentheses
-- Keep all original facts intact
-- Read your output once and fix any spelling errors before finalizing
+- Title: max 80 chars, zero spelling mistakes
+- Slug: English kebab-case from the title meaning
+- Body: 3+ paragraphs, friendly tone, spell-checked
+- Explain technical terms in parentheses
+- Keep facts intact
+- Read aloud mentally to catch errors before output
 
 Original article:
 Title: ${article.title}
 Published: ${article.pubDate}
 Content: ${article.content}`;
 
-      const gRes = await fetch('https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=' + apiKey, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.7, maxOutputTokens: 1600 },
-        }),
+      const completion = await groq.chat.completions.create({
+        messages: [{ role: 'user', content: prompt }],
+        model: 'llama-3.3-70b-versatile',
+        temperature: 0.7,
+        max_tokens: 1600,
       });
-      if (!gRes.ok) { const text = await gRes.text(); throw new Error(`Gemini ${gRes.status}: ${text}`); }
-      const gData = await gRes.json();
-      rawContent = gData.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
+      rawContent = completion.choices?.[0]?.message?.content || '{}';
       const raw = stripCodeFences(rawContent);
       const translated = JSON.parse(raw);
 

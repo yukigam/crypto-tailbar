@@ -121,20 +121,22 @@ For technical terms, add a short (тайлбар) in parentheses the first time.
 
 Use pure Mongolian. Avoid Russian loanwords like "сеть" (use "сүлжээ").
 
-Output ONLY valid JSON:
-{
-  "title": "Catchy Mongolian title, max 80 chars, NO spelling mistakes",
-  "slug": "english-kebab-slug-derived-from-title",
-  "body": "Original blog post in Mongolian, 3-5 paragraphs separated by \\n\\n. Include your analysis and conclusion.",
-  "excerpt": "1-2 sentence Mongolian summary with your key takeaway"
-}
+Output in this EXACT format (no JSON):
+===TITLE===
+[catchy Mongolian title, max 80 chars]
+===SLUG===
+[english-kebab-slug]
+===EXCERPT===
+[1-2 sentence Mongolian summary]
+===BODY===
+[3-5 paragraphs of Mongolian text, paragraphs separated by TWO newlines]
 
 Rules:
 - Title: catchy, informative, max 80 chars, perfect spelling
-- Slug: English kebab-case
+- Slug: English kebab-case ONLY (ASCII, no special chars)
 - Body: original writing, your own thoughts, analysis, and conclusion
 - Explain technical terms in () first time
-- Keep original facts, but add your perspective
+- Keep original facts, add your perspective
 - Spell-check everything twice
 
 Original article:
@@ -159,7 +161,16 @@ Content: ${article.content}`;
       msgContent = msgContent.replace(/<think>[\s\S]*?<\/think>/g, '');
       rawContent = msgContent;
       const raw = stripCodeFences(rawContent);
-      const translated = JSON.parse(raw);
+      const extract = (label) => {
+        const m = raw.match(new RegExp('===' + label + '===\\n([\\s\\S]*?)(?=\\n===\\w+===|$)'));
+        return m ? m[1].trim() : '';
+      };
+      const translated = {
+        title: extract('TITLE'),
+        slug: extract('SLUG'),
+        excerpt: extract('EXCERPT'),
+        body: extract('BODY'),
+      };
 
       let slug = slugify(translated.slug || article.title).slice(0, 100);
       if (/[^\x20-\x7E]/.test(slug)) slug = slugify(article.title).slice(0, 100);

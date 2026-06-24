@@ -161,7 +161,8 @@ Content: ${article.content}`;
       const raw = stripCodeFences(rawContent);
       const translated = JSON.parse(raw);
 
-      const slug = slugify(translated.slug || article.title).slice(0, 100);
+      let slug = slugify(translated.slug || article.title).slice(0, 100);
+      if (/[^\x20-\x7E]/.test(slug)) slug = slugify(article.title).slice(0, 100);
 
       const dupSlug = await sanityClient.fetch(
         `*[_type == "post" && slug.current == $slug][0]._id`,

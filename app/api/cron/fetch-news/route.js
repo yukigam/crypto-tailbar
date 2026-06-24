@@ -1,6 +1,6 @@
 import { createClient } from '@sanity/client';
 import Parser from 'rss-parser';
-import Groq from 'groq-sdk';
+
 
 export const runtime = 'nodejs';
 export const maxDuration = 120;
@@ -62,7 +62,6 @@ export async function GET(request) {
   });
 
   if (!apiKey) throw new Error('GROQ_API_KEY env var is NOT SET');
-  const groq = new Groq({ apiKey });
 
   const parser = new Parser();
   const seen = new Set();
@@ -147,13 +146,22 @@ Title: ${article.title}
 Published: ${article.pubDate}
 Content: ${article.content}`;
 
-      const completion = await groq.chat.completions.create({
-        messages: [{ role: 'user', content: prompt }],
-        model: 'llama-3.3-70b-versatile',
-        temperature: 0.7,
-        max_tokens: 1600,
+      const gRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + apiKey,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'qwen/qwen3-32b',
+          messages: [{ role: 'user', content: prompt }],
+          temperature: 0.7,
+          max_tokens: 1600,
+        }),
       });
-      rawContent = completion.choices?.[0]?.message?.content || '{}';
+      if (!gRes.ok) { const text = await gRes.text(); throw new Error(`Groq ${gRes.status}: ${text}`); }
+      const gData = await gRes.json();
+      rawContent = gData.choices?.[0]?.message?.content || '{}';
       const raw = stripCodeFences(rawContent);
       const translated = JSON.parse(raw);
 

@@ -105,34 +105,37 @@ export async function GET(request) {
 
     let rawContent = '';
     try {
-      const prompt = `You are a professional crypto news translator for "КриптоТайлбарлагч", a Mongolian crypto education blog.
+      const prompt = `You are a Mongolian crypto blogger for "КриптоТайлбарлагч". Write a unique, original blog post in Mongolian based on the English crypto news below.
 
-Translate the English crypto news below into natural, engaging Mongolian. Write it as a professional blog post for beginners.
+IMPORTANT - WRITING STYLE:
+- Do NOT translate. Write in YOUR OWN WORDS, as if you are explaining to a Mongolian friend.
+- Add your own thoughts: why this matters, what could happen next, your analysis.
+- Include a clear conclusion or takeaway at the end.
+- Make it natural, conversational, and engaging - like a real blog post, not a translation.
 
-MONGOLIAN SPELLING RULES - FOLLOW EXACTLY:
-- Double-check every word. Common mistakes to AVOID: write full correct forms like "зээллийг" (хоёр "л"), "зээллийн", "компанийн" (not "компаны")
-- Use proper Cyrillic Mongolian spelling throughout
-Double-check every single word before outputting.
+MONGOLIAN SPELLING - DOUBLE CHECK EVERY WORD:
+- Use correct Cyrillic Mongolian: "зээллийг" (хоёр "л"), "зээллийн", "компанийн"
+- Read your output once and fix any spelling errors before finalizing.
 
-For specialized crypto/finance/tech terms, write the Mongolian word followed by a short (тайлбар) in parentheses. Example: "барьцаа (коллатерал)".
+For technical terms, add a short (тайлбар) in parentheses the first time. Example: "барьцаа (коллатерал)".
 
-Use pure Mongolian. Avoid Russian words like "сеть" (use "сүлжээ"), "компани" (keep as is), "систем" (keep as is).
+Use pure Mongolian. Avoid Russian loanwords like "сеть" (use "сүлжээ").
 
 Output ONLY valid JSON:
 {
-  "title": "Catchy Mongolian title, perfect spelling, max 80 chars",
+  "title": "Catchy Mongolian title, max 80 chars, NO spelling mistakes",
   "slug": "english-kebab-slug-derived-from-title",
-  "body": "Full article in Mongolian, 3-5 paragraphs separated by \\n\\n. Explain terms in ().",
-  "excerpt": "1-2 sentence Mongolian summary, no spelling mistakes"
+  "body": "Original blog post in Mongolian, 3-5 paragraphs separated by \\n\\n. Include your analysis and conclusion.",
+  "excerpt": "1-2 sentence Mongolian summary with your key takeaway"
 }
 
 Rules:
-- Title: max 80 chars, zero spelling mistakes
-- Slug: English kebab-case from the title meaning
-- Body: 3+ paragraphs, friendly tone, spell-checked
-- Explain technical terms in parentheses
-- Keep facts intact
-- Read aloud mentally to catch errors before output
+- Title: catchy, informative, max 80 chars, perfect spelling
+- Slug: English kebab-case
+- Body: original writing, your own thoughts, analysis, and conclusion
+- Explain technical terms in () first time
+- Keep original facts, but add your perspective
+- Spell-check everything twice
 
 Original article:
 Title: ${article.title}

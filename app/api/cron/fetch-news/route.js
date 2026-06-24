@@ -60,7 +60,7 @@ export async function GET(request) {
     useCdn: false,
   });
 
-  if (!apiKey) throw new Error('GEMINI_API_KEY env var is NOT SET');
+  if (!apiKey) throw new Error('GEMINI_API_KEY env var is NOT SET on Vercel');
 
   const parser = new Parser();
   const seen = new Set();

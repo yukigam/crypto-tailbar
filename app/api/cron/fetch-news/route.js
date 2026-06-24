@@ -140,7 +140,7 @@ Content: ${article.content}`;
 
       const completion = await groq.chat.completions.create({
         messages: [{ role: 'user', content: prompt }],
-        model: 'qwen-qwq-32b',
+        model: 'mixtral-8x7b-32768',
         temperature: 0.7,
         max_tokens: 1600,
       });

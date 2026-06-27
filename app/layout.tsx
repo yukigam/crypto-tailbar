@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import GoogleAnalytics from "../components/GoogleAnalytics";
-import MonetagScript from "../components/MonetagScript";
+import AdBanner from "../components/AdBanner";
 import "../globals.css";
 
 const inter = Inter({ subsets: ["latin", "cyrillic"], display: "swap" });
@@ -16,9 +16,6 @@ export const metadata: Metadata = {
     "Крипто тайлбар толь бичиг. Блокчэйн, Биткойн, Койн гэж юу вэ? Crypto нэр томьёоны хамгийн энгийн тайлбарууд Монгол хэлээр (Cyrillic & Latin search friendly).",
   keywords:
     "крипто тайлбар, крипто гэж юу вэ, блокчэйн тайлбар, биткойн гэж юу вэ, койн гэж юу вэ, крипто толь бичиг, крипто сургалт, крипто арилжаа хийх заавар, цахим мөнгө, crypto tailbar, crypto gej yu ve, bitcoin gej yu ve, blockchain tailbar, coin gej yu ve, crypto toli bichig, crypto mgl, coin haanaas avah ve, coin ariljaa, crypto surgalt, blockchain mongolia",
-  other: {
-    monetag: "96445b02d525b7c957bae91152e286c0",
-  },
   verification: {
     google: "ANxdo5-GCya_--dWhCSLTk9pSh3emfgEw_Y75MCgooU",
   },
@@ -48,9 +45,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="mn">
       <body className={inter.className}>
-        <MonetagScript />
         <GoogleAnalytics />
         {children}
+        <AdBanner />
       </body>
     </html>
   );

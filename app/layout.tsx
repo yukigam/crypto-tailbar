@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import GoogleAnalytics from "../components/GoogleAnalytics";
-import AdBanner from "../components/AdBanner";
+import Script from "next/script";
 import "../globals.css";
 
 const inter = Inter({ subsets: ["latin", "cyrillic"], display: "swap" });
@@ -46,8 +46,14 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="mn">
       <body className={inter.className}>
         <GoogleAnalytics />
+        <Script
+          id="vignette-ad"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `(function(s){s.dataset.zone='11211782',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))`,
+          }}
+        />
         {children}
-        <AdBanner />
       </body>
     </html>
   );

@@ -1,19 +1,21 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
-import Script from 'next/script';
 
 export default function VignetteAd() {
   const pathname = usePathname();
-  if (pathname?.startsWith('/studio')) return null;
+  const injected = useRef(false);
 
-  return (
-    <Script
-      id="vignette-ad"
-      strategy="afterInteractive"
-      dangerouslySetInnerHTML={{
-        __html: `(function(s){s.dataset.zone='11211782',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))`,
-        }}
-      />
-    );
-  }
+  useEffect(() => {
+    if (pathname?.startsWith('/studio') || injected.current) return;
+    injected.current = true;
+
+    const s = document.createElement('script');
+    s.dataset.zone = '11211782';
+    s.src = 'https://n6wxm.com/vignette.min.js';
+    document.body.appendChild(s);
+  }, [pathname]);
+
+  return null;
+}

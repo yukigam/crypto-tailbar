@@ -1,12 +1,14 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+export const dynamic = 'force-dynamic';
 import { supabase } from '../../lib/supabase';
 
 const COINS = ['bitcoin', 'ethereum', 'solana'];
 const COIN_LABELS = { bitcoin: 'BTC', ethereum: 'ETH', solana: 'SOL' };
 
 async function ensureProfile(userId: string) {
+  if (!supabase) return 10000;
   const { data } = await supabase
     .from('profiles')
     .select('virtual_balance')
@@ -19,20 +21,12 @@ async function ensureProfile(userId: string) {
 }
 
 async function getPortfolio(userId: string) {
+  if (!supabase) return [];
   const { data } = await supabase
     .from('demo_portfolio')
     .select('coin, amount')
     .eq('user_id', userId);
   return data || [];
-}
-
-async function getBalance(userId: string) {
-  const { data } = await supabase
-    .from('profiles')
-    .select('virtual_balance')
-    .eq('user_id', userId)
-    .single();
-  return data?.virtual_balance ?? 0;
 }
 
 export default function DemoTradePage() {
@@ -80,7 +74,7 @@ export default function DemoTradePage() {
 
   const updatePortfolio = useCallback(
     async (coin: string, price: number, isBuy: boolean) => {
-      if (!userId) return;
+      if (!userId || !supabase) return;
       const cost = 1 * price;
       if (isBuy && balance < cost) {
         setMessage('Хангалттай демо мөнгө байхгүй!');

@@ -144,6 +144,12 @@ export default function EducationPage() {
       <section className="relative overflow-hidden bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 border-b border-slate-800">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-600/10 via-transparent to-transparent pointer-events-none" />
         <div className="relative max-w-6xl mx-auto px-4 py-20 sm:py-28 text-center">
+          <div className="absolute top-6 left-4 sm:left-6">
+            <a href="/"
+              className="inline-flex items-center gap-1.5 text-slate-400 hover:text-slate-200 text-sm font-medium transition-colors">
+              ← Буцах
+            </a>
+          </div>
           <div className="inline-flex items-center gap-2 bg-blue-600/10 border border-blue-500/20 rounded-full px-4 py-1.5 text-xs font-semibold text-blue-400 mb-6">
             🎓 Үнэгүй сургалт
           </div>

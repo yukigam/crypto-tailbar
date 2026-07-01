@@ -151,10 +151,10 @@ export default function EducationPage() {
             Арилжааны Академи
           </h1>
           <p className="text-lg sm:text-xl text-slate-400 max-w-2xl mx-auto font-medium">
-            Анхан шатнаас Ахисан шат хүртэл — крипто арилжааны бүх мэдлэгийг нэг дор
+            Арилжааны суурь ойлголтууд — шинээр сонирхогчдод зориулсан хөтөч
           </p>
           <p className="text-sm text-slate-500 mt-3 max-w-xl mx-auto">
-            Мэргэжлийн арилжаачдын бэлтгэсэн хичээлүүдээр дамжуулан зах зээлийг шинжлэх, эрсдэлээ удирдах, ашигтай арилжаа хийх ур чадварыг эзэмшээрэй.
+            Крипто зах зээлийн үндсэн бүтэц, техникийн анхны мэдэгдэхүүнүүд болон эрсдэлээс сэргийлэх суурь аргуудтай алхам алхмаар танилцаарай.
           </p>
           <div className="flex items-center justify-center gap-6 mt-8 text-sm text-slate-500 flex-wrap">
             <span className="flex items-center gap-1.5">📚 {LEVELS.reduce((s, l) => s + l.courses.length, 0)} хичээл</span>

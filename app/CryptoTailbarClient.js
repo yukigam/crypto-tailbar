@@ -951,48 +951,54 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
         {/* glass nav bar links */}
         <nav style={{ borderTop: `1px solid ${C.border}`, background: "rgba(30, 41, 59, 0.6)" }} aria-label="Үндсэн навигаци">
           <div className="container-wide" style={{ padding: "0 24px", display: "flex", overflowX: "auto" }}>
-            {[["home", "Нүүр"]].concat(allCategories.map(c => [c.id, c.label])).map(([id, label]) => (
-              <IconButton
-                key={id}
-                onClick={() => id === "home" ? setScreen("home") : openCat(id)}
-                aria-label={label}
-                style={{
-                  background: "none",
-                  border: "none",
-                  borderBottom: `3px solid ${isNavItemActive(screen, activeCat, id) ? C.accentBlue : "transparent"}`,
-                  color: isNavItemActive(screen, activeCat, id) ? C.ink : C.inkLight,
-                  padding: "16px 22px",
-                  cursor: "pointer",
-                  fontSize: 14,
-                  fontWeight: isNavItemActive(screen, activeCat, id) ? 800 : 600,
-                  whiteSpace: "nowrap",
-                  transition: "all 0.2s"
-                }}
-                className="nav-link"
-              >
-                {label}
-              </IconButton>
-            ))}
-            <span style={{ width: 1, background: C.border, margin: "12px 8px", flexShrink: 0 }} />
-            <IconButton
-              onClick={() => router.push("/demo-trade")}
-              aria-label="Демо арилжаа"
-              style={{
-                background: "linear-gradient(135deg, #f59e0b, #d97706)",
-                border: "none",
-                borderRadius: 8,
-                color: "#fff",
-                padding: "10px 20px",
-                cursor: "pointer",
-                fontSize: 13,
-                fontWeight: 800,
-                whiteSpace: "nowrap",
-                transition: "all 0.2s"
-              }}
-              className="nav-link"
-            >
-              📊 Демо арилжаа
-            </IconButton>
+            {[["home", "Нүүр"]].concat(allCategories.map(c => [c.id, c.label])).flatMap(([id, label]) => {
+              const btn = (
+                <IconButton
+                  key={id}
+                  onClick={() => id === "home" ? setScreen("home") : openCat(id)}
+                  aria-label={label}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    borderBottom: `3px solid ${isNavItemActive(screen, activeCat, id) ? C.accentBlue : "transparent"}`,
+                    color: isNavItemActive(screen, activeCat, id) ? C.ink : C.inkLight,
+                    padding: "16px 22px",
+                    cursor: "pointer",
+                    fontSize: 14,
+                    fontWeight: isNavItemActive(screen, activeCat, id) ? 800 : 600,
+                    whiteSpace: "nowrap",
+                    transition: "all 0.2s"
+                  }}
+                  className="nav-link"
+                >
+                  {label}
+                </IconButton>
+              );
+              if (id !== "trading") return [btn];
+              return [btn,
+                <span key="d-sep" style={{ width: 1, background: C.border, margin: "12px 8px", flexShrink: 0 }} />,
+                <IconButton
+                  key="demo-trade"
+                  onClick={() => router.push("/demo-trade")}
+                  aria-label="Демо арилжаа"
+                  style={{
+                    background: "linear-gradient(135deg, #f59e0b, #d97706)",
+                    border: "none",
+                    borderRadius: 8,
+                    color: "#fff",
+                    padding: "10px 20px",
+                    cursor: "pointer",
+                    fontSize: 13,
+                    fontWeight: 800,
+                    whiteSpace: "nowrap",
+                    transition: "all 0.2s"
+                  }}
+                  className="nav-link"
+                >
+                  📊 Демо арилжаа
+                </IconButton>
+              ];
+            })}
           </div>
         </nav>
 

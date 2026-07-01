@@ -228,6 +228,14 @@ export default function DemoTradePage() {
 
   return (
     <main style={{ maxWidth: 960, margin: '0 auto', padding: '24px 16px 60px', fontFamily: 'system-ui, sans-serif', background: C.bg, minHeight: '100vh', color: C.ink }}>
+      {/* BACK BUTTON */}
+      <div style={{ marginBottom: 12 }}>
+        <a href="/"
+          style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: C.inkLight, fontSize: 14, fontWeight: 600, textDecoration: 'none', padding: '6px 12px', borderRadius: 8, background: C.card, border: `1px solid ${C.border}`, transition: 'all 0.2s' }}>
+          ← Буцах
+        </a>
+      </div>
+
       {/* HEADER */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12, marginBottom: 24 }}>
         <div>

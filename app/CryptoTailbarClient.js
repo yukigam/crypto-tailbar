@@ -978,6 +978,26 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
               return [btn,
                 <span key="d-sep" style={{ width: 1, background: C.border, margin: "12px 8px", flexShrink: 0 }} />,
                 <IconButton
+                  key="education"
+                  onClick={() => router.push("/education")}
+                  aria-label="Сургалт"
+                  style={{
+                    background: "none",
+                    border: "none",
+                    borderBottom: "3px solid transparent",
+                    color: C.inkLight,
+                    padding: "16px 18px",
+                    cursor: "pointer",
+                    fontSize: 13,
+                    fontWeight: 700,
+                    whiteSpace: "nowrap",
+                    transition: "all 0.2s"
+                  }}
+                  className="nav-link"
+                >
+                  🎓 Сургалт
+                </IconButton>,
+                <IconButton
                   key="demo-trade"
                   onClick={() => router.push("/demo-trade")}
                   aria-label="Демо арилжаа"

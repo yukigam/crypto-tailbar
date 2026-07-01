@@ -954,7 +954,7 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
             {[["home", "Нүүр"]].concat(allCategories.map(c => [c.id, c.label])).map(([id, label]) => (
               <IconButton
                 key={id}
-                onClick={() => id === "home" ? setScreen("home") : id === "trading" ? router.push("/demo-trade") : openCat(id)}
+                onClick={() => id === "home" ? setScreen("home") : openCat(id)}
                 aria-label={label}
                 style={{
                   background: "none",
@@ -973,6 +973,26 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
                 {label}
               </IconButton>
             ))}
+            <span style={{ width: 1, background: C.border, margin: "12px 8px", flexShrink: 0 }} />
+            <IconButton
+              onClick={() => router.push("/demo-trade")}
+              aria-label="Демо арилжаа"
+              style={{
+                background: "linear-gradient(135deg, #f59e0b, #d97706)",
+                border: "none",
+                borderRadius: 8,
+                color: "#fff",
+                padding: "10px 20px",
+                cursor: "pointer",
+                fontSize: 13,
+                fontWeight: 800,
+                whiteSpace: "nowrap",
+                transition: "all 0.2s"
+              }}
+              className="nav-link"
+            >
+              📊 Демо арилжаа
+            </IconButton>
           </div>
         </nav>
 

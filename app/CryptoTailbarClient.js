@@ -954,7 +954,7 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
             {[["home", "Нүүр"]].concat(allCategories.map(c => [c.id, c.label])).map(([id, label]) => (
               <IconButton
                 key={id}
-                onClick={() => id === "home" ? setScreen("home") : openCat(id)}
+                onClick={() => id === "home" ? setScreen("home") : id === "trading" ? router.push("/demo-trade") : openCat(id)}
                 aria-label={label}
                 style={{
                   background: "none",

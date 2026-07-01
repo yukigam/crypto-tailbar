@@ -998,6 +998,26 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
                   🎓 Сургалт
                 </IconButton>,
                 <IconButton
+                  key="quests"
+                  onClick={() => router.push("/quests")}
+                  aria-label="Даалгавар"
+                  style={{
+                    background: "none",
+                    border: "none",
+                    borderBottom: "3px solid transparent",
+                    color: C.inkLight,
+                    padding: "16px 18px",
+                    cursor: "pointer",
+                    fontSize: 13,
+                    fontWeight: 700,
+                    whiteSpace: "nowrap",
+                    transition: "all 0.2s"
+                  }}
+                  className="nav-link"
+                >
+                  🎯 Даалгавар
+                </IconButton>,
+                <IconButton
                   key="demo-trade"
                   onClick={() => router.push("/demo-trade")}
                   aria-label="Демо арилжаа"

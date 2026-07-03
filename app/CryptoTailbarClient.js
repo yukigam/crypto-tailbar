@@ -934,7 +934,39 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
             </div>
           </div>
 
-          <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            <IconButton
+              onClick={() => router.push("/education")}
+              aria-label="Сургалт"
+              style={{ background: "rgba(255,255,255,0.06)", border: `1px solid ${C.border}`, color: C.inkLight, padding: "8px 14px", borderRadius: 8, cursor: "pointer", fontSize: 13, fontWeight: 600, whiteSpace: "nowrap", transition: "all 0.2s" }}
+              className="hover-accent"
+            >
+              🎓 Сургалт
+            </IconButton>
+            <IconButton
+              onClick={() => router.push("/leaderboard")}
+              aria-label="Чансаа"
+              style={{ background: "rgba(255,255,255,0.06)", border: `1px solid ${C.border}`, color: C.inkLight, padding: "8px 14px", borderRadius: 8, cursor: "pointer", fontSize: 13, fontWeight: 600, whiteSpace: "nowrap", transition: "all 0.2s" }}
+              className="hover-accent"
+            >
+              🏆 Чансаа
+            </IconButton>
+            <IconButton
+              onClick={() => router.push("/quests")}
+              aria-label="Даалгавар"
+              style={{ background: "rgba(255,255,255,0.06)", border: `1px solid ${C.border}`, color: C.inkLight, padding: "8px 14px", borderRadius: 8, cursor: "pointer", fontSize: 13, fontWeight: 600, whiteSpace: "nowrap", transition: "all 0.2s" }}
+              className="hover-accent"
+            >
+              🎯 Даалгавар
+            </IconButton>
+            <IconButton
+              onClick={() => router.push("/demo-trade")}
+              aria-label="Демо арилжаа"
+              style={{ background: "linear-gradient(135deg, #f59e0b, #d97706)", border: "none", color: "#fff", padding: "8px 14px", borderRadius: 8, cursor: "pointer", fontSize: 13, fontWeight: 800, whiteSpace: "nowrap", transition: "all 0.2s" }}
+              className="hover-accent"
+            >
+              📊 Демо арилжаа
+            </IconButton>
             <a
               href="/community/create"
               style={{ background: "rgba(192,132,252,0.12)", border: `1px solid ${C.accentPurple}55`, color: C.ink, padding: "9px 18px", borderRadius: 8, cursor: "pointer", fontSize: 13, display: "flex", alignItems: "center", gap: 8, fontWeight: "700", textDecoration: "none", transition: "all 0.2s" }}
@@ -974,90 +1006,7 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
                   {label}
                 </IconButton>
               );
-              if (id !== "trading") return [btn];
-              return [btn,
-                <span key="d-sep" style={{ width: 1, background: C.border, margin: "12px 8px", flexShrink: 0 }} />,
-                <IconButton
-                  key="education"
-                  onClick={() => router.push("/education")}
-                  aria-label="Сургалт"
-                  style={{
-                    background: "none",
-                    border: "none",
-                    borderBottom: "3px solid transparent",
-                    color: C.inkLight,
-                    padding: "16px 18px",
-                    cursor: "pointer",
-                    fontSize: 13,
-                    fontWeight: 700,
-                    whiteSpace: "nowrap",
-                    transition: "all 0.2s"
-                  }}
-                  className="nav-link"
-                >
-                  🎓 Сургалт
-                </IconButton>,
-                <IconButton
-                  key="leaderboard"
-                  onClick={() => router.push("/leaderboard")}
-                  aria-label="Чансаа"
-                  style={{
-                    background: "none",
-                    border: "none",
-                    borderBottom: "3px solid transparent",
-                    color: C.inkLight,
-                    padding: "16px 18px",
-                    cursor: "pointer",
-                    fontSize: 13,
-                    fontWeight: 700,
-                    whiteSpace: "nowrap",
-                    transition: "all 0.2s"
-                  }}
-                  className="nav-link"
-                >
-                  🏆 Чансаа
-                </IconButton>,
-                <IconButton
-                  key="quests"
-                  onClick={() => router.push("/quests")}
-                  aria-label="Даалгавар"
-                  style={{
-                    background: "none",
-                    border: "none",
-                    borderBottom: "3px solid transparent",
-                    color: C.inkLight,
-                    padding: "16px 18px",
-                    cursor: "pointer",
-                    fontSize: 13,
-                    fontWeight: 700,
-                    whiteSpace: "nowrap",
-                    transition: "all 0.2s"
-                  }}
-                  className="nav-link"
-                >
-                  🎯 Даалгавар
-                </IconButton>,
-                <IconButton
-                  key="demo-trade"
-                  onClick={() => router.push("/demo-trade")}
-                  aria-label="Демо арилжаа"
-                  style={{
-                    background: "linear-gradient(135deg, #f59e0b, #d97706)",
-                    border: "none",
-                    borderRadius: 8,
-                    color: "#fff",
-                    padding: "10px 20px",
-                    cursor: "pointer",
-                    fontSize: 13,
-                    fontWeight: 800,
-                    whiteSpace: "nowrap",
-                    transition: "all 0.2s"
-                  }}
-                  className="nav-link"
-                >
-                  📊 Демо арилжаа
-                </IconButton>
-              ];
+              return [btn];
             })}
           </div>
         </nav>

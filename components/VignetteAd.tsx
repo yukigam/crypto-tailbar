@@ -12,9 +12,10 @@ export default function VignetteAd() {
     injected.current = true;
 
     const s = document.createElement('script');
-    s.dataset.zone = '11211782';
+    s.dataset.zone = '11232641';
     s.src = 'https://n6wxm.com/vignette.min.js';
-    document.body.appendChild(s);
+    const target = [document.documentElement, document.body].filter(Boolean).pop();
+    if (target) target.appendChild(s);
   }, [pathname]);
 
   return null;

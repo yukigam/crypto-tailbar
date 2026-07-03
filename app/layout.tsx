@@ -8,6 +8,7 @@ import "../globals.css";
 const inter = Inter({ subsets: ["latin", "cyrillic"], display: "swap" });
 
 export const metadata: Metadata = {
+  other: { monetag: 'c5cfcb1775b77e7e2987809041b65518' },
   title: {
     default: "Крипто Тайлбар Толь | Блокчэйн, Биткойн, Крипто Юу Вэ?",
     template: "%s | Крипто Тайлбар Толь",

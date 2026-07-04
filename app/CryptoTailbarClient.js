@@ -1078,6 +1078,17 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
                 <span style={{ position: "absolute", left: 18, top: "50%", transform: "translateY(-50%)", fontSize: 18, opacity: 0.8 }}>🔍</span>
               </div>
 
+              {cleanQ.length > 0 && (
+                <a
+                  href={`https://www.google.com/search?q=site:crypto-tailbar-gyrr.vercel.app+${encodeURIComponent(searchQ)}`}
+                  target="_blank" rel="noopener noreferrer"
+                  style={{ display: "inline-flex", alignItems: "center", gap: 8, marginTop: 12, color: C.accentBlue, fontSize: 14, fontWeight: 700, textDecoration: "none", padding: "8px 16px", borderRadius: 8, background: "rgba(56,189,248,0.08)", border: `1px solid ${C.accentBlue}44`, transition: "all 0.2s" }}
+                  className="hover-accent"
+                >
+                  🔍 Google-оор хайх: <strong style={{ color: "#fff" }}>"{searchQ}"</strong>
+                </a>
+              )}
+
               {cleanQ.length > 0 && (searchResultsPosts.length > 0 || searchResultsGlossary.length > 0) ? (
                 <div className="search-grid" style={{ marginTop: 24, display: "grid", gridTemplateColumns: searchResultsPosts.length > 0 && searchResultsGlossary.length > 0 ? "1.4fr 1fr" : "1fr", gap: 24, maxHeight: 400, overflowY: "auto", paddingRight: 8 }}>
 

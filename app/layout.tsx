@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     type: "website",
   },
   alternates: {
-    canonical: "https://cryptomn.pp.ua/",
+    canonical: "https://www.cryptomn.pp.ua/",
   },
 };
 

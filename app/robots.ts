@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: '/studio/',
     },
-    sitemap: 'https://cryptomn.pp.ua/sitemap.xml',
+    sitemap: 'https://www.cryptomn.pp.ua/sitemap.xml',
   }
 }

@@ -345,7 +345,7 @@ export default function DemoTradePage() {
           </div>
 
           {/* ── CENTER: CHART ── */}
-          <div className="flex-1 bg-slate-900 rounded-lg border border-slate-800 overflow-hidden relative min-h-[400px]">
+          <div className="flex-1 bg-slate-900 rounded-lg border border-slate-800 overflow-hidden relative min-h-[600px]">
             <div id={chartContainerId} className="absolute inset-0" />
           </div>
 

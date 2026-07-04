@@ -970,53 +970,33 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
                 {mobileMenuOpen && (
                   <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, zIndex: 999, background: "rgba(0,0,0,0.5)" }} onClick={() => setMobileMenuOpen(false)}>
                     <div style={{ position: "absolute", top: 60, left: 16, right: 16, background: C.bgDark, border: `1px solid ${C.border}`, borderRadius: 12, overflow: "hidden", boxShadow: "0 8px 30px rgba(0,0,0,0.4)" }} onClick={e => e.stopPropagation()}>
-                      <button onClick={() => { setMobileMenuOpen(false); router.push("/education"); }} style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", background: "none", border: "none", borderBottom: `1px solid ${C.border}`, color: C.inkLight, padding: "16px 18px", cursor: "pointer", fontSize: 15, fontWeight: 600, textAlign: "left", transition: "all 0.15s" }} className="hover-accent">🎓 Сургалт</button>
-                      <button onClick={() => { setMobileMenuOpen(false); router.push("/leaderboard"); }} style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", background: "none", border: "none", borderBottom: `1px solid ${C.border}`, color: C.inkLight, padding: "16px 18px", cursor: "pointer", fontSize: 15, fontWeight: 600, textAlign: "left", transition: "all 0.15s" }} className="hover-accent">🏆 Чансаа</button>
-                      <button onClick={() => { setMobileMenuOpen(false); router.push("/quests"); }} style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", background: "none", border: "none", borderBottom: `1px solid ${C.border}`, color: C.inkLight, padding: "16px 18px", cursor: "pointer", fontSize: 15, fontWeight: 600, textAlign: "left", transition: "all 0.15s" }} className="hover-accent">🎯 Даалгавар</button>
-                      <button onClick={() => { setMobileMenuOpen(false); router.push("/demo-trade"); }} style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", background: "none", border: "none", color: "#fff", padding: "16px 18px", cursor: "pointer", fontSize: 15, fontWeight: 800, textAlign: "left", transition: "all 0.15s" }} className="hover-accent">📊 Демо арилжаа</button>
+                      <a href="/education" onClick={() => setMobileMenuOpen(false)} style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", background: "none", border: "none", borderBottom: `1px solid ${C.border}`, color: C.inkLight, padding: "16px 18px", cursor: "pointer", fontSize: 15, fontWeight: 600, textAlign: "left", textDecoration: "none", transition: "all 0.15s", boxSizing: "border-box" }} className="hover-accent">🎓 Сургалт</a>
+                      <a href="/leaderboard" onClick={() => setMobileMenuOpen(false)} style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", background: "none", border: "none", borderBottom: `1px solid ${C.border}`, color: C.inkLight, padding: "16px 18px", cursor: "pointer", fontSize: 15, fontWeight: 600, textAlign: "left", textDecoration: "none", transition: "all 0.15s", boxSizing: "border-box" }} className="hover-accent">🏆 Чансаа</a>
+                      <a href="/quests" onClick={() => setMobileMenuOpen(false)} style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", background: "none", border: "none", borderBottom: `1px solid ${C.border}`, color: C.inkLight, padding: "16px 18px", cursor: "pointer", fontSize: 15, fontWeight: 600, textAlign: "left", textDecoration: "none", transition: "all 0.15s", boxSizing: "border-box" }} className="hover-accent">🎯 Даалгавар</a>
+                      <a href="/demo-trade" onClick={() => setMobileMenuOpen(false)} style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", background: "none", border: "none", color: "#fff", padding: "16px 18px", cursor: "pointer", fontSize: 15, fontWeight: 800, textAlign: "left", textDecoration: "none", transition: "all 0.15s", boxSizing: "border-box" }} className="hover-accent">📊 Демо арилжаа</a>
                     </div>
                   </div>
                 )}
               </div>
             ) : (
-              <IconButton
-                onClick={() => router.push("/education")}
-                aria-label="Сургалт"
-                style={{ background: "rgba(255,255,255,0.06)", border: `1px solid ${C.border}`, color: C.inkLight, padding: "8px 14px", borderRadius: 8, cursor: "pointer", fontSize: 13, fontWeight: 600, whiteSpace: "nowrap", transition: "all 0.2s" }}
-                className="hover-accent"
-              >
+              <a href="/education" style={{ background: "rgba(255,255,255,0.06)", border: `1px solid ${C.border}`, color: C.inkLight, padding: "8px 14px", borderRadius: 8, cursor: "pointer", fontSize: 13, fontWeight: 600, whiteSpace: "nowrap", transition: "all 0.2s", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 8 }} className="hover-accent">
                 🎓 Сургалт
-              </IconButton>
+              </a>
             )}
             {!isMobile && (
-              <IconButton
-                onClick={() => router.push("/leaderboard")}
-                aria-label="Чансаа"
-                style={{ background: "rgba(255,255,255,0.06)", border: `1px solid ${C.border}`, color: C.inkLight, padding: "8px 14px", borderRadius: 8, cursor: "pointer", fontSize: 13, fontWeight: 600, whiteSpace: "nowrap", transition: "all 0.2s" }}
-                className="hover-accent"
-              >
+              <a href="/leaderboard" style={{ background: "rgba(255,255,255,0.06)", border: `1px solid ${C.border}`, color: C.inkLight, padding: "8px 14px", borderRadius: 8, cursor: "pointer", fontSize: 13, fontWeight: 600, whiteSpace: "nowrap", transition: "all 0.2s", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 8 }} className="hover-accent">
                 🏆 Чансаа
-              </IconButton>
+              </a>
             )}
             {!isMobile && (
-              <IconButton
-                onClick={() => router.push("/quests")}
-                aria-label="Даалгавар"
-                style={{ background: "rgba(255,255,255,0.06)", border: `1px solid ${C.border}`, color: C.inkLight, padding: "8px 14px", borderRadius: 8, cursor: "pointer", fontSize: 13, fontWeight: 600, whiteSpace: "nowrap", transition: "all 0.2s" }}
-                className="hover-accent"
-              >
+              <a href="/quests" style={{ background: "rgba(255,255,255,0.06)", border: `1px solid ${C.border}`, color: C.inkLight, padding: "8px 14px", borderRadius: 8, cursor: "pointer", fontSize: 13, fontWeight: 600, whiteSpace: "nowrap", transition: "all 0.2s", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 8 }} className="hover-accent">
                 🎯 Даалгавар
-              </IconButton>
+              </a>
             )}
             {!isMobile && (
-              <IconButton
-                onClick={() => router.push("/demo-trade")}
-                aria-label="Демо арилжаа"
-                style={{ background: "linear-gradient(135deg, #f59e0b, #d97706)", border: "none", color: "#fff", padding: "8px 14px", borderRadius: 8, cursor: "pointer", fontSize: 13, fontWeight: 800, whiteSpace: "nowrap", transition: "all 0.2s" }}
-                className="hover-accent"
-              >
+              <a href="/demo-trade" style={{ background: "linear-gradient(135deg, #f59e0b, #d97706)", border: "none", color: "#fff", padding: "8px 14px", borderRadius: 8, cursor: "pointer", fontSize: 13, fontWeight: 800, whiteSpace: "nowrap", transition: "all 0.2s", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 8 }} className="hover-accent">
                 📊 Демо арилжаа
-              </IconButton>
+              </a>
             )}
             <a
               href="/community/create"

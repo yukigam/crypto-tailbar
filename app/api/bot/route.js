@@ -9,7 +9,7 @@ export async function GET(request) {
   const action = searchParams.get('action');
 
   if (action === 'set-webhook') {
-    const host = request.headers.get('host') || 'crypto-tailbar.vercel.app';
+    const host = request.headers.get('host') || 'cryptomn.pp.ua';
     const webhookUrl = `https://${host}/api/bot`;
     const result = await setWebhook(webhookUrl);
     return NextResponse.json({ success: true, webhookUrl, result });
@@ -74,7 +74,7 @@ async function handleTelegramUpdate(update) {
         await sendMessage(chatId, 'Одоогоор нийтлэл байхгүй байна.');
       } else {
         await sendMessage(chatId, `📰 <b>Сүүлийн ${posts.length} нийтлэл:</b>\n\n` +
-          posts.map((p, i) => `${i + 1}. <a href="https://crypto-tailbar.vercel.app/post/${p.slug}">${p.title}</a>`).join('\n'));
+          posts.map((p, i) => `${i + 1}. <a href="https://cryptomn.pp.ua/post/${p.slug}">${p.title}</a>`).join('\n'));
       }
     } catch {
       await sendMessage(chatId, 'Нийтлэлүүдийг татахад алдаа гарлаа.');

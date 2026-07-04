@@ -1080,7 +1080,7 @@ export default function CryptoTailbarClient({ initialPosts = [], initialUncatego
 
               {cleanQ.length > 0 && (
                 <a
-                  href={`https://www.google.com/search?q=site:crypto-tailbar-gyrr.vercel.app+${encodeURIComponent(searchQ)}`}
+                  href={`https://www.google.com/search?q=site:cryptomn.pp.ua+${encodeURIComponent(searchQ)}`}
                   target="_blank" rel="noopener noreferrer"
                   style={{ display: "inline-flex", alignItems: "center", gap: 8, marginTop: 12, color: C.accentBlue, fontSize: 14, fontWeight: 700, textDecoration: "none", padding: "8px 16px", borderRadius: 8, background: "rgba(56,189,248,0.08)", border: `1px solid ${C.accentBlue}44`, transition: "all 0.2s" }}
                   className="hover-accent"

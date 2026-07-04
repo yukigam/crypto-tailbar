@@ -32,7 +32,7 @@ export const metadata: Metadata = {
     type: "website",
   },
   alternates: {
-    canonical: "https://crypto-tailbar-gyrr.vercel.app/",
+    canonical: "https://cryptomn.pp.ua/",
   },
 };
 
